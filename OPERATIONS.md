@@ -1,7 +1,7 @@
 # 🛠️ 운영 가이드 (OPERATIONS)
 
-> **아직 운영 전입니다.** Firebase 프로젝트·도메인·저장소가 정해지면 이 문서를 채웁니다.
-> 차량운행일지의 운영 가이드(같은 구조의 서비스)를 바탕으로 쓰되, 계정·프로젝트 이름은 이 서비스 것으로 바꿉니다.
+> **2026-11-21 첫 배포 뒤 운영 중입니다**(Firebase 프로젝트 `asset-survey-sp`). 1~2장은 처음 준비할 때의 기록이고(완료 표시가 있는 줄은 끝난 일),
+> 지금 지켜야 할 운영 절차는 3장(배포)·4장(되돌리기)·5장(백업·복원)입니다.
 > 이 저장소가 공개되면 계정 이메일·비밀값 내용은 적지 않고 **이름과 위치만** 적습니다.
 
 ---
@@ -94,3 +94,54 @@
 ## 4. 되돌리기
 
 [ROLLBACK.md](ROLLBACK.md)
+
+## 5. 백업·복원
+
+### 5.1 지금 상태 (2026-11-24 확인)
+
+증거가 없는 것은 **미확인**으로 적는다. 확인할 때마다 날짜와 근거를 고친다.
+
+| 대상 | 백업 방식 | 근거 | 최근 확인 | 복원 훈련 |
+|---|---|---|---|---|
+| Firestore (기본 DB, 서울) | 매일 02:20(서울) 전체 export → `gs://asset-survey-sp-backups/backups/firestore/{날짜}/`, **90일 뒤 자동 삭제** | [dailyNightlyBatch.ts](functions/src/handlers/scheduled/dailyNightlyBatch.ts) `backupFirestore`, 버킷 목록에 11-22·11-23·11-24 폴더 있음 | 2026-11-24(목록만) | **미확인 — 한 번도 안 함** |
+| Firestore 특정 시점 복구(PITR) | 꺼짐 | `gcloud firestore databases describe` → `POINT_IN_TIME_RECOVERY_DISABLED` | 2026-11-24 | 해당 없음 |
+| Firestore DB 삭제 보호 | 꺼짐 | 같은 명령 → `DELETE_PROTECTION_DISABLED` | 2026-11-24 | 해당 없음 |
+| Storage(재물 사진·현장 사진·증빙서류, us-east1) | **별도 백업 없음.** 지운 파일은 소프트 삭제로 **7일** 동안 되살릴 수 있다 | `gcloud storage buckets describe` → `soft_delete_policy 604800초` | 2026-11-24 | **미확인** |
+| Authentication(로그인 계정) | **백업 없음** — Firestore export에 들어가지 않는다 | Firebase 기본 동작 | — | 해당 없음 |
+| 담당자 | **미정** — 백업 실패 알림을 받고 복원을 결정할 사람 | — | — | — |
+
+**알아 둘 한계**
+- export는 Firestore 문서만 담는다. **사진 파일은 export에 없다** — 문서에 남은 사진 주소는 복원되지만 파일이 지워졌으면 깨진 사진이 된다(7일 안이면 소프트 삭제에서 되살린다).
+- 로그인 계정(Auth)이 지워지면 같은 구글 계정으로 다시 로그인해도 **새 UID**가 생겨 `users` 문서와 이어지지 않는다. Auth는 콘솔에서 사용자를 지우지 않는 것으로 지킨다.
+- 하루 한 번이라 최악의 경우 **약 하루치 입력**(스캔·가져오기)을 잃을 수 있다. 줄이려면 PITR(최근 7일 1분 단위, 추가 요금)을 켠다 — 아래 '정할 것'.
+
+### 5.2 복원 훈련 (운영 데이터를 건드리지 않는다)
+
+운영 DB `(default)`에는 **절대 import하지 않는다.** 같은 프로젝트에 **훈련용 DB를 따로 만들어** 거기에 되살린 뒤 비교하고 지운다. 석 달에 한 번, 그리고 백업 방식을 바꿨을 때 한다. 명령은 `gcloud`(프로젝트 소유자 계정)로, 한 줄씩 결과를 확인하며 실행한다.
+
+1. **기준 숫자 적기** — 훈련에 쓸 날짜의 export를 고른다(예: 어제). 운영 콘솔 또는 집계 쿼리로 그 export 직후 시점에 가까운 컬렉션별 문서 수를 적는다: `organizations`·`users`·`spaces`·`assets`·`assetAccounting`·`imports`·`history`·`surveys`·`surveyTargets`·`scans`·`surveySubmissions`·`syncTasks`. (export 뒤에 바뀐 만큼 차이가 날 수 있으니 **가장 조용한 시간**의 export를 쓴다.)
+2. **훈련용 DB 만들기** — `gcloud firestore databases create --database=restore-drill --location=asia-northeast3 --project=asset-survey-sp`
+3. **되살리기** — `gcloud firestore import gs://asset-survey-sp-backups/backups/firestore/{날짜} --database=restore-drill --project=asset-survey-sp` → 시작·끝 시각을 적는다(이것이 실제 복원에 걸리는 시간의 기준).
+4. **비교** — 훈련용 DB에서 1번 컬렉션별 문서 수를 센다. 무작위 문서 5개(재물 2·회차 1·스캔 1·반영 목록 1)를 운영과 나란히 열어 필드를 맞대어 본다.
+5. **Storage 되살리기 시험** — 사진 버킷에 `restore-drill/` 아래 시험 파일 하나를 올리고 지운 뒤, `gcloud storage ls --soft-deleted gs://asset-survey-sp.firebasestorage.app/restore-drill/`로 세대 번호를 확인하고 `gcloud storage restore gs://asset-survey-sp.firebasestorage.app/restore-drill/{파일}#{세대}`로 되살려 내용이 같은지 본다. (운영 사진은 건드리지 않는다.)
+6. **치우기** — `gcloud firestore databases delete --database=restore-drill --project=asset-survey-sp`, 시험 파일 삭제. 훈련용 DB가 남지 않았는지 `gcloud firestore databases list`로 확인한다.
+7. **기록** — 아래 표에 한 줄 남기고, 5.1 표의 '복원 훈련' 칸을 고친다.
+
+**합격 기준**
+- import가 오류 없이 끝난다.
+- 1번의 컬렉션별 문서 수와 훈련용 DB의 수가 **같다**(export 뒤 운영에서 바뀐 만큼의 차이는 이유를 적으면 통과).
+- 무작위 5개 문서의 필드가 운영(그 시점 값)과 같다. 날짜·숫자 필드의 형식이 깨지지 않았다.
+- Storage 시험 파일이 되살아나고 내용이 같다.
+- 훈련용 DB·시험 파일이 남지 않았다. 운영 DB에는 쓰기가 없었다.
+- 걸린 시간(3번)을 적었다.
+
+| 날짜 | 한 사람 | 사용한 export | 문서 수 일치 | 걸린 시간 | Storage 되살리기 | 메모 |
+|---|---|---|---|---|---|---|
+| (아직 없음) | | | | | | |
+
+### 5.3 정할 것 (사용자)
+
+- **담당자** — 백업 실패 알림을 받고 복원을 결정할 사람.
+- **DB 삭제 보호 켜기** — 요금 없음. 실수로 DB를 통째로 지우는 것을 막는다: `gcloud firestore databases update --database='(default)' --delete-protection --project=asset-survey-sp`
+- **PITR 켜기 여부** — 잃을 수 있는 입력을 하루치에서 1분 단위로 줄인다. 저장 용량만큼 추가 요금.
+- **사진 백업** — 지금은 소프트 삭제 7일뿐이다. 더 길게 지켜야 하면 소프트 삭제 기간을 늘리거나(요금) 다른 버킷으로 주기 복사를 둔다.
