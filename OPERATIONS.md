@@ -56,6 +56,7 @@
    npx.cmd firebase-tools functions:secrets:set GEMINI_API_KEY --project <프로젝트 ID>
    ```
    (나머지 비밀도 같은 명령으로 이름만 바꿔 넣는다. 알림톡은 템플릿 등록 전까지 쓰지 않으므로 나중에 넣어도 된다.)
+   - ⚠️ `GMAIL_APP_PASSWORD`는 **`GMAIL_USER` 계정의 앱 비밀번호**(16자리, 띄어쓰기 빼고)다. 2026-11-21에 넣은 값이 틀려 앱 메일이 전부 `535-5.7.8 Username and Password not accepted`로 실패한 채 11-25에야 발견했다 — 넣은 뒤 Google 계정 > 앱 비밀번호 화면에 **"최종 사용일"이 찍히는지**로 확인한다. 다시 넣으면 firebase-tools가 쓰는 함수를 새 버전으로 재배포할지 묻는다(Yes).
 3. 주소를 아직 정하지 않았으면 `VITE_APP_URL`·`SERVICE_URL`은 비워 둔다 — Firebase 기본 주소(`https://<프로젝트 ID>.web.app`)를 쓴다.
 
 ### 2.4 배포용 계정과 GitHub 설정 (사용자)
@@ -105,7 +106,7 @@
 |---|---|---|---|---|
 | Firestore (기본 DB, 서울) | 매일 02:20(서울) 전체 export → `gs://asset-survey-sp-backups/backups/firestore/{날짜}/`, **90일 뒤 자동 삭제** | [dailyNightlyBatch.ts](functions/src/handlers/scheduled/dailyNightlyBatch.ts) `backupFirestore`, 버킷 목록에 11-22·11-23·11-24 폴더 있음 | 2026-11-24(목록만) | **미확인 — 한 번도 안 함** |
 | Firestore 특정 시점 복구(PITR) | 꺼짐 | `gcloud firestore databases describe` → `POINT_IN_TIME_RECOVERY_DISABLED` | 2026-11-24 | 해당 없음 |
-| Firestore DB 삭제 보호 | 꺼짐 | 같은 명령 → `DELETE_PROTECTION_DISABLED` | 2026-11-24 | 해당 없음 |
+| Firestore DB 삭제 보호 | **켜짐 (2026-11-25)** | 같은 명령 → `DELETE_PROTECTION_ENABLED` | 2026-11-25 | 해당 없음 |
 | Storage(재물 사진·현장 사진·증빙서류, us-east1) | **별도 백업 없음.** 지운 파일은 소프트 삭제로 **7일** 동안 되살릴 수 있다 | `gcloud storage buckets describe` → `soft_delete_policy 604800초` | 2026-11-24 | **미확인** |
 | Authentication(로그인 계정) | **백업 없음** — Firestore export에 들어가지 않는다 | Firebase 기본 동작 | — | 해당 없음 |
 | 담당자 | **미정** — 백업 실패 알림을 받고 복원을 결정할 사람. 야간·주간 배치의 실패·경고, superAdmin 승격, 새 의견은 `ADMIN_NOTIFICATION_EMAIL`(없으면 `GMAIL_USER`)로 메일이 간다([adminAlertMail.ts](functions/src/core/adminAlertMail.ts)) — 담당자가 정해지면 이 주소를 그 사람으로 | — | — | — |
@@ -142,6 +143,6 @@
 ### 5.3 정할 것 (사용자)
 
 - **담당자** — 백업 실패 알림을 받고 복원을 결정할 사람.
-- **DB 삭제 보호 켜기** — 요금 없음. 실수로 DB를 통째로 지우는 것을 막는다: `gcloud firestore databases update --database='(default)' --delete-protection --project=asset-survey-sp`
+- ~~**DB 삭제 보호 켜기**~~ — 2026-11-25 켰다(`gcloud firestore databases update --database='(default)' --delete-protection --project=asset-survey-sp`). DB를 지워야 할 일이 생기면 `--no-delete-protection`으로 먼저 끈다.
 - **PITR 켜기 여부** — 잃을 수 있는 입력을 하루치에서 1분 단위로 줄인다. 저장 용량만큼 추가 요금.
 - **사진 백업** — 지금은 소프트 삭제 7일뿐이다. 더 길게 지켜야 하면 소프트 삭제 기간을 늘리거나(요금) 다른 버킷으로 주기 복사를 둔다.
