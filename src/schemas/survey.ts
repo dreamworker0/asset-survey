@@ -21,8 +21,11 @@ export const REASON_MAX = 200;
  * - `spaceIds`: 대상 공간. 공간 미지정 재물을 넣었으면 `includesUnassigned`.
  * - 마감(`closed`)은 관리자가 한다(5단계). '나눠서 조사'는 모든 공간이 승인된 뒤에만(화면이 막음).
  *   마감하면 스캔·제출이 모두 막힌다(Rules).
+ * - 마감 중(`closing`, 2026-11-24): 마감을 누르면 먼저 이 상태로 바꿔 스캔·제출·승인을 멈추고(Rules는 `open`에서만
+ *   허락한다), 서버에서 새로 읽어 결과·반영 목록을 만든 뒤 `closed`로 닫는다. 확인창을 연 사이 들어온 스캔이나
+ *   중간에 실패한 마감을 다시 할 때도 요약·반영 목록·다시 연 보고서가 같은 시점의 결과가 된다.
  */
-export const surveyStatusSchema = z.enum(['open', 'closed']);
+export const surveyStatusSchema = z.enum(['open', 'closing', 'closed']);
 export const surveySchema = z.object({
     organizationId: z.string().catch(''),
     name: z.string().catch(''),

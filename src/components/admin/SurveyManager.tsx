@@ -284,7 +284,12 @@ function Dashboard({ s, onReview, onClose }: {
                 </div>
 
                 <div className="mt-5 pt-4 border-t border-surface-100 dark:border-surface-700">
-                    {s.blockers.length > 0 ? (
+                    {open.status === 'closing' ? (
+                        // 지난 마감이 끝나지 않음 — 찍기·제출은 멈춰 있다. 이어서 닫거나 취소해 다시 연다
+                        <div role="alert" className="mb-2 rounded-xl bg-amber-50 dark:bg-amber-900/20 p-3 text-sm text-amber-800 dark:text-amber-300">
+                            마감이 끝나지 않았습니다. 지금은 찍기·제출·승인이 멈춰 있습니다. [이어서 마감]을 누르거나, 더 찍어야 하면 [마감 취소]로 다시 여세요.
+                        </div>
+                    ) : s.blockers.length > 0 ? (
                         <p className="text-sm text-surface-700 dark:text-surface-300 mb-2">
                             마감하려면 모든 공간이 승인돼야 합니다. 남은 공간 {s.blockers.length}곳: <strong>{s.blockers.map(nameOf).join(', ')}</strong>
                             <span className={`${sub} block`}>담당자가 제출하지 못하는 공간은 '대신 승인'(사유 필수)으로 처리할 수 있습니다.</span>
@@ -292,9 +297,17 @@ function Dashboard({ s, onReview, onClose }: {
                     ) : (
                         <p className="text-sm text-surface-700 dark:text-surface-300 mb-2">마감하면 더는 찍거나 고칠 수 없고, 결과 보고서와 희망이음 반영 목록이 만들어집니다.</p>
                     )}
-                    <button type="button" className="btn-primary min-h-[48px] px-5" onClick={onClose} disabled={s.blockers.length > 0 || s.closing}>
-                        {s.closing ? '마감하는 중…' : '조사 마감'}
-                    </button>
+                    <div className="flex flex-wrap gap-2">
+                        <button type="button" className="btn-primary min-h-[48px] px-5" onClick={onClose}
+                            disabled={(open.status !== 'closing' && s.blockers.length > 0) || s.closing}>
+                            {s.closing ? '마감하는 중…' : open.status === 'closing' ? '이어서 마감' : '조사 마감'}
+                        </button>
+                        {open.status === 'closing' && (
+                            <button type="button" className="btn-secondary min-h-[48px] px-5" onClick={() => void s.cancelClose()} disabled={s.closing}>
+                                마감 취소
+                            </button>
+                        )}
+                    </div>
                 </div>
             </section>
 

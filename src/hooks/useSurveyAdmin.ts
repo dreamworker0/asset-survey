@@ -16,6 +16,7 @@ import { useToast } from './useToast';
 import {
     getSurveys, getSurveyTargets, getSpaces, getAssets, getOrganization, startSurvey, groupTargets,
     subscribeSurveyScans, subscribeSubmissions, reviewSpace, closeSurvey, getOrganizationMembers, getBuildings,
+    beginClosing, cancelClosing, getScans, getSubmissions,
 } from '../lib/firestore';
 import { orderSpacesByLocation, spaceLocationMap } from '../lib/spaceGroups';
 import { progressBySpace, type SpaceProgress } from '../lib/survey/judge';
@@ -111,7 +112,8 @@ export default function useSurveyAdmin() {
     const [starting, setStarting] = useState(false);
     const [closing, setClosing] = useState(false);
 
-    const open = surveys.find((s) => s.status === 'open') ?? null;
+    // 진행 중 회차 — '마감 중'(멈춘 뒤 닫기 전)도 여기서 이어서 마감하거나 취소한다
+    const open = surveys.find((s) => s.status !== 'closed') ?? null;
 
     const load = useCallback(async () => {
         if (!orgId) return;
@@ -125,7 +127,7 @@ export default function useSurveyAdmin() {
             setSpaces(sp);
             setBuildings(bd);
             setMode(org?.surveyMode ?? DEFAULT_SURVEY_MODE);
-            const current = list.find((s) => s.status === 'open');
+            const current = list.find((s) => s.status !== 'closed');
             setTargets(current ? await getSurveyTargets(orgId, current.id) : []);
             // 이름은 제출·승인한 사람 표시용 — 못 읽어도 화면은 그린다
             getOrganizationMembers(orgId)
@@ -229,40 +231,87 @@ export default function useSurveyAdmin() {
 
     const blockers = useMemo(() => (open ? closeBlockers(open.mode, open.spaceIds, submissions) : []), [open, submissions]);
 
-    /** 마감 — 보고서·반영 목록을 만들고 회차를 닫는다. @returns 마감한 회차 ID */
+    /**
+     * 마감 — 회차를 먼저 '마감 중'으로 멈추고(스캔·제출·승인이 막힌다), 스캔·제출을 서버에서 새로 읽어
+     * 보고서·반영 목록을 만든 뒤 닫는다(2026-11-24). 확인창의 숫자는 화면 기준이라 그 사이 들어온 스캔이
+     * 있으면 최종 숫자가 달라질 수 있어 결과를 알려 준다. '마감 중'에서 실패했으면 다시 누르면 이어서 한다.
+     * @returns 마감한 회차 ID
+     */
     const close = useCallback(async (): Promise<string | null> => {
         if (!orgId || !open || closing) return null;
-        if (blockers.length > 0) { showToast('승인되지 않은 공간이 있어 마감할 수 없습니다.', 'error'); return null; }
-        const spaceNames = spaceNamesFor(open, spaces);
-        const spaceLocations = spaceLocationsFor(open, spaces, buildings);
-        const report = buildReport(targets, scans, submissions, reportOrderFor(open));
-        const tasks = buildSyncTasks(open.id, report);
-        const ok = await confirm({
+        const resuming = open.status === 'closing';
+        if (!resuming && blockers.length > 0) { showToast('승인되지 않은 공간이 있어 마감할 수 없습니다.', 'error'); return null; }
+        const shown = buildReport(targets, scans, submissions, reportOrderFor(open)).summary;
+        const ok = await confirm(resuming ? {
+            title: '마감을 이어서 할까요?',
+            message: '지난번 마감이 끝나지 않았습니다. 찍기·제출은 이미 멈춰 있고, 지금 서버의 결과로 보고서와 희망이음 반영 목록을 만들어 마감합니다.',
+            confirmText: '이어서 마감',
+            confirmColor: 'danger',
+        } : {
             title: '조사를 마감할까요?',
-            message: `확인 ${report.summary.found}/${report.summary.target}건, 미발견 ${report.summary.missing}건. 마감하면 더는 찍거나 고칠 수 없고, 희망이음 반영 목록 ${tasks.length}건이 만들어집니다.`,
+            message: `지금 화면 기준 확인 ${shown.found}/${shown.target}건, 미발견 ${shown.missing}건. 마감을 누르면 찍기·제출이 바로 멈추고, 그때까지 저장된 결과로 보고서와 희망이음 반영 목록을 만듭니다. 마감하면 더는 찍거나 고칠 수 없습니다.`,
             confirmText: '마감',
             confirmColor: 'danger',
         });
         if (!ok) return null;
         setClosing(true);
         try {
-            await closeSurvey({ orgId, surveyId: open.id, tasks, spaceNames, spaceLocations, summary: report.summary });
-            showToast('마감했습니다. 결과 보고서를 확인하세요.', 'success');
+            if (!resuming) await beginClosing(open.id);
+            // 멈춘 뒤의 결과 — 캐시가 아니라 서버에서 읽는다(인터넷이 없으면 여기서 실패하고 '마감 중'으로 남는다)
+            const [finalScans, finalSubs] = await Promise.all([
+                getScans(orgId, open.id, { fromServer: true }),
+                getSubmissions(orgId, open.id, { fromServer: true }),
+            ]);
+            // 확인창을 연 사이 다른 관리자가 반려했을 수 있다 — 멈춘 것을 풀고 알린다
+            const late = closeBlockers(open.mode, open.spaceIds, finalSubs);
+            if (late.length > 0) {
+                await cancelClosing(open.id);
+                showToast('그 사이 승인되지 않은 공간이 생겨 마감을 멈추고 다시 열었습니다. 현황판을 확인해 주세요.', 'error');
+                await load();
+                return null;
+            }
+            const report = buildReport(targets, finalScans, finalSubs, reportOrderFor(open));
+            const tasks = buildSyncTasks(open.id, report);
+            await closeSurvey({
+                orgId, surveyId: open.id, tasks,
+                spaceNames: spaceNamesFor(open, spaces), spaceLocations: spaceLocationsFor(open, spaces, buildings),
+                summary: report.summary,
+            });
+            const f = report.summary;
+            showToast(!resuming && (f.found !== shown.found || f.target !== shown.target)
+                ? `마감했습니다. 확인창 뒤에 들어온 스캔까지 반영해 확인 ${f.found}/${f.target}건입니다.`
+                : '마감했습니다. 결과 보고서를 확인하세요.', 'success');
             const id = open.id;
             await load();
             return id;
         } catch {
-            showToast('마감하지 못했습니다. 다시 마감하면 이어서 처리됩니다.', 'error');
+            showToast('마감하지 못했습니다. 찍기·제출은 멈춘 상태이니, 인터넷 연결을 확인한 뒤 [이어서 마감]을 누르세요.', 'error');
+            void load(); // '마감 중' 상태를 화면에 반영
             return null;
         } finally {
             setClosing(false);
         }
     }, [orgId, open, closing, blockers, spaces, buildings, targets, scans, submissions, confirm, showToast, load]);
 
+    /** 마감 취소 — '마감 중'에 멈춘 회차를 다시 열어 찍고 승인할 수 있게 한다 */
+    const cancelClose = useCallback(async (): Promise<void> => {
+        if (!open || open.status !== 'closing' || closing) return;
+        setClosing(true);
+        try {
+            await cancelClosing(open.id);
+            showToast('마감을 취소했습니다. 다시 찍고 제출할 수 있습니다.', 'success');
+            await load();
+        } catch {
+            showToast('마감을 취소하지 못했습니다. 잠시 후 다시 시도해 주세요.', 'error');
+        } finally {
+            setClosing(false);
+        }
+    }, [open, closing, showToast, load]);
+
     return {
         orgId, uid, surveys, spaces, buildings, mode, open, loading, error, reload: load,
         form, setForm, openForm, closeForm: () => setForm(null), preview, formError, start, starting,
-        progress, totals, scans, recent, submissions, submissionOf, names, review, blockers, close, closing,
+        progress, totals, scans, recent, submissions, submissionOf, names, review, blockers, close, cancelClose, closing,
     };
 }
 

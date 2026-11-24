@@ -47,7 +47,7 @@ export function reportHeader(ctx: ReportContext): Array<[string, string]> {
         ['회차', survey.name],
         ['기간', `${survey.startDate} ~ ${survey.endDate}`],
         ['조사 방식', MODE_LABEL[survey.mode]],
-        ['상태', survey.status === 'closed' ? '마감' : '진행 중(중간 보고서)'],
+        ['상태', survey.status === 'closed' ? '마감' : survey.status === 'closing' ? '마감 중(중간 보고서)' : '진행 중(중간 보고서)'],
     ];
 }
 

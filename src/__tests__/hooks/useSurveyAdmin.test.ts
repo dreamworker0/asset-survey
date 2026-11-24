@@ -20,6 +20,7 @@ vi.mock('../../lib/firestore', async () => {
         subscribeSurveyScans: vi.fn((_o: string, _s: string, cb: (x: unknown[]) => void) => { pushScans = cb; return () => { }; }),
         subscribeSubmissions: vi.fn((_o: string, _s: string, cb: (x: unknown[]) => void) => { pushSubs = cb; return () => { }; }),
         reviewSpace: vi.fn(), closeSurvey: vi.fn(), getBuildings: vi.fn(async () => []),
+        beginClosing: vi.fn(), cancelClosing: vi.fn(), getScans: vi.fn(async () => []), getSubmissions: vi.fn(async () => []),
     };
 });
 vi.mock('../../lib/firebase', () => ({ db: {}, auth: { currentUser: null } }));
@@ -86,6 +87,9 @@ describe('현황판·승인·마감 (기획서 F13~F15)', () => {
         { id: 'sv1__sp-1', spaceId: 'sp-1', items: [{ id: 'a1', code: '1', name: 'TV', tagId: null }] },
         { id: 'sv1__sp-2', spaceId: 'sp-2', items: [{ id: 'a2', code: '2', name: '책상', tagId: null }] },
     ];
+    const SCAN_A1 = { id: 'sv1__a1', assetId: 'a1', code: '1', name: 'TV', spaceId: 'sp-1', expectedSpaceId: 'sp-1', result: 'ok', method: 'qr', condition: 'normal', memo: '' };
+    const SCAN_A2 = { ...SCAN_A1, id: 'sv1__a2', assetId: 'a2', code: '2', name: '책상', spaceId: 'sp-2', expectedSpaceId: 'sp-2' };
+    const APPROVED = [{ spaceId: 'sp-1', state: 'approved' }, { spaceId: 'sp-2', state: 'approved' }];
     beforeEach(() => {
         vi.mocked(fs.getSurveys).mockResolvedValue([OPEN] as never);
         vi.mocked(fs.getSurveyTargets).mockResolvedValue(TARGETS as never);
@@ -119,16 +123,77 @@ describe('현황판·승인·마감 (기획서 F13~F15)', () => {
 
         act(() => {
             pushSubs([{ spaceId: 'sp-1', state: 'approved' }, { spaceId: 'sp-2', state: 'approved' }]);
-            pushScans([{ id: 'sv1__a1', assetId: 'a1', code: '1', name: 'TV', spaceId: 'sp-1', expectedSpaceId: 'sp-1', result: 'ok', method: 'qr', condition: 'normal', memo: '' }]);
+            pushScans([SCAN_A1]);
         });
         expect(result.current.blockers).toEqual([]);
         expect(result.current.totals).toMatchObject({ target: 2, found: 1 });
+        vi.mocked(fs.getSubmissions).mockResolvedValue([{ spaceId: 'sp-1', state: 'approved' }, { spaceId: 'sp-2', state: 'approved' }] as never);
+        vi.mocked(fs.getScans).mockResolvedValue([SCAN_A1] as never);
         confirm.mockResolvedValueOnce(true);
         await act(async () => { await result.current.close(); });
+        // 먼저 멈추고, 서버에서 새로 읽은 뒤 닫는다
+        expect(fs.beginClosing).toHaveBeenCalledWith('sv1');
+        expect(fs.getScans).toHaveBeenCalledWith('org-A', 'sv1', { fromServer: true });
+        expect(vi.mocked(fs.beginClosing).mock.invocationCallOrder[0]).toBeLessThan(vi.mocked(fs.getScans).mock.invocationCallOrder[0]);
         expect(fs.closeSurvey).toHaveBeenCalledWith(expect.objectContaining({
             orgId: 'org-A', surveyId: 'sv1', spaceNames: { 'sp-1': 'sp-1', 'sp-2': 'sp-2' },
             summary: expect.objectContaining({ target: 2, found: 1, missing: 1 }),
             tasks: [expect.objectContaining({ kind: 'missing', code: '2', fromSpaceId: 'sp-2' })],
         }));
+    });
+
+    it('확인창을 연 사이 찍힌 물건도 요약·반영 목록에 들어간다(멈춘 뒤 서버 값으로 계산)', async () => {
+        vi.mocked(fs.getSpaces).mockResolvedValue([space('sp-1'), space('sp-2')] as never);
+        const { result } = renderHook(() => useSurveyAdmin());
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        act(() => { pushSubs(APPROVED); pushScans([SCAN_A1]); });
+        // 화면은 1/2, 그 사이 다른 관리자가 책상을 찍었다
+        vi.mocked(fs.getSubmissions).mockResolvedValue(APPROVED as never);
+        vi.mocked(fs.getScans).mockResolvedValue([SCAN_A1, SCAN_A2] as never);
+        confirm.mockResolvedValueOnce(true);
+        await act(async () => { await result.current.close(); });
+        expect(confirm.mock.calls[0][0].message).toContain('확인 1/2건');
+        expect(fs.closeSurvey).toHaveBeenCalledWith(expect.objectContaining({
+            summary: expect.objectContaining({ target: 2, found: 2, missing: 0 }),
+            tasks: [],
+        }));
+        expect(showToast).toHaveBeenCalledWith(expect.stringContaining('확인창 뒤에 들어온 스캔까지 반영해 확인 2/2건'), 'success');
+    });
+
+    it('멈춘 뒤 보니 승인되지 않은 공간이 있으면 마감을 취소해 다시 연다', async () => {
+        vi.mocked(fs.getSpaces).mockResolvedValue([space('sp-1'), space('sp-2')] as never);
+        const { result } = renderHook(() => useSurveyAdmin());
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        act(() => pushSubs(APPROVED));
+        vi.mocked(fs.getSubmissions).mockResolvedValue([APPROVED[0], { spaceId: 'sp-2', state: 'rejected' }] as never);
+        confirm.mockResolvedValueOnce(true);
+        await act(async () => { await result.current.close(); });
+        expect(fs.cancelClosing).toHaveBeenCalledWith('sv1');
+        expect(fs.closeSurvey).not.toHaveBeenCalled();
+    });
+
+    it('마감 중에 멈춘 회차는 다시 멈추지 않고 이어서 닫는다 — 실패하면 이어서 마감을 안내한다', async () => {
+        vi.mocked(fs.getSpaces).mockResolvedValue([space('sp-1'), space('sp-2')] as never);
+        vi.mocked(fs.getSurveys).mockResolvedValue([{ ...OPEN, status: 'closing' }] as never);
+        vi.mocked(fs.getSubmissions).mockResolvedValue(APPROVED as never);
+        vi.mocked(fs.getScans).mockResolvedValue([SCAN_A1] as never);
+        const { result } = renderHook(() => useSurveyAdmin());
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        expect(result.current.open?.status).toBe('closing');
+
+        vi.mocked(fs.closeSurvey).mockRejectedValueOnce(new Error('unavailable'));
+        confirm.mockResolvedValueOnce(true);
+        await act(async () => { await result.current.close(); });
+        expect(showToast).toHaveBeenCalledWith(expect.stringMatching(/이어서 마감/), 'error');
+
+        confirm.mockResolvedValueOnce(true);
+        await act(async () => { await result.current.close(); });
+        expect(fs.beginClosing).not.toHaveBeenCalled();
+        expect(fs.closeSurvey).toHaveBeenCalledTimes(2);
+        // 두 번 모두 같은 결과 — 반영 목록이 같아 재시도가 겹치거나 막히지 않는다
+        expect(vi.mocked(fs.closeSurvey).mock.calls[1][0].tasks).toEqual(vi.mocked(fs.closeSurvey).mock.calls[0][0].tasks);
+
+        await act(async () => { await result.current.cancelClose(); });
+        expect(fs.cancelClosing).toHaveBeenCalledWith('sv1');
     });
 });

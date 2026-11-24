@@ -1262,6 +1262,22 @@ describe('Firestore Security Rules for Multi-Tenant Isolation', () => {
         status: 'closed', closedAt: serverTs(), closedByUid: uid, lastEditedByUid: uid,
         spaceNames: { 'sp-1': '101호' }, summary: { target: 1, found: 1 }, ...extra,
       });
+      const freeze = (uid: string, status = 'closing', extra: Record<string, unknown> = {}) => ({ status, lastEditedByUid: uid, ...extra });
+      // 열린 회차를 바로 닫을 수는 없다 — 먼저 '마감 중'으로 멈춘다(2026-11-24)
+      await assertFails(admin('A').collection('surveys').doc('sv1').update(close('admin_A')));
+      await assertFails(emp('A', 1).collection('surveys').doc('sv1').update(freeze('emp_A1')));
+      await assertFails(admin('B').collection('surveys').doc('sv1').update(freeze('admin_B')));
+      await assertFails(admin('A').collection('surveys').doc('sv1').update(freeze('admin_A', 'closing', { name: '바꿈' })));
+      await assertFails(admin('A').collection('surveys').doc('sv1').update(freeze('emp_A1')));
+      await assertSucceeds(admin('A').collection('surveys').doc('sv1').update(freeze('admin_A')));
+      // 마감 중에는 스캔·제출이 막힌다
+      await assertFails(emp('A', 1).collection('scans').doc('sv1__org-A__1').set(scanDoc('emp_A1')));
+      await assertFails(emp('A', 1).collection('surveySubmissions').doc('sv1__sp-1').set(subDoc('emp_A1')));
+      // 마감 취소(closing → open)는 상태만 바꿔서 — 다시 찍을 수 있다
+      await assertFails(emp('A', 1).collection('surveys').doc('sv1').update(freeze('emp_A1', 'open')));
+      await assertSucceeds(admin('A').collection('surveys').doc('sv1').update(freeze('admin_A', 'open')));
+      await assertSucceeds(emp('A', 1).collection('scans').doc('sv1__org-A__1').set(scanDoc('emp_A1')));
+      await assertSucceeds(admin('A').collection('surveys').doc('sv1').update(freeze('admin_A')));
       await assertFails(emp('A', 1).collection('surveys').doc('sv1').update(close('emp_A1')));
       await assertFails(admin('B').collection('surveys').doc('sv1').update(close('admin_B')));
       await assertFails(admin('A').collection('surveys').doc('sv1').update(close('admin_A', { name: '바꿈' })));
@@ -1270,7 +1286,9 @@ describe('Firestore Security Rules for Multi-Tenant Isolation', () => {
       await assertFails(admin('A').collection('surveys').doc('sv1').update(close('admin_A', { spaceLocations: '본관 1층' })));
       await assertSucceeds(admin('A').collection('surveys').doc('sv1').update(close('admin_A', { spaceLocations: { 'sp-1': '본관 1층' } })));
       await assertFails(admin('A').collection('surveys').doc('sv1').update({ status: 'open' }));
-      await assertFails(emp('A', 1).collection('scans').doc('sv1__org-A__1').set(scanDoc('emp_A1')));
+      await assertFails(admin('A').collection('surveys').doc('sv1').update(freeze('admin_A', 'open')));
+      await assertFails(admin('A').collection('surveys').doc('sv1').update(freeze('admin_A')));
+      await assertFails(emp('A', 1).collection('scans').doc('sv1__org-A__2').set({ ...scanDoc('emp_A1'), assetId: 'org-A__2', code: '2' }));
       await assertFails(emp('A', 1).collection('surveySubmissions').doc('sv1__sp-1').set(subDoc('emp_A1')));
     });
 
@@ -1291,13 +1309,18 @@ describe('Firestore Security Rules for Multi-Tenant Isolation', () => {
       await assertFails(admin('B').collection('surveyEvents').doc('e6').set({ ...ev('admin_B', 'close'), organizationId: 'org-B' }));
     });
 
-    it('#V11 희망이음 반영 목록 — 열린 회차를 마감하며 관리자가 만들고, 처리 완료만 체크한다', async () => {
+    it('#V11 희망이음 반영 목록 — 마감 중(멈춘 뒤)에 관리자가 만들고, 처리 완료만 체크한다', async () => {
       await seedSurvey();
       const task = {
         organizationId: 'org-A', surveyId: 'sv1', kind: 'move', assetId: 'org-A__1', code: '1', name: 'TV',
         fromSpaceId: 'sp-1', toSpaceId: 'sp-2', memo: '', done: false, doneByUid: null, doneAt: null,
       };
       const ref = (db: ReturnType<typeof admin>) => db.collection('syncTasks').doc('sv1__move__org-A__1');
+      // 열린 회차(아직 결과가 바뀔 수 있을 때)에는 만들지 못한다(2026-11-24)
+      await assertFails(ref(admin('A')).set(task));
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection('surveys').doc('sv1').update({ status: 'closing' });
+      });
       await assertFails(ref(emp('A', 1)).set(task));
       await assertFails(ref(admin('A')).set({ ...task, done: true }));
       await assertSucceeds(ref(admin('A')).set(task));

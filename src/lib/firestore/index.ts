@@ -185,6 +185,8 @@ export {
     getSubmissions,
     submitSpace,
     reviewSpace,
+    beginClosing,
+    cancelClosing,
     closeSurvey,
     getSyncTasks,
     setSyncTaskDone,

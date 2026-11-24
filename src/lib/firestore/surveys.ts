@@ -10,7 +10,7 @@
  *   (6단계 리허설에서 빠진 것을 발견: 오프라인으로 찍고 로그아웃하면 경고 없이 사라질 수 있었다).
  */
 import {
-    collection, doc, query, where, getDoc, getDocs, writeBatch, setDoc, updateDoc, deleteDoc,
+    collection, doc, query, where, getDoc, getDocs, getDocsFromServer, writeBatch, setDoc, updateDoc, deleteDoc,
     serverTimestamp, orderBy, limit, onSnapshot,
     type Unsubscribe,
 } from 'firebase/firestore';
@@ -224,9 +224,10 @@ export const deleteScan = async (scanId: string): Promise<void> => {
 };
 
 /** 회차의 스캔 전부(관리자 진행 확인) */
-export const getScans = async (orgId: string, surveyId: string): Promise<Scan[]> => {
+export const getScans = async (orgId: string, surveyId: string, opts: { fromServer?: boolean } = {}): Promise<Scan[]> => {
     try {
-        const snap = await getDocs(query(
+        // 마감 계산은 캐시가 아니라 서버 값으로 — 인터넷이 없으면 실패해 마감을 진행하지 않는다
+        const snap = await (opts.fromServer ? getDocsFromServer : getDocs)(query(
             collection(db, 'scans').withConverter(scanConverter),
             where('organizationId', '==', orgId),
             where('surveyId', '==', surveyId),
@@ -293,9 +294,9 @@ export function subscribeSubmissions(orgId: string, surveyId: string, onChange: 
     );
 }
 
-export const getSubmissions = async (orgId: string, surveyId: string): Promise<SurveySubmission[]> => {
+export const getSubmissions = async (orgId: string, surveyId: string, opts: { fromServer?: boolean } = {}): Promise<SurveySubmission[]> => {
     try {
-        const snap = await getDocs(query(
+        const snap = await (opts.fromServer ? getDocsFromServer : getDocs)(query(
             collection(db, 'surveySubmissions').withConverter(submissionConverter),
             where('organizationId', '==', orgId), where('surveyId', '==', surveyId),
         ));
@@ -379,8 +380,32 @@ export function subscribeSubmission(surveyId: string, spaceId: string, onChange:
 // ── 마감·반영 목록·이력 (기획서 F15~F17) ──
 
 /**
- * 마감 — 반영 목록을 먼저 쓰고(400건씩), 마지막 배치에서 회차를 닫고 이력을 남긴다.
- * 중간에 실패해도 다시 마감하면 같은 ID라 반영 목록이 겹치지 않는다(이미 있는 항목은 같은 값으로 덮인다).
+ * 마감 멈추기 — 회차를 '마감 중'으로 바꿔 스캔·제출·승인을 막는다(2026-11-24). 이 뒤에 서버에서 새로 읽어
+ * 결과를 계산하므로 확인창을 연 사이 들어온 스캔도 요약·반영 목록에 들어간다.
+ */
+export const beginClosing = async (surveyId: string): Promise<void> => {
+    try {
+        await updateDoc(doc(db, 'surveys', surveyId), { status: 'closing', lastEditedByUid: actorStamp().lastEditedByUid ?? '' });
+    } catch (error) {
+        captureError(error, { context: 'beginClosing', surveyId });
+        throw error;
+    }
+};
+
+/** 마감 취소 — '마감 중' 회차를 다시 열어 찍고 승인할 수 있게 한다 */
+export const cancelClosing = async (surveyId: string): Promise<void> => {
+    try {
+        await updateDoc(doc(db, 'surveys', surveyId), { status: 'open', lastEditedByUid: actorStamp().lastEditedByUid ?? '' });
+    } catch (error) {
+        captureError(error, { context: 'cancelClosing', surveyId });
+        throw error;
+    }
+};
+
+/**
+ * 마감 — '마감 중'(beginClosing 뒤)인 회차만 닫는다(Rules). 반영 목록을 먼저 쓰고(400건씩), 마지막 배치에서 회차를 닫고 이력을 남긴다.
+ * 중간에 실패해도 다시 마감하면 같은 ID라 반영 목록이 겹치지 않는다. 멈춘 뒤라 결과가 같아 이미 있는 항목도
+ * 같은 값으로 덮인다(내용이 달라지면 Rules가 막아 재시도가 끝나지 않던 문제가 없어진다).
  */
 export const closeSurvey = async (input: {
     orgId: string; surveyId: string; tasks: SyncTaskDraft[]; spaceNames: Record<string, string>; summary: SurveySummary;
