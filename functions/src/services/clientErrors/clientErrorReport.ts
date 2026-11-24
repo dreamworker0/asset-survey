@@ -69,3 +69,38 @@ export function groupKey(r: ClientErrorReport): string {
     const norm = `${r.name}|${r.message.replace(/\d+/g, "#")}|${r.where}|${r.code}`;
     return createHash("sha256").update(norm).digest("hex").slice(0, 32);
 }
+
+/** gRPC 상태 코드 — Admin SDK 오류의 code(숫자). 5 = NOT_FOUND, 6 = ALREADY_EXISTS */
+const NOT_FOUND = 5;
+const ALREADY_EXISTS = 6;
+const grpcCode = (e: unknown): unknown => (e as { code?: unknown } | null)?.code;
+
+/**
+ * 같은 오류 묶음 문서 하나를 올린다 — **트랜잭션 없이** 보통 쓰기 1번(2026-11-24).
+ *
+ * 예전에는 runTransaction(읽기 → 있으면 update, 없으면 set)이었다. 배포 직후 같은 오류가 여러 기기에서
+ * 한꺼번에 나면 모두 **같은 문서**를 두고 트랜잭션끼리 경합해 재시도·중단이 쌓이고(문서당 초당 쓰기 한도도
+ * 함께 깎는다), 그만큼 보고가 사라졌다. 횟수는 increment, 기관은 arrayUnion이라 읽지 않아도 합쳐지므로
+ * 읽기가 필요 없다:
+ *   1. update — 대부분은 이미 있는 오류라 여기서 끝난다(쓰기 1번, 읽기 0번)
+ *   2. 없으면(NOT_FOUND) create — 처음 시각(firstAt)·오류 정체는 이때만 쓴다
+ *   3. 그 사이 다른 기기가 먼저 만들었으면(ALREADY_EXISTS) 다시 update
+ */
+export async function upsertGroup(
+    ref: FirebaseFirestore.DocumentReference,
+    patch: Record<string, unknown>,
+    initial: () => Record<string, unknown>,
+): Promise<void> {
+    try {
+        await ref.update(patch);
+        return;
+    } catch (e) {
+        if (grpcCode(e) !== NOT_FOUND) throw e;
+    }
+    try {
+        await ref.create(initial());
+    } catch (e) {
+        if (grpcCode(e) !== ALREADY_EXISTS) throw e;
+        await ref.update(patch);
+    }
+}
