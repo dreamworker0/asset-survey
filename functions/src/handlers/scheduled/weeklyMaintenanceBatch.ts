@@ -20,6 +20,7 @@ import { getAuth } from "firebase-admin/auth";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { purgeOrgs, cleanupImages } from "./dailyNightlyBatch";
 import { runStep, logBatchResult } from "../../utils/batchStep";
+import { GMAIL_APP_PASSWORD } from "../../core/params";
 import { cleanupOrphanAuthAccounts } from "../../services/account/cleanupOrphanAuthAccounts";
 
 const CONTEXT = "weeklyMaintenanceBatch";
@@ -29,6 +30,8 @@ export const weeklyMaintenanceBatch = onSchedule(
         schedule: "0 3 * * 0", // KST 일요일 03:00 (야간 배치들과 시간대를 겹치지 않게 둔다)
         timeZone: "Asia/Seoul",
         retryCount: 0,
+        // 실패·기관 파기 실패를 운영자에게 메일로 보낸다(utils/batchStep의 logBatchResult)
+        secrets: [GMAIL_APP_PASSWORD],
         memory: "512MiB",
         timeoutSeconds: 540,
     },

@@ -13,7 +13,8 @@ import { getStorage } from "firebase-admin/storage";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { getKSTDateString } from "../../utils/kstDate";
 import { captureWarning } from "../../core/sentry";
-import { runStep, logBatchResult } from "../../utils/batchStep";
+import { runStep, logBatchResult, noteBatchAlert } from "../../utils/batchStep";
+import { GMAIL_APP_PASSWORD } from "../../core/params";
 import { purgeOrganizationData, OrgNotRetiredError, type PurgeBucket } from "../../services/organization/purgeOrganizationData";
 import { computeAllDashboardStats } from "../../services/statistics/computeDashboardStats";
 
@@ -130,6 +131,8 @@ function warnDuplicateRun(reason: string, outputUri: string): void {
             "1차 실행에 '[Batch] dailyNightlyBatch completed'가 없으면 죽은 것이다.",
         참고: ".agent/skills/troubleshoot-deployment/SKILL.md §2.8",
     });
+    noteBatchAlert(`[경고] 야간 배치가 같은 날 두 번 실행됨 — ${reason}
+백업은 정상이지만 1차 실행이 끝을 못 봤을 수 있다(OOM·타임아웃). 함수 로그에서 확인할 것.`);
 }
 
 /** 완료 표식 파일명. Firestore export가 **끝날 때** 이 이름으로 쓴다. */
@@ -359,6 +362,8 @@ export async function purgeOrgs(db: FirebaseFirestore.Firestore, bucket: PurgeBu
             captureWarning(`기관 파기 실패 — 다음 주 배치가 이어서 지운다: ${orgId}`, {
                 context: "purgeOrgs", orgId, error: (err as Error).message,
             });
+            noteBatchAlert(`[경고] 기관 파기 실패 — 다음 주 배치가 이어서 지운다: ${orgId}
+${(err as Error).message}`);
         }
     }
     console.log(`Purge complete: ${totalPurged} organizations purged.`);
@@ -431,6 +436,8 @@ export const dailyNightlyBatch = onSchedule(
         timeZone: "Asia/Seoul",
         // 백업은 하루 놓치면 그날치가 영영 없다. 오늘 폴더 존재 확인으로 멱등하므로 재실행이 안전하다.
         retryCount: 1,
+        // 실패·경고를 운영자에게 메일로 보낸다(utils/batchStep의 logBatchResult)
+        secrets: [GMAIL_APP_PASSWORD],
         memory: "512MiB",
         timeoutSeconds: 540,
     },

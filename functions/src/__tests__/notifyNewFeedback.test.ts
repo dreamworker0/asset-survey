@@ -14,6 +14,10 @@ jest.mock('firebase-admin/firestore', () => ({
     })),
 }));
 jest.mock('../core/discord', () => ({ sendDiscordAlert: (...args: unknown[]) => mockSendDiscordAlert(...args) }));
+// Discord를 비워 둔 운영에서도 알 수 있게 운영자 메일을 보낸다 — 본문·연락처는 싣지 않는다
+const mockSendAdminAlertMail = jest.fn().mockResolvedValue(true);
+jest.mock('../core/adminAlertMail', () => ({ sendAdminAlertMail: (...args: unknown[]) => mockSendAdminAlertMail(...args) }));
+jest.mock('../core/params', () => ({ GMAIL_APP_PASSWORD: 'GMAIL_APP_PASSWORD' }));
 jest.mock('../utils/rateLimit', () => ({
     checkRateLimitBySubject: (...args: unknown[]) => mockCheckRateLimitBySubject(...args),
 }));
@@ -53,6 +57,29 @@ describe('notifyNewFeedback', () => {
             { name: '내용', value: '일지 수정 후 목록으로 돌아오면 좋겠어요', inline: false },
         ]);
         expect(update).not.toHaveBeenCalled();
+    });
+
+    it('운영자 메일도 보내되 의견 본문과 작성자 연락처는 싣지 않는다', async () => {
+        await run({
+            message: '일지 수정 후 목록으로 돌아오면 좋겠어요',
+            userName: '홍길동', userEmail: 'a@b.c', organizationId: 'org1', authorUid: 'u1', category: '건의',
+        });
+
+        expect(mockSendAdminAlertMail).toHaveBeenCalledTimes(1);
+        const mail = mockSendAdminAlertMail.mock.calls[0][0];
+        expect(mail.subject).toBe('새 의견 등록 (건의)');
+        const text = mail.lines.join('\n');
+        expect(text).toContain('기관: 행복복지관');
+        expect(text).not.toContain('목록으로 돌아오면');
+        expect(text).not.toContain('a@b.c');
+        expect(text).not.toContain('홍길동');
+        expect(mail.link.href).toMatch(/\/super-admin\/feedbacks$/);
+    });
+
+    it('한도를 넘으면 메일도 보내지 않는다', async () => {
+        mockCheckRateLimitBySubject.mockResolvedValueOnce(true);
+        await run({ message: '도배', authorUid: 'u1' });
+        expect(mockSendAdminAlertMail).not.toHaveBeenCalled();
     });
 
     it('작성자별 한도를 넘으면 알림을 생략한다', async () => {

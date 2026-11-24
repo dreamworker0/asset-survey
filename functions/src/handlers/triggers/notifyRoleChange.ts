@@ -1,9 +1,13 @@
 import { onDocumentWritten } from "firebase-functions/v2/firestore";
 import { sendDiscordAlert } from "../../core/discord";
+import { sendAdminAlertMail } from "../../core/adminAlertMail";
+import { GMAIL_APP_PASSWORD } from "../../core/params";
+import { serviceUrl } from "../../utils/serviceUrl";
 
 export const notifyRoleChange = onDocumentWritten(
     // cloud-functions.md §3.2의 기본값(256MiB). 문서 1건만 처리한다.
-    { document: "users/{uid}", memory: "256MiB" },
+    // Discord를 비워 둔 운영에서도 경보가 닿도록 메일을 함께 보낸다(core/adminAlertMail).
+    { document: "users/{uid}", secrets: [GMAIL_APP_PASSWORD], memory: "256MiB" },
     async (event) => {
         const before = event.data?.before.data();
         const after = event.data?.after.data();
@@ -29,6 +33,20 @@ export const notifyRoleChange = onDocumentWritten(
                     { name: "추정 소속(Org ID)", value: orgId, inline: false }
                 ]
             }).catch(e => console.error("Discord alert error:", e));
+
+            await sendAdminAlertMail({
+                subject: "보안 경보: 시스템 관리자(superAdmin) 권한 부여",
+                lines: [
+                    "시스템 전체 접근 권한(superAdmin)이 새로 부여되었습니다.",
+                    "의도한 변경이 아니면 즉시 권한을 되돌리고 접속기록을 확인하세요.",
+                    "",
+                    `사용자: ${userName}`,
+                    `이메일: ${email}`,
+                    `소속 기관 ID: ${orgId}`,
+                    `사용자 UID: ${event.params.uid}`,
+                ],
+                link: { href: `${serviceUrl()}/super-admin/admins`, label: "시스템 관리자 목록 열기" },
+            });
         }
     }
 );

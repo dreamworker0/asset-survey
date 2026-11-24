@@ -283,7 +283,7 @@
 | **파일** | `functions/src/handlers/scheduled/dailyNightlyBatch.ts` |
 | **설명** | 야간 배치: Firestore 백업(GCS export) → 어제 백업 완료 확인 → 시스템 관리자 운영 현황 통계 집계(system/dashboardStats) |
 | **인증** | 시스템 자동 실행 |
-| **비고** | schedule: "20 2 * * *" (KST 02:20). 2026-08-28 Cloud Run 비용 점검에서 일곱 스텝 통합 배치를 집계·백업·주간 유지보수 셋으로 분리(1GiB→512MiB, 재시도 범위 축소) |
+| **비고** | 실패·경고(같은 날 두 번 실행)는 끝날 때 운영자 메일 1통으로 묶어 보낸다(`utils/batchStep`, `secrets: [GMAIL_APP_PASSWORD]`). schedule: "20 2 * * *" (KST 02:20). 2026-08-28 Cloud Run 비용 점검에서 일곱 스텝 통합 배치를 집계·백업·주간 유지보수 셋으로 분리(1GiB→512MiB, 재시도 범위 축소) |
 
 ### `weeklyMaintenanceBatch`
 
@@ -292,7 +292,7 @@
 | **파일** | `functions/src/handlers/scheduled/weeklyMaintenanceBatch.ts` |
 | **설명** | 주간 유지보수: soft-delete 기관 30일 후 기관 데이터 전체 파기(purgeOrganizationData) → 증빙 이미지 정리 → 소속 없이 90일 넘게 쓰이지 않은 로그인 계정 정리(기본 보고만, system/authCleanup.deleteEnabled로 켬) |
 | **인증** | 시스템 자동 실행 |
-| **비고** | schedule: "0 3 * * 0" (KST 일요일 03:00). 판정 기준이 30일·3년이라 매일 돌 이유가 없어 주 1회로 옮긴 것 |
+| **비고** | 실패·기관 파기 실패는 끝날 때 운영자 메일 1통으로 묶어 보낸다(`utils/batchStep`, `secrets: [GMAIL_APP_PASSWORD]`). schedule: "0 3 * * 0" (KST 일요일 03:00). 판정 기준이 30일·3년이라 매일 돌 이유가 없어 주 1회로 옮긴 것 |
 
 ---
 
@@ -314,7 +314,7 @@
 | 항목 | 내용 |
 |------|------|
 | **파일** | `functions/src/handlers/triggers/notifyNewFeedback.ts` |
-| **설명** | feedbacks/{feedbackId} 생성 시 운영 채널(Discord)에 알림. 작성자별·전역 일일 상한(fail-closed) |
+| **설명** | feedbacks/{feedbackId} 생성 시 운영 채널(Discord)과 운영자 메일로 알림(메일에는 분류·기관만, 본문·연락처 없음). 작성자별·전역 일일 상한(fail-closed) |
 | **인증** | 시스템 자동 실행 (Firestore 트리거) |
 
 ### `auditUserCreated`
@@ -362,7 +362,7 @@
 | 항목 | 내용 |
 |------|------|
 | **파일** | `functions/src/handlers/triggers/notifyRoleChange.ts` |
-| **설명** | 사용자 권한(role) 변경 감지 시 Discord 보안 알림 발송 |
+| **설명** | superAdmin 승격 감지 시 Discord 보안 알림과 운영자 메일 발송(`core/adminAlertMail`) |
 | **인증** | 시스템 자동 실행 |
 | **비고** | users/{uid} |
 

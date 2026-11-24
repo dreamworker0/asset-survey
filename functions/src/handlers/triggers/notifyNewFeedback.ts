@@ -1,5 +1,5 @@
 /**
- * notifyNewFeedback — 의견 등록 시 운영 채널(Discord) 알림
+ * notifyNewFeedback — 의견 등록 시 운영자 알림(Discord + 메일)
  *
  * Firestore `feedbacks` 컬렉션 onCreate 트리거.
  *
@@ -10,6 +10,9 @@
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
 import { getFirestore } from "firebase-admin/firestore";
 import { sendDiscordAlert } from "../../core/discord";
+import { sendAdminAlertMail } from "../../core/adminAlertMail";
+import { GMAIL_APP_PASSWORD } from "../../core/params";
+import { serviceUrl } from "../../utils/serviceUrl";
 import { log } from "../../utils/helpers";
 import { checkRateLimitBySubject } from "../../utils/rateLimit";
 import { GLOBAL_BUDGETS } from "../../utils/constants";
@@ -52,6 +55,7 @@ export const notifyNewFeedback = onDocumentCreated(
     {
         document: "feedbacks/{feedbackId}",
         region: "asia-northeast3",
+        secrets: [GMAIL_APP_PASSWORD],
     },
     async (event) => {
         const snap = event.data;
@@ -105,5 +109,20 @@ export const notifyNewFeedback = onDocumentCreated(
                 { name: "내용", value: message, inline: false },
             ],
         }).catch(e => console.error("Discord alert error:", e));
+
+        // Discord를 비워 둔 운영(OPERATIONS.md)에서도 새 의견을 알 수 있게 메일로도 알린다.
+        // 본문·작성자 연락처는 싣지 않는다 — 메일함에 개인정보가 쌓이지 않게, 내용은 의견 관리 화면에서 본다.
+        // 쿼터(consumeAlertQuota)를 이미 통과했으므로 메일도 같은 한도 안에서만 나간다.
+        await sendAdminAlertMail({
+            subject: `새 의견 등록 (${category})`,
+            lines: [
+                "새 의견이 등록되었습니다. 내용은 의견 관리 화면에서 확인하세요.",
+                "",
+                `분류: ${category}`,
+                `기관: ${orgName || "(기관 없음)"}`,
+                `글자 수: ${message.length}자`,
+            ],
+            link: { href: `${serviceUrl()}/super-admin/feedbacks`, label: "의견 관리 화면 열기" },
+        });
     }
 );

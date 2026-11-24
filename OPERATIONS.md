@@ -108,7 +108,7 @@
 | Firestore DB 삭제 보호 | 꺼짐 | 같은 명령 → `DELETE_PROTECTION_DISABLED` | 2026-11-24 | 해당 없음 |
 | Storage(재물 사진·현장 사진·증빙서류, us-east1) | **별도 백업 없음.** 지운 파일은 소프트 삭제로 **7일** 동안 되살릴 수 있다 | `gcloud storage buckets describe` → `soft_delete_policy 604800초` | 2026-11-24 | **미확인** |
 | Authentication(로그인 계정) | **백업 없음** — Firestore export에 들어가지 않는다 | Firebase 기본 동작 | — | 해당 없음 |
-| 담당자 | **미정** — 백업 실패 알림을 받고 복원을 결정할 사람 | — | — | — |
+| 담당자 | **미정** — 백업 실패 알림을 받고 복원을 결정할 사람. 야간·주간 배치의 실패·경고, superAdmin 승격, 새 의견은 `ADMIN_NOTIFICATION_EMAIL`(없으면 `GMAIL_USER`)로 메일이 간다([adminAlertMail.ts](functions/src/core/adminAlertMail.ts)) — 담당자가 정해지면 이 주소를 그 사람으로 | — | — | — |
 
 **알아 둘 한계**
 - export는 Firestore 문서만 담는다. **사진 파일은 export에 없다** — 문서에 남은 사진 주소는 복원되지만 파일이 지워졌으면 깨진 사진이 된다(7일 안이면 소프트 삭제에서 되살린다).

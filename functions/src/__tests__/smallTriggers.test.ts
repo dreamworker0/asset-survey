@@ -1,6 +1,7 @@
 /**
  * smallTriggers.test.ts — 커버리지 0%였던 작은 트리거 둘
- * - notifyRoleChange: superAdmin **승격**일 때만 보안 알림(이미 superAdmin·다른 역할 변경·삭제는 조용히)
+ * - notifyRoleChange: superAdmin **승격**일 때만 보안 알림(이미 superAdmin·다른 역할 변경·삭제는 조용히).
+ *   Discord를 비워 둔 운영에서도 닿도록 운영자 메일을 함께 보낸다
  * - onUserDelete: Auth 계정 삭제 시 users 문서 익명화, 문서가 없으면(NOT_FOUND) 정보 로그만
  */
 
@@ -12,6 +13,10 @@ const mockCollection = jest.fn((_name: string) => ({ doc: mockDoc }));
 const mockLog = jest.fn();
 
 jest.mock('../core/discord', () => ({ sendDiscordAlert: (...args: unknown[]) => mockSendDiscordAlert(...args) }));
+const mockSendAdminAlertMail = jest.fn().mockResolvedValue(true);
+jest.mock('../core/adminAlertMail', () => ({ sendAdminAlertMail: (...args: unknown[]) => mockSendAdminAlertMail(...args) }));
+jest.mock('../core/params', () => ({ GMAIL_APP_PASSWORD: 'GMAIL_APP_PASSWORD' }));
+jest.mock('../utils/serviceUrl', () => ({ serviceUrl: () => 'https://app.example' }));
 jest.mock('firebase-admin/firestore', () => ({
     getFirestore: () => ({ collection: mockCollection }),
     FieldValue: { serverTimestamp: jest.fn(() => 'SERVER_TIMESTAMP'), delete: jest.fn(() => 'FIELD_DELETE') },
@@ -47,6 +52,7 @@ beforeEach(() => {
 describe('notifyRoleChange — superAdmin 승격 경보', () => {
     type Doc = Record<string, unknown> | null;
     const run = (before: Doc, after: Doc) => (notifyRoleChange as unknown as (e: unknown) => Promise<void>)({
+        params: { uid: 'u1' },
         data: { before: { data: () => before ?? undefined }, after: { data: () => after ?? undefined } },
     });
 
@@ -64,6 +70,12 @@ describe('notifyRoleChange — superAdmin 승격 경보', () => {
             { name: '이메일', value: 'h@x.kr', inline: true },
             { name: '추정 소속(Org ID)', value: 'org1', inline: false },
         ]);
+        // Discord가 꺼져 있어도 닿는 경로 — 메일 1통
+        expect(mockSendAdminAlertMail).toHaveBeenCalledTimes(1);
+        const mail = mockSendAdminAlertMail.mock.calls[0][0];
+        expect(mail.subject).toContain('superAdmin');
+        expect(mail.lines).toEqual(expect.arrayContaining(['사용자: 홍길동', '소속 기관 ID: org1', '사용자 UID: u1']));
+        expect(mail.link.href).toBe('https://app.example/super-admin/admins');
     });
 
     it.each([
@@ -74,6 +86,7 @@ describe('notifyRoleChange — superAdmin 승격 경보', () => {
     ])('%s은 알리지 않는다', async (_label, before, after) => {
         await run(before, after);
         expect(mockSendDiscordAlert).not.toHaveBeenCalled();
+        expect(mockSendAdminAlertMail).not.toHaveBeenCalled();
     });
 
     it('빈 정보는 대체 문구로 채우고, 알림 실패는 트리거를 실패시키지 않는다', async () => {
