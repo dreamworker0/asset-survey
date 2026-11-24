@@ -104,10 +104,10 @@
 
 | 대상 | 백업 방식 | 근거 | 최근 확인 | 복원 훈련 |
 |---|---|---|---|---|
-| Firestore (기본 DB, 서울) | 매일 02:20(서울) 전체 export → `gs://asset-survey-sp-backups/backups/firestore/{날짜}/`, **90일 뒤 자동 삭제** | [dailyNightlyBatch.ts](functions/src/handlers/scheduled/dailyNightlyBatch.ts) `backupFirestore`, 버킷 목록에 11-22·11-23·11-24 폴더 있음 | 2026-11-24(목록만) | **미확인 — 한 번도 안 함** |
+| Firestore (기본 DB, 서울) | 매일 02:20(서울) 전체 export → `gs://asset-survey-sp-backups/backups/firestore/{날짜}/`, **90일 뒤 자동 삭제** | [dailyNightlyBatch.ts](functions/src/handlers/scheduled/dailyNightlyBatch.ts) `backupFirestore`, 버킷 목록에 11-22~11-25 폴더 있음 | 2026-11-25 | **통과 (2026-11-25)** — 아래 5.2 기록 |
 | Firestore 특정 시점 복구(PITR) | 꺼짐 | `gcloud firestore databases describe` → `POINT_IN_TIME_RECOVERY_DISABLED` | 2026-11-24 | 해당 없음 |
 | Firestore DB 삭제 보호 | **켜짐 (2026-11-25)** | 같은 명령 → `DELETE_PROTECTION_ENABLED` | 2026-11-25 | 해당 없음 |
-| Storage(재물 사진·현장 사진·증빙서류, us-east1) | **별도 백업 없음.** 지운 파일은 소프트 삭제로 **7일** 동안 되살릴 수 있다 | `gcloud storage buckets describe` → `soft_delete_policy 604800초` | 2026-11-24 | **미확인** |
+| Storage(재물 사진·현장 사진·증빙서류, us-east1) | **별도 백업 없음.** 지운 파일은 소프트 삭제로 **7일** 동안 되살릴 수 있다 | `gcloud storage buckets describe` → `soft_delete_policy 604800초` | 2026-11-25 | **통과 (2026-11-25)** — 시험 파일 지웠다 되살림 |
 | Authentication(로그인 계정) | **백업 없음** — Firestore export에 들어가지 않는다 | Firebase 기본 동작 | — | 해당 없음 |
 | 담당자 | **미정** — 백업 실패 알림을 받고 복원을 결정할 사람. 야간·주간 배치의 실패·경고, superAdmin 승격, 새 의견은 `ADMIN_NOTIFICATION_EMAIL`(없으면 `GMAIL_USER`)로 메일이 간다([adminAlertMail.ts](functions/src/core/adminAlertMail.ts)) — 담당자가 정해지면 이 주소를 그 사람으로 | — | — | — |
 
@@ -138,7 +138,7 @@
 
 | 날짜 | 한 사람 | 사용한 export | 문서 수 일치 | 걸린 시간 | Storage 되살리기 | 메모 |
 |---|---|---|---|---|---|---|
-| (아직 없음) | | | | | | |
+| 2026-11-25 | AI(사용자 승인) | `2026-11-25`(02:20 KST, 3.4MB) | **12개 컬렉션 전부 같음** (재물 2,943·금액 2,943·반영 목록 520 등). 표본 5건(재물 2·회차 1·스캔 1·반영 목록 1) 필드·형식 일치 | **51초** (import 23:14:32→23:15:23 UTC, 문서 6,626) | 통과 — `restore-drill/drill.txt` 지운 뒤 `#세대`로 되살려 내용 같음 | 훈련용 DB `restore-drill` 만든 뒤 지움(남은 DB는 `(default)`뿐). 운영 DB는 읽기만. 시험 파일은 지워 7일 뒤 소프트 삭제에서도 사라짐. 다음 훈련 2027-02 |
 
 ### 5.3 정할 것 (사용자)
 
