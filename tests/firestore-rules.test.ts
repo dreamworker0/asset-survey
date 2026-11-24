@@ -1284,7 +1284,12 @@ describe('Firestore Security Rules for Multi-Tenant Isolation', () => {
       await assertFails(admin('A').collection('surveys').doc('sv1').update(close('admin_A', { closedByUid: 'emp_A1' })));
       // 마감 시점 공간 위치(2026-11-22)는 map일 때만 함께 남길 수 있다
       await assertFails(admin('A').collection('surveys').doc('sv1').update(close('admin_A', { spaceLocations: '본관 1층' })));
-      await assertSucceeds(admin('A').collection('surveys').doc('sv1').update(close('admin_A', { spaceLocations: { 'sp-1': '본관 1층' } })));
+      // 마감 시점 보고서 머리(2026-11-24) — 정해진 키·모양일 때만
+      const snap = { orgName: '행복복지관', approvalLine: [{ title: '담당' }], personNames: { emp_A1: '김직원' } };
+      await assertFails(admin('A').collection('surveys').doc('sv1').update(close('admin_A', { reportSnapshot: { ...snap, extra: 1 } })));
+      await assertFails(admin('A').collection('surveys').doc('sv1').update(close('admin_A', { reportSnapshot: { ...snap, personNames: '김직원' } })));
+      await assertFails(admin('A').collection('surveys').doc('sv1').update(close('admin_A', { reportSnapshot: '행복복지관' })));
+      await assertSucceeds(admin('A').collection('surveys').doc('sv1').update(close('admin_A', { spaceLocations: { 'sp-1': '본관 1층' }, reportSnapshot: snap })));
       await assertFails(admin('A').collection('surveys').doc('sv1').update({ status: 'open' }));
       await assertFails(admin('A').collection('surveys').doc('sv1').update(freeze('admin_A', 'open')));
       await assertFails(admin('A').collection('surveys').doc('sv1').update(freeze('admin_A')));

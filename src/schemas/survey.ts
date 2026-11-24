@@ -49,6 +49,16 @@ export const surveySchema = z.object({
      * 보고서가 나중에 공간을 옮겨도 마감 시점 위치로 묶이게 남긴다. 그 전에 마감한 회차에는 없다.
      */
     spaceLocations: z.record(z.string(), z.string()).optional().catch(undefined),
+    /**
+     * 마감 시점 보고서 머리 — 2026-11-24(사용자 결정). 결재 문서라 나중에 다시 출력해도 마감 당시 기관명·결재선 칸과
+     * 제출·승인·이력에 나온 사람 이름(uid → 이름)으로 나오게 남긴다. 이름은 그 회차에 나온 사람만 담는다.
+     * 그 전에 마감한 회차에는 없어 지금 값을 쓴다.
+     */
+    reportSnapshot: z.object({
+        orgName: z.string().catch(''),
+        approvalLine: z.array(z.object({ title: z.string().catch('') })).catch([]),
+        personNames: z.record(z.string(), z.string()).catch({}),
+    }).optional().catch(undefined),
     /** 마감 시점 요약 숫자(목록 화면용) */
     summary: z.object({
         target: z.number().catch(0),

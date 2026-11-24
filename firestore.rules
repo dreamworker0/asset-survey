@@ -459,12 +459,22 @@ service cloud.firestore {
                     && resource.data.status == 'closing'
                     && request.resource.data.status == 'closed'
                     && request.resource.data.diff(resource.data).affectedKeys()
-                         .hasOnly(['status', 'closedAt', 'closedByUid', 'spaceNames', 'spaceLocations', 'summary', 'lastEditedByUid'])
+                         .hasOnly(['status', 'closedAt', 'closedByUid', 'spaceNames', 'spaceLocations', 'summary', 'reportSnapshot', 'lastEditedByUid'])
                     && request.resource.data.closedAt == request.time
                     && request.resource.data.closedByUid == request.auth.uid
                     && request.resource.data.lastEditedByUid == request.auth.uid
                     && request.resource.data.spaceNames is map
                     && (!('spaceLocations' in request.resource.data) || request.resource.data.spaceLocations is map)
+                    // 마감 시점 보고서 머리(기관명·결재선·나온 사람 이름, 2026-11-24) — 정해진 모양일 때만
+                    && (!('reportSnapshot' in request.resource.data)
+                        || (request.resource.data.reportSnapshot is map
+                            && request.resource.data.reportSnapshot.keys().hasOnly(['orgName', 'approvalLine', 'personNames'])
+                            && request.resource.data.reportSnapshot.orgName is string
+                            && request.resource.data.reportSnapshot.orgName.size() <= 100
+                            && request.resource.data.reportSnapshot.approvalLine is list
+                            && request.resource.data.reportSnapshot.approvalLine.size() <= 10
+                            && request.resource.data.reportSnapshot.personNames is map
+                            && request.resource.data.reportSnapshot.personNames.size() <= 500))
                     && request.resource.data.summary is map;
       allow delete: if false;
     }

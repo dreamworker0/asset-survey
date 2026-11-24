@@ -16,14 +16,15 @@ import { useToast } from './useToast';
 import {
     getSurveys, getSurveyTargets, getSpaces, getAssets, getOrganization, startSurvey, groupTargets,
     subscribeSurveyScans, subscribeSubmissions, reviewSpace, closeSurvey, getOrganizationMembers, getBuildings,
-    beginClosing, cancelClosing, getScans, getSubmissions,
+    beginClosing, cancelClosing, getScans, getSubmissions, getSurveyEvents,
 } from '../lib/firestore';
 import { orderSpacesByLocation, spaceLocationMap } from '../lib/spaceGroups';
 import { progressBySpace, type SpaceProgress } from '../lib/survey/judge';
 import { buildReport, buildSyncTasks, closeBlockers } from '../lib/survey/report';
 import { DEFAULT_SURVEY_MODE, SURVEY_NAME_MAX, NO_SPACE_KEY } from '../schemas';
 import { toLocalDateStr } from '../lib/dateUtils';
-import type { Survey, SurveyTarget, Scan, SurveySubmission } from '../types/survey';
+import type { Survey, SurveyTarget, Scan, SurveySubmission, SurveyEvent } from '../types/survey';
+import type { Organization } from '../types/organization';
 import type { Asset } from '../types/asset';
 import type { Space } from '../types/space';
 import type { Building } from '../types/building';
@@ -272,10 +273,15 @@ export default function useSurveyAdmin() {
             }
             const report = buildReport(targets, finalScans, finalSubs, reportOrderFor(open));
             const tasks = buildSyncTasks(open.id, report);
+            // 보고서 머리를 마감 시점으로 남긴다(2026-11-24) — 나중에 다시 출력해도 같은 기관명·결재선·이름
+            const [org, members, events] = await Promise.all([
+                getOrganization(orgId), getOrganizationMembers(orgId), getSurveyEvents(orgId, open.id),
+            ]);
+            const reportSnapshot = buildReportSnapshot(org, members, finalSubs, events, uid);
             await closeSurvey({
                 orgId, surveyId: open.id, tasks,
                 spaceNames: spaceNamesFor(open, spaces), spaceLocations: spaceLocationsFor(open, spaces, buildings),
-                summary: report.summary,
+                summary: report.summary, reportSnapshot,
             });
             const f = report.summary;
             showToast(!resuming && (f.found !== shown.found || f.target !== shown.target)
@@ -291,7 +297,7 @@ export default function useSurveyAdmin() {
         } finally {
             setClosing(false);
         }
-    }, [orgId, open, closing, blockers, spaces, buildings, targets, scans, submissions, confirm, showToast, load]);
+    }, [orgId, uid, open, closing, blockers, spaces, buildings, targets, scans, submissions, confirm, showToast, load]);
 
     /** 마감 취소 — '마감 중'에 멈춘 회차를 다시 열어 찍고 승인할 수 있게 한다 */
     const cancelClose = useCallback(async (): Promise<void> => {
@@ -312,6 +318,30 @@ export default function useSurveyAdmin() {
         orgId, uid, surveys, spaces, buildings, mode, open, loading, error, reload: load,
         form, setForm, openForm, closeForm: () => setForm(null), preview, formError, start, starting,
         progress, totals, scans, recent, submissions, submissionOf, names, review, blockers, close, cancelClose, closing,
+    };
+}
+
+/**
+ * 마감 시점 보고서 머리 — 기관명·결재선 칸(숨겼으면 빈 줄)과, 이 회차의 제출·승인·이력에 나온 사람과 마감한 사람의 이름.
+ * 기관을 나가 목록에 없는 사람은 담지 않는다(보고서에 '알 수 없음').
+ */
+export function buildReportSnapshot(
+    org: Pick<Organization, 'name' | 'approvalLine' | 'hideApprovalLine'> | null,
+    members: Array<{ id: string; name?: string | null; email?: string | null }>,
+    submissions: Array<Pick<SurveySubmission, 'submittedByUid' | 'reviewedByUid'>>,
+    events: Array<Pick<SurveyEvent, 'byUid'>>,
+    closerUid: string | null,
+): NonNullable<Survey['reportSnapshot']> {
+    const uids = new Set<string>();
+    for (const x of submissions) { if (x.submittedByUid) uids.add(x.submittedByUid); if (x.reviewedByUid) uids.add(x.reviewedByUid); }
+    for (const e of events) if (e.byUid) uids.add(e.byUid);
+    if (closerUid) uids.add(closerUid);
+    const personNames: Record<string, string> = {};
+    for (const m of members) if (uids.has(m.id)) personNames[m.id] = m.name || m.email || '(이름 없음)';
+    return {
+        orgName: org?.name ?? '',
+        approvalLine: org?.hideApprovalLine ? [] : (org?.approvalLine ?? []).map((a) => ({ title: a.title })),
+        personNames,
     };
 }
 

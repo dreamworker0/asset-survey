@@ -21,12 +21,13 @@ vi.mock('../../lib/firestore', async () => {
         subscribeSubmissions: vi.fn((_o: string, _s: string, cb: (x: unknown[]) => void) => { pushSubs = cb; return () => { }; }),
         reviewSpace: vi.fn(), closeSurvey: vi.fn(), getBuildings: vi.fn(async () => []),
         beginClosing: vi.fn(), cancelClosing: vi.fn(), getScans: vi.fn(async () => []), getSubmissions: vi.fn(async () => []),
+        getSurveyEvents: vi.fn(async () => []),
     };
 });
 vi.mock('../../lib/firebase', () => ({ db: {}, auth: { currentUser: null } }));
 
 import * as fs from '../../lib/firestore';
-import useSurveyAdmin, { defaultStartForm, validateStartForm } from '../../hooks/useSurveyAdmin';
+import useSurveyAdmin, { defaultStartForm, validateStartForm, buildReportSnapshot } from '../../hooks/useSurveyAdmin';
 
 const space = (id: string, archived = false) => ({ id, organizationId: 'org-A', name: id, order: 0, managerUids: [], archived });
 const asset = (id: string, spaceId: string | null, status = 'active') => ({ id, code: id, name: null, tagId: null, spaceId, status });
@@ -127,10 +128,20 @@ describe('현황판·승인·마감 (기획서 F13~F15)', () => {
         });
         expect(result.current.blockers).toEqual([]);
         expect(result.current.totals).toMatchObject({ target: 2, found: 1 });
-        vi.mocked(fs.getSubmissions).mockResolvedValue([{ spaceId: 'sp-1', state: 'approved' }, { spaceId: 'sp-2', state: 'approved' }] as never);
+        vi.mocked(fs.getSubmissions).mockResolvedValue([
+            { spaceId: 'sp-1', state: 'approved', submittedByUid: 'emp-1', reviewedByUid: 'admin-1' },
+            { spaceId: 'sp-2', state: 'approved', submittedByUid: null, reviewedByUid: 'admin-1' },
+        ] as never);
         vi.mocked(fs.getScans).mockResolvedValue([SCAN_A1] as never);
+        vi.mocked(fs.getOrganization).mockResolvedValue({ id: 'org-A', name: '행복복지관', approvalLine: [{ title: '담당' }, { title: '관장' }] } as never);
+        vi.mocked(fs.getOrganizationMembers).mockResolvedValue([{ id: 'emp-1', name: '김직원' }, { id: 'admin-1', name: '박관리' }, { id: 'other', name: '다른사람' }] as never);
         confirm.mockResolvedValueOnce(true);
         await act(async () => { await result.current.close(); });
+        // 보고서 머리를 마감 시점으로 남긴다 — 이 회차에 나온 사람만
+        expect(vi.mocked(fs.closeSurvey).mock.calls[0][0].reportSnapshot).toEqual({
+            orgName: '행복복지관', approvalLine: [{ title: '담당' }, { title: '관장' }],
+            personNames: { 'emp-1': '김직원', 'admin-1': '박관리' },
+        });
         // 먼저 멈추고, 서버에서 새로 읽은 뒤 닫는다
         expect(fs.beginClosing).toHaveBeenCalledWith('sv1');
         expect(fs.getScans).toHaveBeenCalledWith('org-A', 'sv1', { fromServer: true });
@@ -195,5 +206,18 @@ describe('현황판·승인·마감 (기획서 F13~F15)', () => {
 
         await act(async () => { await result.current.cancelClose(); });
         expect(fs.cancelClosing).toHaveBeenCalledWith('sv1');
+    });
+});
+
+describe('buildReportSnapshot (2026-11-24)', () => {
+    it('결재선을 숨겼으면 빈 줄, 나간 사람은 담지 않고, 이력에 나온 사람과 마감한 사람은 담는다', () => {
+        const snap = buildReportSnapshot(
+            { name: '기관', approvalLine: [{ title: '담당' }], hideApprovalLine: true },
+            [{ id: 'a', name: '' , email: 'a@x.org' }, { id: 'b', name: '비' }, { id: 'c', name: '씨' }],
+            [{ submittedByUid: 'gone', reviewedByUid: null }],
+            [{ byUid: 'a' }],
+            'b',
+        );
+        expect(snap).toEqual({ orgName: '기관', approvalLine: [], personNames: { a: 'a@x.org', b: '비' } });
     });
 });

@@ -411,6 +411,8 @@ export const closeSurvey = async (input: {
     orgId: string; surveyId: string; tasks: SyncTaskDraft[]; spaceNames: Record<string, string>; summary: SurveySummary;
     /** 마감 시점 공간 위치("본관 2층") — 건물을 등록하지 않은 기관은 빈 글자뿐이라 남기지 않는다 */
     spaceLocations?: Record<string, string>;
+    /** 마감 시점 보고서 머리 — 기관명·결재선·나온 사람 이름(2026-11-24) */
+    reportSnapshot?: NonNullable<Survey['reportSnapshot']>;
 }): Promise<void> => {
     const { orgId, surveyId, tasks } = input;
     const uid = actorStamp().lastEditedByUid ?? '';
@@ -428,6 +430,7 @@ export const closeSurvey = async (input: {
         batch.update(doc(db, 'surveys', surveyId), {
             status: 'closed', closedAt: serverTimestamp(), closedByUid: uid, spaceNames: input.spaceNames, summary: input.summary,
             ...(input.spaceLocations && Object.values(input.spaceLocations).some(Boolean) ? { spaceLocations: input.spaceLocations } : {}),
+            ...(input.reportSnapshot ? { reportSnapshot: input.reportSnapshot } : {}),
             lastEditedByUid: uid,
         });
         batch.set(doc(collection(db, 'surveyEvents')), eventData(orgId, surveyId, 'close', {
