@@ -146,17 +146,26 @@ describe('Firestore Security Rules for Multi-Tenant Isolation', () => {
     // 정상: 동의 기록을 건드리지 않는 다른 필드 수정은 허용
     await assertSucceeds(adminADb.collection('organizations').doc('org-A').update({ hipassEnabled: false }));
 
-    // 신청자 경로(status:'pending' + 본인 신청)도 consent를 건드리지 않으면 정상 동작해야 한다
+    // 신청자 본인 수정 분기는 2026-11-24 뺐다(신청은 서버가 applicantUid "anonymous-app"으로 만든다).
+    // applicantUid가 실제 uid와 같은 승인 전 기관이라도 신청자는 아무 필드도 쓸 수 없다.
     await testEnv.withSecurityRulesDisabled(async (context) => {
       await context.firestore().collection('organizations').doc('org-pending').set({
         name: '신청중기관', applicantUid: 'applicant_1', status: 'pending',
       });
     });
     const applicantDb = setupContext('applicant_1', { role: 'employee' }).firestore();
-    await assertSucceeds(applicantDb.collection('organizations').doc('org-pending').update({ address: '서울시' }));
+    await assertFails(applicantDb.collection('organizations').doc('org-pending').update({ address: '서울시' }));
     await assertFails(applicantDb.collection('organizations').doc('org-pending').update({
       consent: { terms: true, privacy: true, termsVersion: '2026-08-05', privacyVersion: '2026-08-05' },
     }));
+    // 서버가 실제로 남기는 표식("anonymous-app")으로는 누구도 맞출 수 없다 — 이름·연락처를 고쳐 쓰는 것도 막힌다
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      await context.firestore().collection('organizations').doc('org-anon').set({
+        name: '익명신청기관', applicantUid: 'anonymous-app', status: 'pending',
+      });
+    });
+    const anonUidDb = setupContext('anonymous-app', { role: 'employee' }).firestore();
+    await assertFails(anonUidDb.collection('organizations').doc('org-anon').update({ applicantPhone: '010-0000-0000' }));
 
     // create 경로로 임의 동의 기록을 심는 것도 차단 (update만 막으면 우회 가능)
     await assertFails(superDb.collection('organizations').doc('org_new_evil').set({

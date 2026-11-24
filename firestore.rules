@@ -165,7 +165,10 @@ service cloud.firestore {
                             'uniqueNumber', 'uniqueNumberImagePath', 'uniqueNumberImageUrl',
                             'applicantUid', 'applicantEmail', 'applicantName', 'applicantPhone'
                           ]))
-                      || (isSignedIn() && resource.data.status == 'pending' && resource.data.applicantUid == request.auth.uid && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['status', 'role']))
+                      // 신청자 본인 수정 분기(status:'pending' + applicantUid == uid)는 2026-11-24 뺐다 —
+                      // 신청은 로그인 없이 submitOrgApplication(Admin SDK)이 만들고 applicantUid를
+                      // "anonymous-app"으로 남겨, 어떤 계정과도 맞지 않는 죽은 분기였다. 남겨 두면
+                      // applicantUid를 실제 uid로 쓰는 경로가 생기는 순간 승인 전 기관 문서가 열린다.
                     );
       allow delete: if isSuperAdmin();
 
