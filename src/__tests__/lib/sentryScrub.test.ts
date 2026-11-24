@@ -170,11 +170,11 @@ describe('scrubContext', () => {
         const out = scrubContext({
             context: 'updateVehicle',
             vehicleId: 'v1',
-            googleCalendarId: 'jw@sasw.or.kr',
+            googleCalendarId: 'staff@example.or.kr',
             componentStack: '문의 010-9876-5432 로 연락',
         });
 
-        expect(out.googleCalendarId).not.toContain('sasw.or.kr');
+        expect(out.googleCalendarId).not.toContain('example.or.kr');
         expect(out.componentStack).not.toContain('010-9876-5432');
         expect(out.vehicleId).toBe('v1');
     });
