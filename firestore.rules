@@ -119,10 +119,11 @@ service cloud.firestore {
 
     // === 기관 ===
     match /organizations/{orgId} {
-      // 소속 멤버, 신청자 본인, superAdmin만 읽기 가능 (초대 코드 검증은 Cloud Function에서 처리)
+      // 소속 멤버와 superAdmin만 읽기 가능 (초대 코드 검증은 Cloud Function에서 처리).
+      // 신청자 본인 읽기 분기(applicantUid == uid)는 2026-11-24 뺐다 — 신청은 로그인 없이 서버가
+      // applicantUid "anonymous-app"으로 만들어 맞는 계정이 없었다. 수정 분기와 같은 이유(#36).
       allow read: if isSuperAdmin()
-                  || isOrgMember(orgId)
-                  || (isSignedIn() && resource.data.applicantUid == request.auth.uid);
+                  || isOrgMember(orgId);
       // 기관 생성은 서버(submitOrgApplication, Admin SDK) 또는 superAdmin 전용.
       // 과거 클라이언트 create는 status:'approved'·inviteCode를 임의 지정해 AI 검증·
       // superAdmin 승인 절차를 통째로 우회할 수 있었음 (2026-07-10 감사 #2).

@@ -166,6 +166,10 @@ describe('Firestore Security Rules for Multi-Tenant Isolation', () => {
     });
     const anonUidDb = setupContext('anonymous-app', { role: 'employee' }).firestore();
     await assertFails(anonUidDb.collection('organizations').doc('org-anon').update({ applicantPhone: '010-0000-0000' }));
+    // 읽기도 같다 — 신청자 본인 읽기 분기도 뺐다(2026-11-24). 승인 전 기관의 연락처·주소는 superAdmin만 본다
+    await assertFails(applicantDb.collection('organizations').doc('org-pending').get());
+    await assertFails(anonUidDb.collection('organizations').doc('org-anon').get());
+    await assertSucceeds(superDb.collection('organizations').doc('org-pending').get());
 
     // create 경로로 임의 동의 기록을 심는 것도 차단 (update만 막으면 우회 가능)
     await assertFails(superDb.collection('organizations').doc('org_new_evil').set({
