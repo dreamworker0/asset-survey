@@ -83,6 +83,8 @@ export default function ScanPage() {
     }
 
     const pct = sc.target > 0 ? Math.round((sc.found / sc.target) * 100) : 0;
+    /** 입력을 막는 경우 — 이 공간을 제출했거나, 재물 담당자가 마감을 시작했거나 */
+    const inputLocked = sc.locked || sc.paused;
     const submitManual = (e: React.FormEvent) => {
         e.preventDefault();
         if (!code.trim()) return;
@@ -115,12 +117,19 @@ export default function ScanPage() {
                 </div>
             </section>
 
-            {sc.survey.mode === 'delegated' && (
+            {sc.paused && (
+                <section className="rounded-2xl border-2 p-4 bg-amber-50 border-amber-300 text-amber-900 dark:bg-amber-900/30 dark:border-amber-700 dark:text-amber-200" role="alert">
+                    <p className="font-bold">재물 담당자가 조사를 마감하는 중입니다</p>
+                    <p className="text-sm">지금은 스캔과 제출을 할 수 없습니다. 이미 찍은 기록은 그대로 결과에 들어갑니다. 마감이 취소되면 다시 찍을 수 있습니다.</p>
+                </section>
+            )}
+
+            {sc.survey.mode === 'delegated' && !sc.paused && (
                 <SubmissionPanel submission={sc.submission} pending={sc.submissionPending} remaining={sc.remaining.length} submitting={sc.submitting}
                     onSubmit={() => void sc.submit(sc.remaining.length)} />
             )}
 
-            {!sc.locked && (<>
+            {!inputLocked && (<>
             <div className="flex gap-2" role="group" aria-label="입력 방법">
                 {(['camera', 'manual'] as const).map((m) => (
                     <button key={m} type="button" aria-pressed={mode === m} onClick={() => setMode(m)}
@@ -156,8 +165,8 @@ export default function ScanPage() {
             </>)}
 
             {sc.checking && <p className={sub} role="status">확인하는 중…</p>}
-            {sc.last && !sc.locked && <ResultCard last={sc.last} spaceName={sc.spaceName} scan={sc.last.kind === 'saved' ? sc.scanMap.get(sc.last.draft.scanId) : undefined}
-                onCondition={sc.setCondition} onUndo={sc.undo} />}
+            {sc.last && !inputLocked && <ResultCard last={sc.last} spaceName={sc.spaceName} scan={sc.last.kind === 'saved' ? sc.scanMap.get(sc.last.draft.scanId) : undefined}
+                onCondition={sc.setCondition} onUndo={sc.undo} onBeforePhoto={() => setCameraOn(false)} />}
 
             <div className="flex gap-2 pt-2" role="group" aria-label="목록 고르기">
                 <TabButton active={tab === 'remaining'} onClick={() => setTab('remaining')}>남은 재물 {sc.remaining.length}</TabButton>
@@ -193,13 +202,13 @@ export default function ScanPage() {
                                 </span>
                                 </span>
                                 {/* 누르면 상태·사진·지우기가 펼쳐진다는 표시(예전엔 평범한 글자 줄이라 찾을 수 없었다) */}
-                                {!sc.locked && (
+                                {!inputLocked && (
                                     <span className="flex-shrink-0 self-center text-xs font-medium text-primary-700 dark:text-primary-300 border border-surface-300 dark:border-surface-600 rounded-lg px-2 py-1">
                                         고치기 <span aria-hidden="true">{editing === s.id ? '▴' : '▾'}</span>
                                     </span>
                                 )}
                             </button>
-                            {editing === s.id && !sc.locked && <ConditionEditor scan={s} onSave={sc.setCondition} onUndo={sc.undo} />}
+                            {editing === s.id && !inputLocked && <ConditionEditor scan={s} onSave={sc.setCondition} onUndo={sc.undo} />}
                         </li>
                     ))}
                 </ul>
@@ -306,9 +315,11 @@ interface ResultCardProps {
     scan: Scan | undefined;
     onCondition: (scanId: string, c: ScanCondition, memo: string) => void;
     onUndo: (scanId: string) => void;
+    /** 현장 사진 찍기 직전 — QR 카메라를 먼저 끈다(휴대폰 카메라를 둘이 동시에 쥐지 않게) */
+    onBeforePhoto?: () => void;
 }
 
-function ResultCard({ last, spaceName, scan, onCondition, onUndo }: ResultCardProps) {
+function ResultCard({ last, spaceName, scan, onCondition, onUndo, onBeforePhoto }: ResultCardProps) {
     if (last.kind === 'lookupFailed') {
         return (
             <section className={`rounded-2xl border-2 p-4 ${RESULT_STYLE.unregistered}`} role="alert" key={last.at}>
@@ -341,13 +352,13 @@ function ResultCard({ last, spaceName, scan, onCondition, onUndo }: ResultCardPr
             {draft.result === 'otherSpace' && (
                 <p className="text-sm mt-1">목록상 공간: <strong>{draft.expectedSpaceId ? spaceName.get(draft.expectedSpaceId) ?? '(지운 공간)' : '공간 미지정'}</strong></p>
             )}
-            {scan && <ConditionEditor scan={scan} onSave={onCondition} onUndo={onUndo} compact />}
+            {scan && <ConditionEditor scan={scan} onSave={onCondition} onUndo={onUndo} onBeforePhoto={onBeforePhoto} compact />}
         </section>
     );
 }
 
-function ConditionEditor({ scan, onSave, onUndo, compact = false }: {
-    scan: Scan; onSave: (scanId: string, c: ScanCondition, memo: string) => void; onUndo: (scanId: string) => void; compact?: boolean;
+function ConditionEditor({ scan, onSave, onUndo, onBeforePhoto, compact = false }: {
+    scan: Scan; onSave: (scanId: string, c: ScanCondition, memo: string) => void; onUndo: (scanId: string) => void; onBeforePhoto?: () => void; compact?: boolean;
 }) {
     const [condition, setCondition] = useState<ScanCondition>(scan.condition);
     const [memo, setMemo] = useState(scan.memo);
@@ -371,7 +382,7 @@ function ConditionEditor({ scan, onSave, onUndo, compact = false }: {
                     <input className="input min-h-[48px] mt-1" maxLength={SCAN_MEMO_MAX} value={memo} onChange={(e) => setMemo(e.target.value)} placeholder="예: 다리 한쪽 부러짐" />
                 </label>
             )}
-            <ScanPhoto scan={scan} />
+            <ScanPhoto scan={scan} onBeforePick={onBeforePhoto} />
             <div className="flex flex-wrap gap-2 mt-2">
                 <button type="button" className="btn-primary min-h-[48px] px-4 text-sm" disabled={!dirty} onClick={() => onSave(scan.id, condition, memo)}>상태 저장</button>
                 {/* 지우기는 저장과 떨어뜨리고(ml-auto) 묻고 지운다 — 휴대폰에서 잘못 누르기 쉬웠다 */}
@@ -386,7 +397,7 @@ function ConditionEditor({ scan, onSave, onUndo, compact = false }: {
  * 사진은 인터넷이 필요하다(스캔은 끊긴 곳에서도 되지만 사진은 연결됐을 때 올린다).
  * 올린 뒤에는 실시간 구독이 스캔 문서를 다시 받아 작은 사진이 보인다.
  */
-function ScanPhoto({ scan }: { scan: Scan }) {
+function ScanPhoto({ scan, onBeforePick }: { scan: Scan; onBeforePick?: () => void }) {
     const { showToast } = useToast();
     const { confirm } = useConfirm();
     const inputRef = useRef<HTMLInputElement>(null);
@@ -426,7 +437,7 @@ function ScanPhoto({ scan }: { scan: Scan }) {
             )}
             <input ref={inputRef} type="file" accept="image/*" capture="environment" className="hidden"
                 aria-label="현장 사진 찍기" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; void pick(f); }} />
-            <button type="button" className="btn-secondary min-h-[48px] px-3 text-sm" disabled={busy} onClick={() => inputRef.current?.click()}>
+            <button type="button" className="btn-secondary min-h-[48px] px-3 text-sm" disabled={busy} onClick={() => { onBeforePick?.(); inputRef.current?.click(); }}>
                 {busy ? '올리는 중…' : scan.photoUrl ? '📷 사진 바꾸기' : '📷 사진 찍기'}
             </button>
             {scan.photoUrl && (

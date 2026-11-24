@@ -56,7 +56,7 @@ export default function EmployeeHome() {
                 ) : error ? (
                     <div role="alert">
                         <p className="text-sm text-red-700 dark:text-red-300">담당 공간을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 다시 불러오세요.</p>
-                        <button type="button" className="btn-secondary btn-sm min-h-[44px] mt-3" onClick={() => setReloadKey((k) => k + 1)}>다시 불러오기</button>
+                        <button type="button" className="btn-secondary btn-sm min-h-[48px] mt-3" onClick={() => setReloadKey((k) => k + 1)}>다시 불러오기</button>
                     </div>
                 ) : spaces.length === 0 ? (
                     <p className="text-sm text-surface-600 dark:text-surface-400">
@@ -68,13 +68,13 @@ export default function EmployeeHome() {
                             {spaces.map((s) => (
                                 <li key={s.id}>
                                     <Link to={`/employee/assets?space=${encodeURIComponent(s.id)}`}
-                                        className="inline-flex items-center px-3 min-h-[44px] rounded-xl bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-sm font-medium">
+                                        className="inline-flex items-center px-3 min-h-[48px] rounded-xl bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-sm font-medium">
                                         {s.name}
                                     </Link>
                                 </li>
                             ))}
                         </ul>
-                        <Link to="/employee/assets" className="btn-secondary btn-sm min-h-[44px] mt-3">
+                        <Link to="/employee/assets" className="btn-secondary btn-sm min-h-[48px] mt-3">
                             내 공간 재물 보기 <span aria-hidden="true">→</span>
                         </Link>
                     </>
@@ -86,7 +86,13 @@ export default function EmployeeHome() {
                     <p className="text-xs font-medium text-primary-700 dark:text-primary-300">진행 중인 재물조사</p>
                     <h2 id="survey-heading" className="font-semibold text-surface-900 dark:text-surface-100">{survey.name}</h2>
                     <p className="text-sm text-surface-600 dark:text-surface-400 tabular-nums">{survey.startDate} ~ {survey.endDate}</p>
-                    <Link to="/employee/scan" className="btn-primary w-full min-h-[52px] mt-4">📷 스캔하러 가기</Link>
+                    {survey.status === 'closing' ? (
+                        <p className="mt-4 rounded-xl bg-amber-50 dark:bg-amber-900/30 p-3 text-sm text-amber-900 dark:text-amber-200" role="status">
+                            재물 담당자가 조사를 마감하는 중입니다. 지금은 스캔할 수 없습니다.
+                        </p>
+                    ) : (
+                        <Link to="/employee/scan" className="btn-primary w-full min-h-[52px] mt-4">📷 스캔하러 가기</Link>
+                    )}
                 </section>
             ) : (
                 <div className="glass-card p-6 text-center">

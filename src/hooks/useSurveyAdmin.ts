@@ -14,7 +14,7 @@ import { useAuth } from './useAuth';
 import { useConfirm } from './useConfirm';
 import { useToast } from './useToast';
 import {
-    getSurveys, getSurveyTargets, getSpaces, getAssets, getOrganization, startSurvey, groupTargets,
+    getSurveys, getSurveyTargets, getSpaces, getAssets, getOrganization, startSurvey, groupTargets, findOversizedTarget, MAX_TARGETS_PER_SPACE,
     subscribeSurveyScans, subscribeSubmissions, reviewSpace, closeSurvey, getOrganizationMembers, getBuildings,
     beginClosing, cancelClosing, getScans, getSubmissions, getSurveyEvents,
 } from '../lib/firestore';
@@ -178,6 +178,16 @@ export default function useSurveyAdmin() {
     const start = useCallback(async () => {
         if (!orgId || !form || formError || starting || !preview) return;
         if (open) { showToast('이미 진행 중인 조사가 있습니다.', 'error'); return; }
+        // 한 공간 묶음이 문서 하나에 안 담기면 시작이 통째로 거부된다 — 어느 공간을 나눌지 미리 알린다
+        const keys = [...form.spaceIds, ...(form.includesUnassigned ? [NO_SPACE_KEY] : [])];
+        const big = findOversizedTarget(groupTargets(assets, form.spaceIds, form.includesUnassigned), keys);
+        if (big) {
+            const where = big.key === NO_SPACE_KEY ? '공간 미지정' : (spaces.find((s) => s.id === big.key)?.name ?? '한 공간');
+            showToast(big.reason === 'count'
+                ? `'${where}'에 대상이 ${big.count.toLocaleString('ko-KR')}건이라 한 번에 조사할 수 있는 ${MAX_TARGETS_PER_SPACE.toLocaleString('ko-KR')}건을 넘습니다. 재물을 여러 공간으로 나눈 뒤 시작해 주세요.`
+                : `'${where}'의 대상 목록이 너무 커서(품명이 긴 재물 ${big.count.toLocaleString('ko-KR')}건) 한 번에 담을 수 없습니다. 재물을 여러 공간으로 나눈 뒤 시작해 주세요.`, 'error');
+            return;
+        }
         const ok = await confirm({
             title: '조사를 시작할까요?',
             message: `대상 ${preview.total.toLocaleString('ko-KR')}건을 지금 기준으로 고정합니다. 시작한 뒤 재물을 다시 가져와도 이번 조사 대상은 바뀌지 않습니다.`,
@@ -195,7 +205,7 @@ export default function useSurveyAdmin() {
         } finally {
             setStarting(false);
         }
-    }, [orgId, form, formError, starting, preview, open, confirm, mode, assets, showToast, load]);
+    }, [orgId, form, formError, starting, preview, open, confirm, mode, assets, spaces, showToast, load]);
 
     const progress = useMemo<Map<string, SpaceProgress>>(() => progressBySpace(targets, scans), [targets, scans]);
     const totals = useMemo(() => {

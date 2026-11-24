@@ -16,6 +16,7 @@ vi.mock('../../lib/firestore', async () => {
     return {
         getSurveys: vi.fn(), getSurveyTargets: vi.fn(), getSpaces: vi.fn(), getAssets: vi.fn(),
         getOrganization: vi.fn(), startSurvey: vi.fn(), groupTargets: real.groupTargets,
+        findOversizedTarget: real.findOversizedTarget, MAX_TARGETS_PER_SPACE: real.MAX_TARGETS_PER_SPACE,
         getOrganizationMembers: vi.fn(async () => [{ id: 'emp-1', name: '김직원' }]),
         subscribeSurveyScans: vi.fn((_o: string, _s: string, cb: (x: unknown[]) => void) => { pushScans = cb; return () => { }; }),
         subscribeSubmissions: vi.fn((_o: string, _s: string, cb: (x: unknown[]) => void) => { pushSubs = cb; return () => { }; }),

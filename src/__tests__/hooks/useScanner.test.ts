@@ -17,10 +17,12 @@ vi.mock('../../hooks/useToast', () => ({ useToast: () => ({ showToast }) }));
 const confirm = vi.fn();
 vi.mock('../../hooks/useConfirm', () => ({ useConfirm: () => ({ confirm }) }));
 let pushSubmission: (s: unknown) => void = () => { };
+let pushStatus: (s: unknown) => void = () => { };
 vi.mock('../../lib/firestore', () => ({
     getOpenSurvey: vi.fn(), getSurveyTargets: vi.fn(), getSpaces: vi.fn(), findAssetByTag: vi.fn(), findAssetByCode: vi.fn(),
     peekScan: vi.fn(), saveScan: vi.fn(), updateScanCondition: vi.fn(), deleteScan: vi.fn(),
     subscribeSpaceScans: vi.fn(() => () => { }),
+    subscribeSurveyStatus: vi.fn((_id: string, cb: (s: unknown) => void) => { pushStatus = cb; return () => { }; }),
     subscribeSubmission: vi.fn((_s: string, _p: string, cb: (s: unknown) => void) => { pushSubmission = cb; return () => { }; }),
     submitSpace: vi.fn(),
 }));
@@ -164,6 +166,41 @@ describe('공간 제출 (기획서 F13)', () => {
         const h = await ready();
         confirm.mockResolvedValueOnce(false);
         await act(async () => { await h.result.current.submit(0); });
+        expect(fs.submitSpace).not.toHaveBeenCalled();
+    });
+});
+
+// 재물 담당자가 마감을 시작하면(closing) Rules가 스캔·제출을 거부한다 — 열어 둔 직원 화면도 바로 잠가야 한다
+describe('마감 중 잠금', () => {
+    it('회차가 closing으로 바뀌면 paused가 되고 찍어도 저장하지 않는다', async () => {
+        const h = await ready();
+        expect(h.result.current.paused).toBe(false);
+
+        act(() => pushStatus('closing'));
+        expect(h.result.current.paused).toBe(true);
+
+        await act(async () => { h.result.current.handle('1', 'manual'); });
+        expect(fs.saveScan).not.toHaveBeenCalled();
+    });
+
+    it('마감이 취소되면(open) 다시 찍을 수 있다', async () => {
+        const h = await ready();
+        act(() => pushStatus('closing'));
+        act(() => pushStatus('open'));
+        expect(h.result.current.paused).toBe(false);
+    });
+
+    it('처음부터 마감 중인 회차로 열면 잠겨 있다', async () => {
+        vi.mocked(fs.getOpenSurvey).mockResolvedValue({ ...SURVEY, status: 'closing' });
+        const h = await ready();
+        expect(h.result.current.paused).toBe(true);
+    });
+
+    it('마감 중에는 제출하지 않는다', async () => {
+        const h = await ready();
+        act(() => pushStatus('closing'));
+        await act(async () => { await h.result.current.submit(0); });
+        expect(confirm).not.toHaveBeenCalled();
         expect(fs.submitSpace).not.toHaveBeenCalled();
     });
 });

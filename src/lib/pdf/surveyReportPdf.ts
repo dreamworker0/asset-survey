@@ -72,6 +72,28 @@ export function buildSurveyReportHtml(ctx: ReportContext, orgName: string, appro
 </html>`;
 }
 
+/**
+ * 새 창의 그림(현장 사진)을 다 받은 뒤 인쇄한다.
+ *
+ * 예전에는 `document.close()` 뒤에 `w.onload`를 걸었는데, about:blank 창은 close 시점에 이미
+ * load가 끝났을 수 있어 인쇄 창이 아예 안 뜨거나, 사진이 덜 받아진 채 인쇄됐다.
+ * 라벨 인쇄(LabelPrintDialog)처럼 그림마다 decode를 기다리고, 실패한 그림은 건너뛰며,
+ * 느린 연결에서도 끝없이 기다리지 않게 상한을 둔다.
+ */
+export function printWhenImagesReady(w: Window, timeoutMs = 8000): void {
+    let done = false;
+    const go = () => {
+        if (done) return;
+        done = true;
+        // 레이아웃이 자리 잡을 짧은 여유
+        setTimeout(() => { try { w.print(); } catch { /* 사용자가 창을 먼저 닫은 경우 */ } }, 300);
+    };
+    const pending = Array.from(w.document.images ?? []).filter((img) => !img.complete);
+    if (pending.length === 0) { go(); return; }
+    void Promise.all(pending.map((img) => img.decode().catch(() => undefined))).then(go);
+    setTimeout(go, timeoutMs);
+}
+
 /** 새 창에 보고서를 열고 인쇄 창을 띄운다(PDF로 저장 가능) */
 export function printSurveyReport(ctx: ReportContext, orgName: string, approvalLine: ApprovalEntry[], onError?: (msg: string) => void): boolean {
     const w = window.open('', '_blank', 'width=900,height=900');
@@ -81,7 +103,7 @@ export function printSurveyReport(ctx: ReportContext, orgName: string, approvalL
     }
     w.document.write(buildSurveyReportHtml(ctx, orgName, approvalLine));
     w.document.close();
-    w.onload = () => { setTimeout(() => w.print(), 300); };
+    printWhenImagesReady(w);
     recordExport('pdf', 'surveyReport', ctx.report.summary.target);
     return true;
 }

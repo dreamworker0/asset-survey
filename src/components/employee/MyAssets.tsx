@@ -81,7 +81,7 @@ export default function MyAssets() {
                                 <button
                                     key={s.id} type="button" aria-pressed={active}
                                     onClick={() => setParams(s.id === 'all' ? {} : { space: s.id }, { replace: true })}
-                                    className={`flex-shrink-0 px-3 min-h-[44px] rounded-xl text-sm font-medium ${active
+                                    className={`flex-shrink-0 px-3 min-h-[48px] rounded-xl text-sm font-medium ${active
                                         ? 'bg-primary-600 text-white dark:bg-primary-500'
                                         : 'bg-white dark:bg-surface-800 text-surface-700 dark:text-surface-300 border border-surface-200 dark:border-surface-700'}`}
                                 >
@@ -95,7 +95,7 @@ export default function MyAssets() {
                         <span className="sr-only">검색</span>
                         <input type="search" className="input min-h-[48px]" placeholder="자산코드·품명으로 찾기" value={search} onChange={(e) => setSearch(e.target.value)} />
                     </label>
-                    <label className="flex items-center gap-2 min-h-[44px] text-sm text-surface-700 dark:text-surface-300">
+                    <label className="flex items-center gap-2 min-h-[48px] text-sm text-surface-700 dark:text-surface-300">
                         <input type="checkbox" className="w-5 h-5 accent-primary-600" checked={withInactive} onChange={(e) => setWithInactive(e.target.checked)} />
                         불용·폐기도 보기
                     </label>

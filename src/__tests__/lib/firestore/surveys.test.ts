@@ -35,7 +35,7 @@ vi.mock('../../../lib/offline/syncQueue', () => ({ trackWrite: (...a: unknown[])
 
 import * as fs from 'firebase/firestore';
 import {
-    groupTargets, startSurvey, saveScan, peekScan, subscribeSpaceScans, submitSpace, reviewSpace, closeSurvey, setSyncTaskDone,
+    groupTargets, findOversizedTarget, MAX_TARGETS_PER_SPACE, startSurvey, saveScan, peekScan, subscribeSpaceScans, submitSpace, reviewSpace, closeSurvey, setSyncTaskDone,
 } from '../../../lib/firestore/surveys';
 import type { Asset } from '../../../types/asset';
 
@@ -50,6 +50,28 @@ const ASSETS = [
 ];
 
 beforeEach(() => { vi.clearAllMocks(); ops.length = 0; });
+
+// 회차 시작은 한 배치라 공간 묶음 하나만 문서 한도를 넘어도 통째로 거부된다 — 어느 공간인지 미리 찾는다
+describe('findOversizedTarget', () => {
+    const item = (i: number, name = 'TV') => ({ id: `org__${i}`, code: String(i), name, tagId: null });
+    it('모든 묶음이 담기면 null', () => {
+        const g = new Map([['sp-1', [item(1)]], ['_none', [item(2)]]]);
+        expect(findOversizedTarget(g, ['sp-1', '_none'])).toBeNull();
+    });
+    it('건수 한도(Rules와 같은 3,000건)를 넘는 공간을 찾는다', () => {
+        const g = new Map([['sp-1', [item(1)]], ['sp-2', Array.from({ length: MAX_TARGETS_PER_SPACE + 1 }, (_, i) => item(i))]]);
+        expect(findOversizedTarget(g, ['sp-1', 'sp-2'])).toEqual({ key: 'sp-2', count: MAX_TARGETS_PER_SPACE + 1, reason: 'count' });
+    });
+    it('건수 안이어도 품명이 길어 문서 크기를 넘으면 찾는다', () => {
+        const long = '가'.repeat(150); // UTF-8 450바이트
+        const g = new Map([['sp-1', Array.from({ length: 2500 }, (_, i) => item(i, long))]]);
+        expect(findOversizedTarget(g, ['sp-1'])).toEqual({ key: 'sp-1', count: 2500, reason: 'bytes' });
+    });
+    it('고르지 않은 공간은 보지 않는다', () => {
+        const g = new Map([['sp-9', Array.from({ length: MAX_TARGETS_PER_SPACE + 1 }, (_, i) => item(i))]]);
+        expect(findOversizedTarget(g, ['sp-1'])).toBeNull();
+    });
+});
 
 describe('groupTargets', () => {
     it('운영 재물만, 고른 공간만, 미지정은 넣을 때만', () => {

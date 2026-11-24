@@ -53,7 +53,7 @@ export default function MorePage() {
                     <p className="text-sm font-semibold text-surface-800 dark:text-surface-200 truncate">{userData?.name || user?.displayName || '사용자'}</p>
                     <p className="text-xs text-surface-600 dark:text-surface-400 truncate">{user?.email || ''}</p>
                 </div>
-                <button type="button" onClick={logout} className="btn-secondary btn-sm min-h-[44px] flex-shrink-0 text-red-700 dark:text-red-300">
+                <button type="button" onClick={logout} className="btn-secondary btn-sm min-h-[48px] flex-shrink-0 text-red-700 dark:text-red-300">
                     <svg aria-hidden="true" className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15m3 0 3-3m0 0-3-3m3 3H9" /></svg>
                     로그아웃
                 </button>
@@ -106,7 +106,7 @@ export default function MorePage() {
                     </div>
                     <div className="flex rounded-lg border border-surface-300 dark:border-surface-600 overflow-hidden" role="group" aria-label="글자 크기">
                         {[{ key: 'small', label: '작게' }, { key: 'normal', label: '보통' }, { key: 'large', label: '크게' }].map(opt => (
-                            <button key={opt.key} type="button" aria-pressed={fontSize === opt.key} onClick={() => setSize(opt.key as 'small' | 'normal' | 'large')} className={`min-h-[44px] min-w-[44px] px-3 text-sm font-medium transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500 ${fontSize === opt.key ? 'bg-primary-600 dark:bg-primary-500 text-white' : 'bg-surface-50 dark:bg-surface-700 text-surface-600 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-600'}`}>{opt.label}</button>
+                            <button key={opt.key} type="button" aria-pressed={fontSize === opt.key} onClick={() => setSize(opt.key as 'small' | 'normal' | 'large')} className={`min-h-[48px] min-w-[44px] px-3 text-sm font-medium transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500 ${fontSize === opt.key ? 'bg-primary-600 dark:bg-primary-500 text-white' : 'bg-surface-50 dark:bg-surface-700 text-surface-600 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-600'}`}>{opt.label}</button>
                         ))}
                     </div>
                 </div>

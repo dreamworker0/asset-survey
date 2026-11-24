@@ -74,13 +74,17 @@ export const getSurvey = async (surveyId: string): Promise<Survey | null> => {
     }
 };
 
-/** 진행 중인 회차 — 한 기관에 하나만 연다(화면이 막는다). 없으면 null */
+/**
+ * 진행 중인 회차 — 한 기관에 하나만 연다(화면이 막는다). 없으면 null.
+ * '마감 중'(closing)도 돌려준다 — 직원 화면이 "마감 중"을 알리고 입력을 잠가야 한다(2026-11-24).
+ * 'open'만 찾으면 마감을 멈춘 사이 들어온 직원은 "조사 없음"을 보고, 이미 열어 둔 화면은 계속 찍다가 거부된다.
+ */
 export const getOpenSurvey = async (orgId: string): Promise<Survey | null> => {
     try {
         const snap = await getDocs(query(
             collection(db, 'surveys').withConverter(surveyConverter),
             where('organizationId', '==', orgId),
-            where('status', '==', 'open'),
+            where('status', 'in', ['open', 'closing']),
             limit(1),
         ));
         return snap.empty ? null : (snap.docs[0].data() as Survey);
@@ -89,6 +93,18 @@ export const getOpenSurvey = async (orgId: string): Promise<Survey | null> => {
         throw error;
     }
 };
+
+/**
+ * 회차 상태를 실시간으로(직원 스캔 화면) — 재물 담당자가 마감을 시작하면 바로 입력을 잠근다.
+ * 문서 1건 구독이라 읽기 비용은 상태가 바뀔 때만 든다.
+ */
+export function subscribeSurveyStatus(surveyId: string, onChange: (status: Survey['status'] | null) => void): Unsubscribe {
+    return onSnapshot(
+        doc(db, 'surveys', surveyId).withConverter(surveyConverter),
+        (snap) => onChange(snap.exists() ? (snap.data() as Survey).status : null),
+        (error) => captureError(error, { context: 'subscribeSurveyStatus', surveyId }),
+    );
+}
 
 /** 회차의 대상 묶음 전부(공간 수만큼, 문서 수십 개) */
 export const getSurveyTargets = async (orgId: string, surveyId: string): Promise<SurveyTarget[]> => {
@@ -131,6 +147,28 @@ export function groupTargets(assets: Asset[], spaceIds: string[], includesUnassi
         });
     }
     return groups;
+}
+
+/** 대상 묶음 한 문서에 담을 수 있는 최대 건수 — firestore.rules의 surveyTargets items.size()와 같다 */
+export const MAX_TARGETS_PER_SPACE = 3000;
+/**
+ * 대상 묶음 한 문서의 안전 상한(바이트). Firestore 문서 상한은 1MiB인데, 품명이 긴 재물이 한 공간에
+ * 몰리면 3,000건 안에서도 넘을 수 있다. 필드 이름·색인 여유를 두고 900KB로 막는다.
+ */
+export const MAX_TARGET_DOC_BYTES = 900_000;
+
+/**
+ * 한 문서에 담기지 않는 공간 묶음을 찾는다 — 없으면 null.
+ * 회차 시작은 한 배치라 하나만 넘어도 통째로 거부되고, 그때 오류만으로는 어느 공간을 나눠야 하는지 모른다.
+ */
+export function findOversizedTarget(groups: Map<string, SurveyTargetItem[]>, keys: string[]): { key: string; count: number; reason: 'count' | 'bytes' } | null {
+    const encoder = new TextEncoder();
+    for (const key of keys) {
+        const items = groups.get(key) ?? [];
+        if (items.length > MAX_TARGETS_PER_SPACE) return { key, count: items.length, reason: 'count' };
+        if (encoder.encode(JSON.stringify(items)).length > MAX_TARGET_DOC_BYTES) return { key, count: items.length, reason: 'bytes' };
+    }
+    return null;
 }
 
 /** 회차 시작 — 회차 문서와 공간별 대상 묶음을 한 배치로. @returns 회차 ID */

@@ -15,7 +15,7 @@ import { useAuth } from './useAuth';
 import { useToast } from './useToast';
 import { useConfirm } from './useConfirm';
 import {
-    getOpenSurvey, getSurveyTargets, getSpaces, findAssetByTag, findAssetByCode, peekScan, saveScan,
+    getOpenSurvey, subscribeSurveyStatus, getSurveyTargets, getSpaces, findAssetByTag, findAssetByCode, peekScan, saveScan,
     updateScanCondition, deleteScan, subscribeSpaceScans, subscribeSubmission, submitSpace,
 } from '../lib/firestore';
 import {
@@ -56,6 +56,8 @@ export default function useScanner(initialSpaceId: string | null) {
     const [submission, setSubmission] = useState<SurveySubmission | null>(null);
     const [submissionPending, setSubmissionPending] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    /** 회차 상태 실시간 — survey 객체를 바꾸면 스캔·제출 구독이 다시 걸리므로 상태만 따로 둔다 */
+    const [liveStatus, setLiveStatus] = useState<Survey['status'] | null>(null);
 
     useEffect(() => {
         if (!orgId) return;
@@ -98,6 +100,14 @@ export default function useScanner(initialSpaceId: string | null) {
         if (!spaceId || !mySpaces.some((s) => s.id === spaceId)) setSpaceId(mySpaces.length === 1 ? mySpaces[0].id : null);
     }, [mySpaces, spaceId]);
 
+    // 회차 상태 실시간 — 재물 담당자가 마감을 시작하면(closing) 바로 입력을 잠근다
+    const surveyId = survey?.id ?? null;
+    useEffect(() => {
+        setLiveStatus(null);
+        if (!surveyId) return;
+        return subscribeSurveyStatus(surveyId, setLiveStatus);
+    }, [surveyId]);
+
     // 이 공간에 관한 스캔 실시간
     useEffect(() => {
         if (!orgId || !survey || !spaceId) { setScans([]); return; }
@@ -114,6 +124,8 @@ export default function useScanner(initialSpaceId: string | null) {
 
     /** 제출·승인돼 스캔이 잠긴 공간 */
     const locked = !!submission && submission.state !== 'rejected';
+    /** 마감 중(또는 끝남) — Rules가 스캔·제출을 거부하므로 입력을 미리 막는다 */
+    const paused = !!survey && (liveStatus ?? survey.status) !== 'open';
 
     const index = useMemo(() => buildTargetIndex(targets), [targets]);
     const scanMap = useMemo(() => new Map(scans.map((s) => [s.id, s])), [scans]);
@@ -122,7 +134,7 @@ export default function useScanner(initialSpaceId: string | null) {
     /** 찍힌 글자 처리 — 처리 중이면 false(카메라가 다음 프레임에 다시 넘긴다) */
     const handle = useCallback((text: string, method: ScanMethod): boolean => {
         if (busy.current || !orgId || !survey || !spaceId) return false;
-        if (locked) return true; // 잠긴 공간 — 화면이 입력을 숨기지만 카메라 콜백이 남아 있을 수 있다
+        if (locked || paused) return true; // 잠긴 공간·마감 중 — 화면이 입력을 숨기지만 카메라 콜백이 남아 있을 수 있다
         const lookup = resolveInput(text, method);
         if (!lookup) return true;
         busy.current = true;
@@ -169,7 +181,7 @@ export default function useScanner(initialSpaceId: string | null) {
             }
         })();
         return true;
-    }, [orgId, survey, spaceId, index, scanMap, showToast, locked]);
+    }, [orgId, survey, spaceId, index, scanMap, showToast, locked, paused]);
 
     const setCondition = useCallback((scanId: string, condition: ScanCondition, memo: string) => {
         updateScanCondition(scanId, condition, memo, () => showToast('물건 상태를 저장하지 못했습니다.', 'error'));
@@ -210,7 +222,7 @@ export default function useScanner(initialSpaceId: string | null) {
 
     /** 이 공간 제출 — 남은 재물이 있으면 미발견으로 보고된다고 알린다 */
     const submit = useCallback(async (remaining: number) => {
-        if (!orgId || !survey || !spaceId || submitting) return;
+        if (!orgId || !survey || !spaceId || submitting || paused) return;
         const ok = await confirm({
             title: '이 공간 조사를 제출할까요?',
             message: remaining > 0
@@ -228,10 +240,10 @@ export default function useScanner(initialSpaceId: string | null) {
         } finally {
             setSubmitting(false);
         }
-    }, [orgId, survey, spaceId, submitting, confirm, showToast]);
+    }, [orgId, survey, spaceId, submitting, paused, confirm, showToast]);
 
     return {
-        submission, submissionPending, locked, submit, submitting,
+        submission, submissionPending, locked, paused, submit, submitting,
         loading, error, survey, isAdmin, mySpaces, spaceId, setSpaceId, spaceName,
         handle, checking, last, clearLast: () => setLast(null), scanMap, setCondition, undo, ...view,
     };
