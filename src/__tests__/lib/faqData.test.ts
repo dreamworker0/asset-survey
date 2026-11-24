@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { FAQ_ITEMS } from '@/lib/faqData';
+import { FAQ_ITEMS, FAQ_CATEGORIES, EMPLOYEE_QUICK_GUIDE } from '@/lib/faqData';
 
 /**
  * FAQ 데이터 계약.
@@ -31,6 +31,21 @@ describe('FAQ 데이터 계약', () => {
             !item.question?.trim() || !Array.isArray(item.answer) || item.answer.length === 0
         );
         expect(empty.map(item => item.id)).toEqual([]);
+    });
+
+    it('모든 항목이 정해진 분류 중 하나에 속한다 — 도움말이 분류별로 묶는다', () => {
+        const bad = FAQ_ITEMS.filter(item => !(FAQ_CATEGORIES as readonly string[]).includes(item.category));
+        expect(bad.map(item => item.id)).toEqual([]);
+    });
+
+    it('비어 있는 분류가 없다', () => {
+        const empty = FAQ_CATEGORIES.filter(c => !FAQ_ITEMS.some(item => item.category === c));
+        expect(empty).toEqual([]);
+    });
+
+    it('직원용 첫 사용 안내는 8단계이고 비어 있지 않다', () => {
+        expect(EMPLOYEE_QUICK_GUIDE).toHaveLength(8);
+        expect(EMPLOYEE_QUICK_GUIDE.every(step => step.text.trim().length > 0)).toBe(true);
     });
 
     it('답변에 빈 문단이 없다 — 화면에 빈 줄로 남는다', () => {

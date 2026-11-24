@@ -15,7 +15,7 @@ import { defineSecret } from "firebase-functions/params";
 
 /**
  * Gemini API 키 — core/gemini를 (간접적으로라도) 쓰는 함수 전부:
- * ocrDocument·autoVerifyDocument·submitOrgApplication(documentScreen 프리스크린).
+ * ocrDocument·autoVerifyDocument·submitOrgApplication(documentScreen 프리스크린)·askAI(도움말).
  *
  * 과금 LLM 키라 defineString(functions/.env 평문)이 아니라 시크릿으로 둔다.
  * DISCORD_WEBHOOK_URL은 선택 항목이라 시크릿으로 강제하면 값이 없는 배포가 막혀 .env에 둔다.

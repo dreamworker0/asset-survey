@@ -12,6 +12,7 @@ import { useToast } from '../../hooks/useToast';
 import { useConfirm } from '../../hooks/useConfirm';
 import FeedbackForm from '../common/FeedbackForm';
 import ReleaseNotesModal from '../common/ReleaseNotesModal';
+import HelpModal from '../common/HelpModal';
 import useReleaseNotesStatus from '../../hooks/useReleaseNotesStatus';
 import Toggle from '../common/Toggle';
 
@@ -19,6 +20,7 @@ export default function MorePage() {
     const { user, userData } = useAuth();
     const [showFeedback, setShowFeedback] = useState(false);
     const [showReleaseNotes, setShowReleaseNotes] = useState(false);
+    const [showHelp, setShowHelp] = useState(false);
     const { hasNew: hasNewReleaseNotes, markSeen: markReleaseNotesSeen } = useReleaseNotesStatus();
     const { permission, requestPermission } = useNotification();
     const { isDark, toggleTheme } = useTheme();
@@ -64,6 +66,11 @@ export default function MorePage() {
                     {hasNewReleaseNotes && (
                         <span className="ml-auto inline-flex items-center px-2 py-0.5 text-xs font-bold rounded-full bg-red-600 text-white">새 소식</span>
                     )}
+                </button>
+                {/* 도움말 · 자주 하는 질문 (2026-11-24) — 검색과 AI에게 묻기 */}
+                <button type="button" onClick={() => setShowHelp(true)} className="w-full flex items-center gap-3 p-4 min-h-[56px] hover:bg-surface-50 dark:hover:bg-surface-700 transition-colors text-left focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500">
+                    <svg aria-hidden="true" className="w-5 h-5 text-surface-400 dark:text-surface-500" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" /></svg>
+                    <span className="text-sm text-surface-700 dark:text-surface-300">도움말 · 자주 하는 질문</span>
                 </button>
                 <button type="button" onClick={() => setShowFeedback(true)} className="w-full flex items-center gap-3 p-4 min-h-[56px] hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-colors text-left focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500">
                     <svg aria-hidden="true" className="w-5 h-5 text-primary-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.087.16 2.185.283 3.293.369V21l4.076-4.076a1.526 1.526 0 0 1 1.037-.443 48.282 48.282 0 0 0 5.68-.494c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z" /></svg>
@@ -130,6 +137,7 @@ export default function MorePage() {
             </div>
 
             {showReleaseNotes && <ReleaseNotesModal onClose={() => setShowReleaseNotes(false)} />}
+            {showHelp && <HelpModal audience="employee" onClose={() => setShowHelp(false)} />}
             {showFeedback && <FeedbackForm onClose={() => setShowFeedback(false)} />}
         </div>
     );

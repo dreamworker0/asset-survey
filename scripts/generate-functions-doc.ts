@@ -45,6 +45,15 @@ const FUNCTIONS: FunctionEntry[] = [
     returns: '{ orgName: string, bizNumber: string, address: string }',
   },
   {
+    name: 'askAI',
+    type: 'onCall',
+    file: 'handlers/callable/askAI.ts',
+    description: '앱 안 도움말의 "AI에게 묻기". FAQ 본문(shared/faqData.ts)과 직원용 첫 사용 안내만 근거로 Gemini가 2~4문장으로 답한다. 근거 글에 없으면 "도움말에 없다 — 재물 담당자에게 물어보라"로 답한다. 규칙·근거 글은 systemInstruction, 질문은 본문으로 나눈다. 질문은 300자까지, 분당 5회·하루 20회(사용자당, 둘 다 fail-closed). 질문 글은 로그·Sentry에 남기지 않는다.',
+    auth: '인증 필수 + 기관 소속(토큰 `orgId`), App Check',
+    params: '{ question: string }',
+    returns: '{ answer: string }',
+  },
+  {
     name: 'getOrgDocumentUrl',
     type: 'onCall',
     file: 'handlers/callable/getOrgDocumentUrl.ts',

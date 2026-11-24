@@ -2,9 +2,9 @@
 
 > **자동 생성 문서** — `scripts/generate-functions-doc.ts`로 생성됨
 >
-> 마지막 업데이트: 2026. 11. 23. 오후 9:58:43
+> 마지막 업데이트: 2026. 11. 24. 오전 11:49:03
 >
-> 총 함수 수: **37개**
+> 총 함수 수: **38개**
 
 ---
 
@@ -22,7 +22,7 @@
 
 ## 📞 onCall (클라이언트 직접 호출)
 
-> 총 25개
+> 총 26개
 
 ### `ocrDocument`
 
@@ -33,6 +33,16 @@
 | **인증** | 인증 필수 |
 | **요청 파라미터** | `{ imageBase64: string, mimeType: string }` |
 | **반환값** | `{ orgName: string, bizNumber: string, address: string }` |
+
+### `askAI`
+
+| 항목 | 내용 |
+|------|------|
+| **파일** | `functions/src/handlers/callable/askAI.ts` |
+| **설명** | 앱 안 도움말의 "AI에게 묻기". FAQ 본문(shared/faqData.ts)과 직원용 첫 사용 안내만 근거로 Gemini가 2~4문장으로 답한다. 근거 글에 없으면 "도움말에 없다 — 재물 담당자에게 물어보라"로 답한다. 규칙·근거 글은 systemInstruction, 질문은 본문으로 나눈다. 질문은 300자까지, 분당 5회·하루 20회(사용자당, 둘 다 fail-closed). 질문 글은 로그·Sentry에 남기지 않는다. |
+| **인증** | 인증 필수 + 기관 소속(토큰 `orgId`), App Check |
+| **요청 파라미터** | `{ question: string }` |
+| **반환값** | `{ answer: string }` |
 
 ### `getOrgDocumentUrl`
 

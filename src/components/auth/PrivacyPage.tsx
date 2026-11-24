@@ -13,7 +13,8 @@ const EFFECTIVE_DATE = formatLegalVersion(PRIVACY_VERSION);
  * 외부 연동을 추가·제거하면 이 배열도 반드시 함께 갱신해야 한다.
  * - Firebase/Analytics: src/lib/firebase.ts, functions/src/core/firebase.ts
  * - Gemini: functions/src/handlers/callable/ocrDocument.ts, functions/src/handlers/https/submitOrgApplication.ts,
- *           functions/src/handlers/triggers/{autoVerifyDocument,notifyNewFeedback}.ts
+ *           functions/src/handlers/triggers/{autoVerifyDocument,notifyNewFeedback}.ts,
+ *           functions/src/handlers/callable/askAI.ts(도움말 AI에게 묻기 — 질문 글만)
  * - Gmail: functions/src/core/mailer.ts 사용처
  * - 알리고·Cafe24(카카오 알림톡 — 신청 접수·승인·반려·중복 안내): functions/src/services/alimtalk/
  *
@@ -49,8 +50,8 @@ const PROCESSORS: {
     {
         name: 'Google LLC (Gemini API)',
         country: '미국',
-        task: '비영리 증빙서류 유형 자동 판별, 문의 답변 초안 생성',
-        items: '비영리 증빙서류 이미지, 문의 내용 및 첨부 이미지',
+        task: '비영리 증빙서류 유형 자동 판별, 문의 답변 초안 생성, 도움말 질문에 대한 답변 생성(질문 글만 전송)',
+        items: '비영리 증빙서류 이미지, 문의 내용 및 첨부 이미지, 도움말 질문 글',
         contact: 'https://support.google.com/policies/troubleshooter/7575787',
     },
     {
@@ -249,6 +250,7 @@ export default function PrivacyPage() {
                                 <p className="font-medium text-amber-800 dark:text-amber-300 mb-2">💬 문의 답변</p>
                                 <ul className="list-disc list-inside space-y-1 ml-2 text-amber-700 dark:text-amber-400 text-xs">
                                     <li>서비스 내 문의·의견의 답변 초안 작성에 AI(Google Gemini API)가 사용되며, 문의 내용과 첨부 이미지가 전달됩니다.</li>
+                                    <li>앱 안 도움말의 'AI에게 묻기'는 이용자가 적은 <strong>질문 글만</strong> AI(Google Gemini API)에 보내 도움말 내용 안에서 답변을 만듭니다. 이름·계정 정보는 함께 보내지 않으며, 질문 글은 서비스에 따로 저장하지 않습니다. 질문에 이름·전화번호 같은 개인정보를 적지 말아 주십시오.</li>
                                     <li>재물 대장·재물조사 기록은 AI에 전달하지 않습니다. 엑셀 대장은 이용자의 브라우저에서 읽으며 원본 파일은 서버로 보내지 않습니다.</li>
                                 </ul>
                             </div>

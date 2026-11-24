@@ -21,6 +21,10 @@ export const DEFAULT_RATE_LIMITS = {
     regenerateInviteCode: { max: 5, windowSec: 3600 },        // uid당 시간당 5회
     // 초대 메일(2026-11-23) — 한 번에 100명까지 보내므로 호출 수는 적다. 메일 폭탄 남용만 막는다.
     sendInviteEmails: { max: 10, windowSec: 3600 },           // uid당 시간당 10회
+    // 도움말 AI에게 묻기(2026-11-24) — 질문 1건이 Gemini 호출 1회다. 연타는 분 단위로,
+    // 하루 종일 반복하는 비용 증폭은 일일 누적으로 막는다. 둘 다 fail-closed(askAI.ts).
+    askAI: { max: 5, windowSec: 60 },                // uid당 분당 5회
+    askAIDaily: { max: 20, windowSec: 86400 },       // uid당 일일 20회
 } as const;
 
 export type RateLimitKey = keyof typeof DEFAULT_RATE_LIMITS;

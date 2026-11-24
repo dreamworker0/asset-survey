@@ -55,6 +55,10 @@ export {
     auditUserCreated, auditUserUpdated, auditUserDeleted,
 } from "./handlers/triggers/auditLog";
 
+// ── 도움말 ──
+// AI에게 묻기 (Gemini) — FAQ·직원 안내만 근거로 답한다
+export { askAI } from "./handlers/callable/askAI";
+
 // ── 공지·의견 ──
 export { sendAdminNotice } from "./handlers/callable/sendAdminNotice";
 export { sendBroadcastNotice } from "./handlers/callable/sendBroadcastNotice";

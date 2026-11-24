@@ -5,10 +5,27 @@
  * 양쪽 모두 이 파일을 그대로 re-export한다 — 프론트는 src/lib/faqData.ts,
  * Functions는 functions/src/utils/faqData.ts(tsconfig의 include에 ../shared가 있다).
  * → FAQ 수정 시 이 파일만 편집하세요.
+ *
+ * 2026-11-24 — 앱 안 도움말(HelpModal)이 분류별로 묶어 보여 주도록 `category`를 붙였다.
+ * 같은 데이터가 AI에게 묻기(askAI)의 근거 글이 되므로, 새 항목은 반드시 분류를 고른다.
  */
+
+/** FAQ 분류 — 이 배열의 순서가 도움말 화면의 기본 순서다 */
+export const FAQ_CATEGORIES = [
+    "설치·화면",
+    "공간·조사 방식",
+    "재물 가져오기",
+    "재물 목록·QR 라벨",
+    "재물조사·현장 스캔",
+    "제출·승인·마감",
+    "계정·기관",
+] as const;
+
+export type FaqCategory = typeof FAQ_CATEGORIES[number];
 
 export interface FAQItem {
     id: string; // 고유 질문 식별자 (URL 해시 딥링크 등에 사용)
+    category: FaqCategory;
     question: string;
     answer: string[];
 }
@@ -17,6 +34,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     /* ── 설치·화면 ── */
     {
         id: "app-install",
+        category: "설치·화면",
         question: "이거 일반 앱처럼 휴대폰 바탕화면에 아이콘을 꺼내둘 순 없나요?",
         answer: [
             "물론 꺼내둘 수 있습니다! 먼저 관리자님이 주신 접속 링크를 복사해서 스마트폰의 기본 브라우저(아이폰은 사파리, 갤럭시는 크롬이나 삼성 인터넷) 주소창에 딱 붙여넣고 들어가 주세요. (⚠️ 카톡 채팅창에서 열린 화면에서는 안 돼요!)",
@@ -31,6 +49,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "google-login-browser",
+        category: "설치·화면",
         question: "카톡이나 네이버에서 링크를 열고 로그인하려니 '액세스 차단됨(403 오류)'이라고 뜨면서 안 돼요.",
         answer: [
             "당황하지 마세요! 앱이 고장 난 게 아니라, 구글(Google)의 보안 정책 때문에 생기는 정상적인 현상입니다.",
@@ -44,6 +63,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "pc-browser",
+        category: "설치·화면",
         question: "스마트폰 말고 사무실 컴퓨터로도 할 수 있나요?",
         answer: [
             "그럼요! 사무실 컴퓨터에 깔려 있는 크롬이나 엣지 브라우저에서도 늘 쓰시던 똑같은 주소로 접속하시면 됩니다.",
@@ -52,6 +72,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "dark-mode",
+        category: "설치·화면",
         question: "밤에 눈 아픈데 화면 까맣게 하는 다크 모드 없나요?",
         answer: [
             "당연히 있습니다. 눈이 편안한 다크 모드로 바꿔보세요.",
@@ -61,6 +82,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "font-size",
+        category: "설치·화면",
         question: "글씨가 너무 작아서 안 보여요. 키울 수 있나요?",
         answer: [
             "네, 노안이 오셨더라도 걱정 없습니다! 화면 위쪽에 보시면 '가A'라고 쓰인 글씨 크기 조절 버튼이 있어요.",
@@ -70,16 +92,30 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "push-notif",
+        category: "설치·화면",
         question: "다른 사람들은 알림 뜬다던데 저는 푸시 알림이 안 와요.",
         answer: [
             "우선 앱 아래쪽 '더보기' 메뉴로 들어가서 화면 오른쪽 위에 있는 종 모양 '알림' 버튼이 켜져 있는지 확인해 주세요.",
             "앱에서는 켰는데도 안 온다면, 십중팔구 선생님 휴대폰 자체 설정에서 알림을 꽉 막아두신 거예요. 폰 설정(톱니바퀴) 메뉴로 가셔서 애플리케이션 목록에서 저희 앱을 찾은 다음, '알림 허용' 스위치를 찰칵 켜주셔야 합니다."
         ],
     },
+    {
+        id: "in-app-help",
+        category: "설치·화면",
+        question: "앱을 쓰다가 모르는 게 생기면 어디서 찾아보나요? 'AI에게 묻기'는 뭔가요?",
+        answer: [
+            "로그인한 뒤 직원은 아래 '[더보기] → [도움말 · 자주 하는 질문]', 관리자는 '[설정] → [도움말 · 자주 하는 질문]'을 누르시면 됩니다.",
+            "① 맨 위 검색 칸에 '라벨', '제출'처럼 궁금한 낱말을 넣으면 그 낱말이 들어간 질문만 골라 보여 드려요. 띄어쓰기는 신경 쓰지 않으셔도 됩니다.",
+            "② 직원 화면에서는 '처음 쓰는 분께' 8단계 안내와 현장 스캔·제출 관련 질문이 먼저 나와요.",
+            "③ 찾는 내용이 없으면 아래 '[AI에게 묻기]'에 질문을 적고 [보내기]를 누르세요. AI가 이 도움말에 적힌 내용 안에서만 짧게 답해 드리고, 도움말에 없는 내용이면 기관의 재물 담당자에게 물어보시라고 안내해요.",
+            "⚠️ 질문 글은 답을 만들기 위해 Google Gemini로 보내집니다. 이름·전화번호 같은 개인정보는 적지 마세요. 한 사람이 하루에 20번까지 물을 수 있어요."
+        ],
+    },
 
     /* ── 공간·조사 방식 ── */
     {
         id: "space-setup",
+        category: "공간·조사 방식",
         question: "공간과 공간 담당자는 어떻게 정하나요?",
         answer: [
             "관리자 화면 왼쪽 메뉴의 '공간 관리'에서 정합니다.",
@@ -92,6 +128,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "building-floor",
+        category: "공간·조사 방식",
         question: "건물이 여러 곳이에요. 건물과 층은 어떻게 나누나요?",
         answer: [
             "'공간 관리'의 [건물·층] 탭에서 건물을 먼저 등록하세요. 건물이 한 곳뿐이면 등록하지 않아도 지금처럼 쓸 수 있어요.",
@@ -106,6 +143,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "team-setup",
+        category: "공간·조사 방식",
         question: "팀 단위로 공간을 맡기거나, 관리 책임자(정·부)를 적어 둘 수 있나요?",
         answer: [
             "네! 팀은 [팀·직원 관리] 위쪽 '팀' 칸에서 먼저 만듭니다(예: 행정지원팀). 팀이 생기면 한 줄로 접히고, 추가·이름 바꾸기·삭제는 [팀 고치기]에서 합니다.",
@@ -117,6 +155,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "staff-invite",
+        category: "공간·조사 방식",
         question: "직원을 미리 등록했는데 다들 가입을 안 해요. 어떻게 알리나요?",
         answer: [
             "[팀·직원 관리]에서 '가입 대기'를 누르고, 알릴 사람을 줄 앞 상자로 고른 뒤 화면 아래 막대의 [초대 메일 보내기]를 누르세요. 아직 한 번도 안 보낸 사람 모두에게는 가입 대기 안내 칸의 버튼으로 한 번에 보낼 수 있어요.",
@@ -127,6 +166,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "survey-mode",
+        category: "공간·조사 방식",
         question: "'나눠서 조사'와 '혼자 조사'는 무엇이 다른가요?",
         answer: [
             "관리자 화면 '설정 → 조사 방식'에서 고릅니다.",
@@ -139,6 +179,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     /* ── 재물 가져오기 ── */
     {
         id: "asset-import",
+        category: "재물 가져오기",
         question: "희망이음 재물 목록을 앱에 어떻게 넣나요?",
         answer: [
             "관리자 화면 왼쪽 메뉴의 '재물 가져오기'에서 엑셀 파일을 올립니다. 희망이음 고정자산대장도, 기관이 따로 쓰는 재물 대장도 됩니다.",
@@ -153,6 +194,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "asset-manual",
+        category: "재물 가져오기",
         question: "엑셀 없이 재물을 한 건씩 등록하거나 고칠 수 있나요?",
         answer: [
             "네! 관리자 화면 [재물 목록] 오른쪽 위의 [재물 등록]을 누르세요.",
@@ -165,6 +207,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "unplaced-assets",
+        category: "재물 가져오기",
         question: "엑셀로 가져왔는데 공간이 정해지지 않은 재물이 많아요. 어떻게 정리하나요?",
         answer: [
             "대장의 위치 이름이 앱의 공간 이름과 다르면 그 재물은 '공간 미지정'으로 들어옵니다. 공간이 없으면 조사 대상에 들어가지 않아요.",
@@ -176,6 +219,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "useful-life",
+        category: "재물 가져오기",
         question: "재물의 내용연수(내구연한)를 적어 두고, 지난 것을 찾을 수 있나요?",
         answer: [
             "네! 재물마다 내용연수(쓸 수 있는 햇수)를 적어 두면, 취득일자로 끝나는 날을 계산해 지난 재물에 '내용연수 지남'을 표시합니다.",
@@ -188,6 +232,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "asset-photo",
+        category: "재물 가져오기",
         question: "재물 사진은 어디에 올리나요?",
         answer: [
             "관리자 화면 [재물 목록]에서 재물을 눌러 들어가면 맨 위에 사진 칸이 있어요. [사진 올리기]를 누르세요.",
@@ -201,6 +246,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "asset-reimport",
+        category: "재물 가져오기",
         question: "희망이음 대장이 바뀌었어요. 다시 올리면 어떻게 되나요?",
         answer: [
             "같은 방법으로 새 엑셀을 올리면 앱에 있는 재물과 자산코드로 맞대어 '새로 등록·바뀜·대장에 없음·그대로'를 나눠 보여 줍니다. 바뀐 것만 저장돼요.",
@@ -214,6 +260,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     /* ── 재물 목록·QR 라벨 ── */
     {
         id: "asset-list",
+        category: "재물 목록·QR 라벨",
         question: "가져온 재물은 어디서 보나요? 직원도 볼 수 있나요?",
         answer: [
             "관리자는 왼쪽 메뉴의 '재물 목록'에서 봅니다. 자산코드·품명·위치로 찾고, 공간·상태(운영·불용·폐기)·라벨 여부·'대장에 없음'으로 거를 수 있어요.",
@@ -224,6 +271,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "label-print",
+        category: "재물 목록·QR 라벨",
         question: "QR 라벨은 어떻게 뽑나요? 어떤 라벨지를 써야 하나요?",
         answer: [
             "① '재물 목록'에서 뽑을 재물을 고릅니다. 공간별로 뽑으려면 공간으로 거른 뒤 '걸러진 N건 모두 고르기'를 누르세요.",
@@ -237,6 +285,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "label-scan",
+        category: "재물 목록·QR 라벨",
         question: "라벨의 QR을 찍으면 무엇이 보이나요? 다른 사람이 찍어도 괜찮나요?",
         answer: [
             "휴대폰 기본 카메라로 QR을 찍으면 앱의 그 재물 화면이 열립니다. 로그인하지 않았으면 로그인한 뒤 바로 그 재물로 이어집니다.",
@@ -249,6 +298,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     /* ── 재물조사·현장 스캔 ── */
     {
         id: "asset-last-check",
+        category: "재물조사·현장 스캔",
         question: "조사 기간이 아닐 때도 재물을 확인한 기록을 남길 수 있나요?",
         answer: [
             "네! 라벨의 QR을 휴대폰 기본 카메라로 찍어 재물을 열면 그 재물의 '마지막 확인'이 자동으로 남습니다. 따로 누를 버튼은 없어요.",
@@ -261,6 +311,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "survey-start",
+        category: "재물조사·현장 스캔",
         question: "재물조사는 어떻게 시작하나요? 시작한 뒤 대장을 다시 가져와도 되나요?",
         answer: [
             "관리자 화면 왼쪽 메뉴의 '재물조사'에서 '새 조사 시작'을 누르고 이름·기간·대상 공간을 정합니다.",
@@ -272,6 +323,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "survey-scan",
+        category: "재물조사·현장 스캔",
         question: "직원은 어떻게 스캔하나요? 카메라가 안 되면요?",
         answer: [
             "직원 화면 가운데 '스캔' 버튼을 누르고, 조사할 공간을 고른 뒤 '카메라 켜고 찍기'로 라벨의 QR을 차례로 비추면 됩니다. 같은 라벨을 계속 비춰도 한 번만 처리돼요.",
@@ -284,6 +336,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "scan-results",
+        category: "재물조사·현장 스캔",
         question: "스캔하면 나오는 '정상·다른 공간·미등록·범위 밖·이미 찍음'은 무슨 뜻인가요?",
         answer: [
             "정상: 이 공간의 재물이 맞습니다.",
@@ -298,6 +351,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     /* ── 제출·승인·마감 ── */
     {
         id: "survey-submit",
+        category: "제출·승인·마감",
         question: "공간 조사를 마치면 어떻게 하나요? 반려되면요?",
         answer: [
             "'나눠서 조사' 방식이면, 공간 담당자가 스캔 화면 아래 '이 공간 조사 제출'을 누릅니다. 제출하면 그 공간은 스캔이 잠깁니다.",
@@ -309,6 +363,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "survey-close",
+        category: "제출·승인·마감",
         question: "조사는 언제 마감하나요? 결과 보고서는 어디서 받나요?",
         answer: [
             "[재물조사] 화면의 현황판에서 남은 기간·진행률·공간별 상태를 보고, 모든 공간이 승인되면 '조사 마감'을 누릅니다('나눠서 조사'는 승인 안 된 공간이 있으면 마감할 수 없어요).",
@@ -320,6 +375,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "survey-sync",
+        category: "제출·승인·마감",
         question: "'희망이음 반영 목록'은 무엇인가요?",
         answer: [
             "조사로 드러난 것 중 희망이음에 옮겨 적어야 할 일을 모은 목록입니다. 마감할 때 만들어지고, 결과 보고서 맨 위에 있어요.",
@@ -332,6 +388,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     /* ── 계정·기관 ── */
     {
         id: "agency-code",
+        category: "계정·기관",
         question: "처음 가입할 때 치라는 '기관 코드'는 대체 어디서 알아내나요?",
         answer: [
             "이 코드는 아무나 막 들어오면 안 되기 때문에 밖에는 절대 공개해 두지 않아요.",
@@ -340,6 +397,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "duplicate-agency",
+        category: "계정·기관",
         question: "이직해서 새 회사에 가입하려는데 '이미 기관에 소속되어 있습니다'라며 안 들어가져요.",
         answer: [
             "이건 선생님의 정보가 아직 예전 회사 명단에 걸쳐 있어서 그렇습니다.",
@@ -349,6 +407,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "admin-privilege",
+        category: "계정·기관",
         question: "저도 관리자 화면의 메뉴를 보고 싶어요.",
         answer: [
             "관리자 메뉴에는 기관 전체 재물 정보와 직원 정보가 모여 있어서, 일반 직원 화면에는 그 메뉴가 보이지 않아요.",
@@ -357,6 +416,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
     {
         id: "withdraw-service",
+        category: "계정·기관",
         question: "기관에서 더 이상 서비스를 쓰지 않으려면(탈퇴/해지) 어떻게 하나요?",
         answer: [
             "관리자 계정으로 직접 해지하실 수 있어요. **설정 페이지 맨 아래 '기관 정보 · 해지'** 영역에서 **[서비스 해지하기]** 버튼을 눌러주세요.",
@@ -367,8 +427,56 @@ export const FAQ_ITEMS: FAQItem[] = [
     },
 ];
 
+/**
+ * 직원용 첫 사용 안내 — 시범운영안내.md "직원용 한 쪽 안내"의 8단계를 옮긴 것.
+ * 도움말 화면(직원)의 '처음 쓰는 분께'와 AI에게 묻기의 근거 글이 함께 쓴다.
+ * 문서의 안내가 바뀌면 이 배열도 맞춘다.
+ */
+export interface QuickGuideStep {
+    text: string;
+    /** 단계 아래 덧붙이는 설명(판정 종류 등) */
+    details?: string[];
+}
+
+export const EMPLOYEE_QUICK_GUIDE_TITLE = "재물조사 — 공간 담당자 안내";
+
+export const EMPLOYEE_QUICK_GUIDE: QuickGuideStep[] = [
+    { text: "앱을 열고 로그인합니다. 첫 화면에 '진행 중인 재물조사' 카드가 보이면 [📷 스캔하러 가기]를 누릅니다." },
+    { text: "조사할 공간을 고릅니다(담당 공간이 하나면 바로 열립니다)." },
+    {
+        text: "[카메라 켜고 찍기] → 라벨의 QR을 화면 가운데에 비춥니다. 처음에는 카메라 허용을 눌러 주세요.",
+        details: ["QR이 상해서 안 읽히면 [코드 직접 입력]에 라벨에 크게 적힌 자산코드를 넣습니다."],
+    },
+    {
+        text: "찍을 때마다 결과가 크게 나옵니다.",
+        details: [
+            "정상: 이 공간 재물이 맞습니다.",
+            "다른 공간: 목록상 다른 곳의 재물입니다. 그대로 두면 재물 담당자가 확인합니다.",
+            "미등록 / 범위 밖: 목록에 없거나 조사 대상이 아닌 재물입니다. 찍은 그대로 두면 됩니다.",
+            "이미 찍은 재물: 다시 찍어도 수는 늘지 않습니다.",
+        ],
+    },
+    { text: "물건이 망가졌거나 라벨이 상했으면 [물건 상태]에서 '파손·불용 필요' 또는 '라벨 훼손'을 고르고 짧게 메모한 뒤 [상태 저장]을 누릅니다." },
+    { text: "잘못 찍었으면 [잘못 찍음 · 지우기]를 누릅니다." },
+    { text: "[남은 재물] 탭에서 아직 못 찾은 것을 확인합니다." },
+    { text: "다 찍었으면 [이 공간 조사 제출]을 누릅니다. 반려되면 사유가 보이니 다시 확인하고 [다시 제출]합니다." },
+];
+
+export const EMPLOYEE_QUICK_GUIDE_TIP =
+    "💡 지하·창고처럼 인터넷이 약한 곳에서도 그대로 찍으세요. '보내지 못한 기록 N건'이 보이면 인터넷이 되는 곳에서 0건이 될 때까지 기다린 뒤 앱을 닫거나 로그아웃하세요.";
+
+/** AI에게 묻기 프롬프트용 — 직원 첫 사용 안내를 글로 펼친다 */
+export function buildQuickGuidePromptText(): string {
+    const steps = EMPLOYEE_QUICK_GUIDE.map((step, i) => {
+        const details = (step.details ?? []).map((d) => `   - ${d}`).join("\n");
+        return `${i + 1}. ${step.text}${details ? `\n${details}` : ""}`;
+    }).join("\n");
+    return `[${EMPLOYEE_QUICK_GUIDE_TITLE}]\n${steps}\n${EMPLOYEE_QUICK_GUIDE_TIP}`;
+}
+
+/** AI에게 묻기 프롬프트용 — FAQ 전체를 분류와 함께 글로 펼친다 */
 export function buildFaqPromptText(): string {
     return FAQ_ITEMS.map((item) =>
-        `[FAQ ID: ${item.id}]\nQ: ${item.question}\nA: ${item.answer.join(" ")}`
+        `[FAQ ID: ${item.id} · ${item.category}]\nQ: ${item.question}\nA: ${item.answer.join(" ")}`
     ).join("\n\n");
 }
