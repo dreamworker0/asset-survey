@@ -239,9 +239,9 @@ export default function LandingPage() {
             {/* ─── 푸터 ─── */}
             <footer className="relative bg-primary-900 text-primary-200 text-center text-xs px-4 py-6 space-y-2" role="contentinfo">
                 <nav className="space-x-2 flex items-center justify-center min-h-[48px]" aria-label="법적 고지">
-                    <Link to="/terms" className="hover:text-white underline underline-offset-2 transition-colors p-2 min-h-[44px] inline-flex items-center">이용약관</Link>
+                    <Link to="/terms" className="hover:text-white underline underline-offset-2 transition-colors p-2 min-h-[48px] inline-flex items-center">이용약관</Link>
                     <span className="text-primary-300/60" aria-hidden="true">|</span>
-                    <Link to="/privacy" className="hover:text-white underline underline-offset-2 transition-colors p-2 min-h-[44px] inline-flex items-center">개인정보 처리방침</Link>
+                    <Link to="/privacy" className="hover:text-white underline underline-offset-2 transition-colors p-2 min-h-[48px] inline-flex items-center">개인정보 처리방침</Link>
                 </nav>
                 <p>© 2026 재물조사. All rights reserved.</p>
             </footer>

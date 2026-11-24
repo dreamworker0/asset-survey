@@ -199,7 +199,7 @@ export default function AssetList() {
                                 {al.visible.map((a) => (
                                     <li key={a.id} className="glass-card p-2 pr-3 flex items-start gap-2">
                                         {/* 상자만 누르기엔 작아 칸 전체(44px)를 라벨로 감싼다 */}
-                                        <label className="w-11 h-11 flex items-center justify-center flex-shrink-0 cursor-pointer">
+                                        <label className="w-12 h-12 flex items-center justify-center flex-shrink-0 cursor-pointer">
                                             <input type="checkbox" className="w-5 h-5 accent-primary-600" aria-label={`${a.code} 고르기`} checked={al.selected.has(a.id)} onChange={() => al.toggle(a.id)} />
                                         </label>
                                         <Thumb asset={a} size="w-12 h-12" />
@@ -359,16 +359,16 @@ function Filters({ filters, setFilter, spaces, buildings, onReset }: FiltersProp
                     </select>
                 </label>
                 <div className="flex flex-wrap items-center justify-between gap-2 sm:col-span-2 lg:col-span-5">
-                    <label className="flex items-center gap-2 min-h-[44px] text-sm text-surface-700 dark:text-surface-300">
+                    <label className="flex items-center gap-2 min-h-[48px] text-sm text-surface-700 dark:text-surface-300">
                         <input type="checkbox" className="w-5 h-5 accent-primary-600" checked={filters.onlyMissing} onChange={(e) => setFilter('onlyMissing', e.target.checked)} />
                         대장에 없음만
                     </label>
                     {/* 내용연수(내구연한)가 지난 것만 — 바꿀 때가 된 재물을 모아 본다(2026-11-22) */}
-                    <label className="flex items-center gap-2 min-h-[44px] text-sm text-surface-700 dark:text-surface-300">
+                    <label className="flex items-center gap-2 min-h-[48px] text-sm text-surface-700 dark:text-surface-300">
                         <input type="checkbox" className="w-5 h-5 accent-primary-600" checked={!!filters.onlyLifeOver} onChange={(e) => setFilter('onlyLifeOver', e.target.checked)} />
                         내용연수 지난 것만
                     </label>
-                    <button type="button" className="btn-secondary btn-sm min-h-[44px]" onClick={onReset} disabled={!changed}>조건 초기화</button>
+                    <button type="button" className="btn-secondary btn-sm min-h-[48px]" onClick={onReset} disabled={!changed}>조건 초기화</button>
                 </div>
             </div>
         </div>

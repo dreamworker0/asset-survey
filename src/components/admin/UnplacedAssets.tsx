@@ -122,7 +122,7 @@ export default function UnplacedAssets() {
 
     return (
         <div className="max-w-3xl mx-auto animate-fade-in">
-            <Link to="/admin/assets" className="inline-flex items-center gap-1 text-sm font-medium text-primary-700 dark:text-primary-300 min-h-[44px]">
+            <Link to="/admin/assets" className="inline-flex items-center gap-1 text-sm font-medium text-primary-700 dark:text-primary-300 min-h-[48px]">
                 <span aria-hidden="true">←</span> 재물 목록
             </Link>
             <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-1">공간 미지정 재물 정리</h1>

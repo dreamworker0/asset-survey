@@ -230,7 +230,7 @@ function MapSection({ im, locked }: { im: Im; locked: boolean }) {
                 )}
                 {!locked && (
                     <details className="mt-3 group">
-                        <summary className="btn-secondary btn-sm min-h-[44px] list-none [&::-webkit-details-marker]:hidden inline-flex cursor-pointer"><span aria-hidden="true" className="group-open:rotate-90 transition-transform">▸</span> 머리글 줄이 틀렸나요?</summary>
+                        <summary className="btn-secondary btn-sm min-h-[48px] list-none [&::-webkit-details-marker]:hidden inline-flex cursor-pointer"><span aria-hidden="true" className="group-open:rotate-90 transition-transform">▸</span> 머리글 줄이 틀렸나요?</summary>
                         <HeaderRowPicker im={im} />
                     </details>
                 )}
@@ -312,7 +312,7 @@ function MapSection({ im, locked }: { im: Im; locked: boolean }) {
                     )}
                     {parsed.problems.length > 0 && (
                         <details className="mt-3 group">
-                            <summary className="btn-secondary btn-sm min-h-[44px] list-none [&::-webkit-details-marker]:hidden inline-flex cursor-pointer text-amber-800 dark:text-amber-300">
+                            <summary className="btn-secondary btn-sm min-h-[48px] list-none [&::-webkit-details-marker]:hidden inline-flex cursor-pointer text-amber-800 dark:text-amber-300">
                                 <span aria-hidden="true" className="group-open:rotate-90 transition-transform">▸</span> 확인할 것 {parsed.problems.length}건 (저장은 됩니다)
                             </summary>
                             <ul className={`${sub} space-y-1 mt-1`}>
@@ -396,7 +396,7 @@ function CompareSection({ im }: { im: Im }) {
                 {diff.changed.length > 0 && (
                     <div className="mb-2">
                         <button type="button" onClick={() => setShowChanged((v) => !v)} aria-expanded={showChanged}
-                            className="btn-secondary btn-sm min-h-[44px]">
+                            className="btn-secondary btn-sm min-h-[48px]">
                             <span aria-hidden="true">{showChanged ? '▾' : '▸'}</span> 바뀌는 재물 보기
                         </button>
                         {showChanged && <div className="mt-2"><ChangedList items={diff.changed} spaces={im.spaces} /></div>}
@@ -408,7 +408,7 @@ function CompareSection({ im }: { im: Im }) {
                             이번 파일에 없는 재물 {diff.missing.length}건은 지우지 않고 &lsquo;대장에 없음&rsquo;으로 표시합니다.
                         </p>
                         <button type="button" onClick={() => setShowMissing((v) => !v)} aria-expanded={showMissing}
-                            className="btn-secondary btn-sm min-h-[44px] mt-2">
+                            className="btn-secondary btn-sm min-h-[48px] mt-2">
                             <span aria-hidden="true">{showMissing ? '▾' : '▸'}</span> 대장에 없는 재물 보기
                         </button>
                         {showMissing && (

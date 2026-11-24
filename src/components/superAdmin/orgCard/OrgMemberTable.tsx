@@ -37,7 +37,7 @@ export default memo(function OrgMemberTable({ members, orgId, changingRole, load
             <div className="p-4 text-center" role="alert">
                 <p className="text-sm text-red-700 dark:text-red-300">멤버 목록을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.</p>
                 {onRetry && (
-                    <button type="button" onClick={() => onRetry(orgId)} className="btn-secondary btn-sm min-h-[44px] mt-2">
+                    <button type="button" onClick={() => onRetry(orgId)} className="btn-secondary btn-sm min-h-[48px] mt-2">
                         다시 시도
                     </button>
                 )}
@@ -84,7 +84,7 @@ export default memo(function OrgMemberTable({ members, orgId, changingRole, load
                                     onChange={(e) => onRoleChange(member, orgId, e.target.value as UserRole)}
                                     disabled={changingRole === member.id}
                                     aria-label={`${member.name || '직원'} 구분`}
-                                    className={`min-h-[44px] text-sm border border-surface-300 dark:border-surface-600 rounded-lg px-2 py-1 bg-white dark:bg-surface-800 text-surface-800 dark:text-surface-200 focus:outline-none focus:ring-2 focus:ring-primary-500/30 cursor-pointer transition-colors ${changingRole === member.id ? 'opacity-50' : ''}`}
+                                    className={`min-h-[48px] text-sm border border-surface-300 dark:border-surface-600 rounded-lg px-2 py-1 bg-white dark:bg-surface-800 text-surface-800 dark:text-surface-200 focus:outline-none focus:ring-2 focus:ring-primary-500/30 cursor-pointer transition-colors ${changingRole === member.id ? 'opacity-50' : ''}`}
                                 >
                                     <option value="admin">기관관리자</option>
                                     <option value="employee">직원</option>

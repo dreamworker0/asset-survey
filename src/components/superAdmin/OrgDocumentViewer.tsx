@@ -38,7 +38,7 @@ export default function OrgDocumentViewer({ orgId, stopPropagation }: OrgDocumen
                 <button
                     type="button"
                     onClick={() => setAttempt(n => n + 1)}
-                    className="btn-secondary btn-sm min-h-[44px] mt-2"
+                    className="btn-secondary btn-sm min-h-[48px] mt-2"
                 >
                     다시 시도
                 </button>

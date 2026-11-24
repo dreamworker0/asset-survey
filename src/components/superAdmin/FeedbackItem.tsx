@@ -55,7 +55,7 @@ export default function FeedbackItem({
                     type="button"
                     aria-expanded={isExpanded}
                     onClick={() => onToggleExpand(isExpanded ? null : fb.id)}
-                    className="flex-1 min-w-0 min-h-[44px] flex items-start gap-2 text-left rounded-xl p-1 hover:bg-surface-50/70 dark:hover:bg-surface-700/30 transition-colors"
+                    className="flex-1 min-w-0 min-h-[48px] flex items-start gap-2 text-left rounded-xl p-1 hover:bg-surface-50/70 dark:hover:bg-surface-700/30 transition-colors"
                 >
                     <span aria-hidden="true" className="mt-0.5 w-4 shrink-0 text-surface-600 dark:text-surface-400">{isExpanded ? '▾' : '▸'}</span>
                     <span className="flex-1 min-w-0 block">
@@ -108,7 +108,7 @@ export default function FeedbackItem({
                     <button
                         type="button"
                         onClick={() => onToggleResolve(fb)}
-                        className="btn-secondary btn-sm min-h-[44px]"
+                        className="btn-secondary btn-sm min-h-[48px]"
                     >
                         {isUnread ? '처리완료로 표시' : '미확인으로 되돌리기'}
                     </button>

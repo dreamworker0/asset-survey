@@ -106,7 +106,7 @@ export default function MorePage() {
                     </div>
                     <div className="flex rounded-lg border border-surface-300 dark:border-surface-600 overflow-hidden" role="group" aria-label="글자 크기">
                         {[{ key: 'small', label: '작게' }, { key: 'normal', label: '보통' }, { key: 'large', label: '크게' }].map(opt => (
-                            <button key={opt.key} type="button" aria-pressed={fontSize === opt.key} onClick={() => setSize(opt.key as 'small' | 'normal' | 'large')} className={`min-h-[48px] min-w-[44px] px-3 text-sm font-medium transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500 ${fontSize === opt.key ? 'bg-primary-600 dark:bg-primary-500 text-white' : 'bg-surface-50 dark:bg-surface-700 text-surface-600 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-600'}`}>{opt.label}</button>
+                            <button key={opt.key} type="button" aria-pressed={fontSize === opt.key} onClick={() => setSize(opt.key as 'small' | 'normal' | 'large')} className={`min-h-[48px] min-w-[48px] px-3 text-sm font-medium transition-colors focus:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-500 ${fontSize === opt.key ? 'bg-primary-600 dark:bg-primary-500 text-white' : 'bg-surface-50 dark:bg-surface-700 text-surface-600 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-600'}`}>{opt.label}</button>
                         ))}
                     </div>
                 </div>

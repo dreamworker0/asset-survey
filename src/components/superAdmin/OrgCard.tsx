@@ -91,7 +91,7 @@ export default memo(function OrgCard({
                                     <button
                                         type="button"
                                         onClick={() => setEditing(true)}
-                                        className="btn-secondary btn-sm min-h-[44px]"
+                                        className="btn-secondary btn-sm min-h-[48px]"
                                     >
                                         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
                                             <path strokeLinecap="round" strokeLinejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
@@ -106,7 +106,7 @@ export default memo(function OrgCard({
                                         <button
                                             type="button"
                                             onClick={() => { void copyOrgId(); }}
-                                            className="btn-secondary btn-sm min-h-[44px]"
+                                            className="btn-secondary btn-sm min-h-[48px]"
                                             aria-label="기관 ID 전체 복사"
                                         >
                                             복사
@@ -133,7 +133,7 @@ export default memo(function OrgCard({
                                             href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(org.address)}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-0.5 min-h-[44px] px-2 rounded text-xs font-medium text-primary-700 dark:text-primary-300 underline underline-offset-2 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+                                            className="inline-flex items-center gap-0.5 min-h-[48px] px-2 rounded text-xs font-medium text-primary-700 dark:text-primary-300 underline underline-offset-2 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
                                         >
                                             <span aria-hidden="true">📍</span> 지도에서 보기<span className="sr-only">(구글 지도, 새 창)</span>
                                         </a>
@@ -147,7 +147,7 @@ export default memo(function OrgCard({
                                             type="button"
                                             onClick={() => setShowImage(v => !v)}
                                             aria-expanded={showImage}
-                                            className="btn-secondary btn-sm min-h-[44px]"
+                                            className="btn-secondary btn-sm min-h-[48px]"
                                         >
                                             <span aria-hidden="true">{showImage ? '▾' : '▸'}</span>
                                             증빙서류 {showImage ? '닫기' : '보기'}

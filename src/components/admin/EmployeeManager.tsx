@@ -130,9 +130,9 @@ export default function EmployeeManager() {
                         기관 코드 <span className="font-mono text-lg font-bold text-primary-700 dark:text-primary-300 select-all">{organization?.inviteCode || '------'}</span>
                     </p>
                     <div className="flex flex-wrap gap-2 mt-3">
-                        <button type="button" onClick={() => void handleCopyInviteCode('link')} className="btn-secondary btn-sm min-h-[44px] px-4">링크 복사</button>
-                        <button type="button" onClick={() => void handleCopyInviteCode('code')} className="btn-secondary btn-sm min-h-[44px] px-4">코드 복사</button>
-                        <button type="button" onClick={() => void handleRegenerateCode()} disabled={regenerating} className="btn-secondary btn-sm min-h-[44px] px-4">
+                        <button type="button" onClick={() => void handleCopyInviteCode('link')} className="btn-secondary btn-sm min-h-[48px] px-4">링크 복사</button>
+                        <button type="button" onClick={() => void handleCopyInviteCode('code')} className="btn-secondary btn-sm min-h-[48px] px-4">코드 복사</button>
+                        <button type="button" onClick={() => void handleRegenerateCode()} disabled={regenerating} className="btn-secondary btn-sm min-h-[48px] px-4">
                             {regenerating ? '새로 만드는 중…' : '코드 새로 만들기'}
                         </button>
                     </div>
@@ -170,7 +170,7 @@ export default function EmployeeManager() {
                                     <button type="button" className="btn-primary min-h-[48px] px-3 flex-shrink-0" disabled={teams.busy || !newTeamName.trim()} onClick={() => void createTeamInDialog()}>팀 만들기</button>
                                 </div>
                                 {/* 잘못 골랐을 때 돌아갈 길 — 예전엔 창을 닫아야만 팀 고르기로 돌아갔다 */}
-                                <button type="button" className="btn-secondary btn-sm min-h-[44px] px-3 mt-2" onClick={() => { setCreatingTeam(false); setNewTeamName(''); }}>
+                                <button type="button" className="btn-secondary btn-sm min-h-[48px] px-3 mt-2" onClick={() => { setCreatingTeam(false); setNewTeamName(''); }}>
                                     있는 팀에서 고르기
                                 </button>
                             </>
@@ -203,7 +203,7 @@ export default function EmployeeManager() {
                             .filter(([key, , n]) => key === 'all' || key === 'active' || n > 0)
                             .map(([key, label, n]) => (
                                 <button key={key} type="button" aria-pressed={statusFilter === key} onClick={() => { setStatusFilter(key); setSelected(new Set()); }}
-                                    className={`min-h-[44px] px-4 rounded-xl text-sm font-medium border ${statusFilter === key
+                                    className={`min-h-[48px] px-4 rounded-xl text-sm font-medium border ${statusFilter === key
                                         ? 'bg-primary-600 border-primary-600 text-white'
                                         : 'bg-white border-surface-300 text-surface-800 dark:bg-surface-800 dark:border-surface-600 dark:text-surface-200'}`}>
                                     {label} <span className="tabular-nums">{n}</span>
@@ -230,7 +230,7 @@ export default function EmployeeManager() {
                             <b className="font-semibold">가입 대기</b>는 미리 등록만 하고 아직 가입하지 않은 사람입니다. 초대 링크로 같은 이메일(구글 계정)로 가입하면 이름과 팀이 저절로 들어가고 '활성'이 됩니다.
                             {' '}아직 메일을 안 보낸 사람에게는 아래에서 골라 [초대 메일 보내기]를 누르세요.
                             {notInvited.length > 0 && (
-                                <button type="button" className="btn-secondary btn-sm min-h-[44px] px-3 mt-2 block"
+                                <button type="button" className="btn-secondary btn-sm min-h-[48px] px-3 mt-2 block"
                                     onClick={() => void bulkSendInvites(notInvited)}>
                                     ✉️ 아직 안 보낸 {notInvited.length}명 모두에게 초대 메일 보내기
                                 </button>
@@ -250,7 +250,7 @@ export default function EmployeeManager() {
                 <div className="glass-card p-8 text-center" aria-live="polite">
                     <p className="text-surface-800 dark:text-surface-200 font-medium">조건에 맞는 직원이 없습니다</p>
                     {(filtering || statusFilter !== 'all') && (
-                        <button type="button" className="btn-secondary min-h-[44px] px-4 mt-3" onClick={() => { setSearchQuery(''); setTeamFilter('all'); setStatusFilter('all'); }}>
+                        <button type="button" className="btn-secondary min-h-[48px] px-4 mt-3" onClick={() => { setSearchQuery(''); setTeamFilter('all'); setStatusFilter('all'); }}>
                             모든 직원 보기
                         </button>
                     )}
@@ -258,7 +258,7 @@ export default function EmployeeManager() {
             ) : (
                 <div className="glass-card overflow-hidden">
                     <div className="flex items-center gap-1 border-b border-surface-100 dark:border-surface-700 bg-surface-50/60 dark:bg-surface-800/60">
-                        <label className="w-11 h-11 flex items-center justify-center flex-shrink-0 cursor-pointer">
+                        <label className="w-12 h-12 flex items-center justify-center flex-shrink-0 cursor-pointer">
                             <input type="checkbox" className="w-5 h-5 accent-primary-600"
                                 checked={allShownPicked}
                                 ref={(el) => { if (el) el.indeterminate = pickedShown > 0 && !allShownPicked; }}
@@ -293,7 +293,7 @@ export default function EmployeeManager() {
                         role="region" aria-label="고른 직원에게 할 일">
                         <span className="text-sm font-semibold text-surface-900 dark:text-surface-100 tabular-nums mr-auto">{pickedMembers.length}명 고름</span>
                         <label htmlFor="bulk-team" className="sr-only">고른 직원의 팀 지정</label>
-                        <select id="bulk-team" value="" className="input w-auto min-w-[9rem] min-h-[44px] text-sm"
+                        <select id="bulk-team" value="" className="input w-auto min-w-[9rem] min-h-[48px] text-sm"
                             onChange={(e) => {
                                 const v = e.target.value;
                                 if (!v) return;
@@ -304,18 +304,18 @@ export default function EmployeeManager() {
                             <option value={NO_TEAM}>팀 비우기</option>
                         </select>
                         {pickedPending.length > 0 && (
-                            <button type="button" className="btn-primary btn-sm min-h-[44px] px-3"
+                            <button type="button" className="btn-primary btn-sm min-h-[48px] px-3"
                                 onClick={() => void bulkSendInvites(pickedPending).then((ok) => { if (ok) setSelected(new Set()); })}>
                                 ✉️ 초대 메일 보내기 ({pickedPending.length}명)
                             </button>
                         )}
                         {pickedPending.length > 0 && (
-                            <button type="button" className="btn-secondary btn-sm min-h-[44px] px-3 text-red-700 dark:text-red-300"
+                            <button type="button" className="btn-secondary btn-sm min-h-[48px] px-3 text-red-700 dark:text-red-300"
                                 onClick={() => void bulkDeletePending(pickedPending).then((ok) => { if (ok) setSelected(new Set()); })}>
                                 가입 대기 {pickedPending.length}명 등록 취소
                             </button>
                         )}
-                        <button type="button" className="btn-ghost btn-sm min-h-[44px] px-3" onClick={() => setSelected(new Set())}>고르기 해제</button>
+                        <button type="button" className="btn-ghost btn-sm min-h-[48px] px-3" onClick={() => setSelected(new Set())}>고르기 해제</button>
                     </div>
                 </div>
             )}

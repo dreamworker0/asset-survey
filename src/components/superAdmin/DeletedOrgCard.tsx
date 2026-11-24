@@ -68,7 +68,7 @@ export default function DeletedOrgCard({ org, isDeleting, onRestore, onPermanent
                             type="button"
                             onClick={() => onRestore(org)}
                             disabled={isDeleting}
-                            className="btn-secondary btn-sm min-h-[44px]"
+                            className="btn-secondary btn-sm min-h-[48px]"
                             aria-label={`${org.name} 기관 복구`}
                         >
                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
@@ -80,7 +80,7 @@ export default function DeletedOrgCard({ org, isDeleting, onRestore, onPermanent
                             type="button"
                             onClick={() => onPermanentDelete(org)}
                             disabled={isDeleting}
-                            className="btn-danger btn-sm min-h-[44px]"
+                            className="btn-danger btn-sm min-h-[48px]"
                             aria-label={`${org.name} 기관 영구 삭제`}
                         >
                             {isDeleting ? (

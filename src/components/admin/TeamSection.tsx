@@ -38,7 +38,7 @@ export default function TeamSection({ t, memberCount, step }: Props) {
                             </li>
                         ))}
                     </ul>
-                    <button type="button" className="btn-secondary btn-sm min-h-[44px]" onClick={() => setEditing(true)}>팀 고치기</button>
+                    <button type="button" className="btn-secondary btn-sm min-h-[48px]" onClick={() => setEditing(true)}>팀 고치기</button>
                 </div>
             ) : (
                 <>
@@ -47,7 +47,7 @@ export default function TeamSection({ t, memberCount, step }: Props) {
                     </p>
                     <AddTeamForm t={t} inputId="new-team-name" />
                     {t.archivedTeams.length > 0 && (
-                        <button type="button" className="btn-secondary btn-sm min-h-[44px] mt-3" onClick={() => setEditing(true)}>
+                        <button type="button" className="btn-secondary btn-sm min-h-[48px] mt-3" onClick={() => setEditing(true)}>
                             삭제한 팀 {t.archivedTeams.length}개 보기
                         </button>
                     )}
@@ -64,11 +64,11 @@ export default function TeamSection({ t, memberCount, step }: Props) {
                                     {team.name} <span className="text-xs font-normal text-surface-600 dark:text-surface-400 tabular-nums">{memberCount(team.id)}명</span>
                                 </span>
                                 <button type="button" onClick={() => void t.renameTeam(team)} disabled={t.busy}
-                                    className="btn-secondary btn-sm min-h-[44px] px-3" aria-label={`${team.name} 이름 바꾸기`}>
+                                    className="btn-secondary btn-sm min-h-[48px] px-3" aria-label={`${team.name} 이름 바꾸기`}>
                                     이름 바꾸기
                                 </button>
                                 <button type="button" onClick={() => void t.archiveTeam(team, memberCount(team.id))} disabled={t.busy}
-                                    className="btn-secondary btn-sm min-h-[44px] px-3 text-red-700 dark:text-red-300" aria-label={`${team.name} 삭제`}>
+                                    className="btn-secondary btn-sm min-h-[48px] px-3 text-red-700 dark:text-red-300" aria-label={`${team.name} 삭제`}>
                                     삭제
                                 </button>
                             </li>
@@ -85,7 +85,7 @@ export default function TeamSection({ t, memberCount, step }: Props) {
                             {t.archivedTeams.map((team) => (
                                 <li key={team.id}>
                                     <button type="button" onClick={() => void t.restoreTeam(team)} disabled={t.busy}
-                                        className="btn-secondary btn-sm min-h-[44px] px-3" aria-label={`${team.name} 되살리기`}>
+                                        className="btn-secondary btn-sm min-h-[48px] px-3" aria-label={`${team.name} 되살리기`}>
                                         {team.name} 되살리기
                                     </button>
                                 </li>

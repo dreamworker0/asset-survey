@@ -159,7 +159,7 @@ function DailyScans({ s }: { s: DashboardStats }) {
             )}
             {scanDays.length > 0 && (
                 <details className="mt-3 group">
-                    <summary className="btn-secondary btn-sm min-h-[44px] cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+                    <summary className="btn-secondary btn-sm min-h-[48px] cursor-pointer list-none [&::-webkit-details-marker]:hidden">
                         <span aria-hidden="true" className="group-open:hidden">▸</span>
                         <span aria-hidden="true" className="hidden group-open:inline">▾</span>
                         날짜별 스캔 보기
@@ -246,7 +246,7 @@ function OrgTable({ rows }: { rows: DashboardOrgRow[] }) {
                 <label className="text-sm text-surface-600 dark:text-surface-300 flex items-center gap-2">
                     정렬
                     <select
-                        className="input min-h-[44px] py-1.5 text-sm"
+                        className="input min-h-[48px] py-1.5 text-sm"
                         value={sortKey}
                         onChange={(e) => setSortKey(e.target.value as SortKey)}
                     >

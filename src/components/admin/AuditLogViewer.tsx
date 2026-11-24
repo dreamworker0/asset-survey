@@ -169,7 +169,7 @@ export default function AuditLogViewer() {
                         <button
                             type="button"
                             onClick={() => setRange({ start: '', end: '' })}
-                            className="btn-secondary btn-sm min-h-[44px] px-4 mt-2"
+                            className="btn-secondary btn-sm min-h-[48px] px-4 mt-2"
                         >
                             직접 지정 지우기
                         </button>
@@ -230,7 +230,7 @@ export default function AuditLogViewer() {
                     {/* 목록을 하나도 못 불러왔으면 글자만으로는 할 일이 없다 — 다시 불러올 길을 준다.
                         훅에 재조회 함수가 없어 화면을 새로 연다(거르기 값은 처음으로 돌아간다) */}
                     {logs.length === 0 && !exporting && error.includes('불러오지 못했습니다') && (
-                        <button type="button" className="btn-secondary btn-sm min-h-[44px] px-4" onClick={() => window.location.reload()}>
+                        <button type="button" className="btn-secondary btn-sm min-h-[48px] px-4" onClick={() => window.location.reload()}>
                             다시 불러오기
                         </button>
                     )}

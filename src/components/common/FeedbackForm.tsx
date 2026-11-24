@@ -180,7 +180,7 @@ export default function FeedbackForm({ onClose }: FeedbackFormProps) {
             <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose} role="presentation">
                 {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions */}
                 <div className="relative bg-white dark:bg-surface-800 rounded-2xl p-8 max-w-sm mx-4 text-center animate-scale-in" onClick={e => e.stopPropagation()} role="dialog" aria-modal="true" aria-labelledby="feedback-success-title">
-                    <button type="button" onClick={onClose} aria-label="창 닫기" className="absolute top-2 right-2 btn-icon min-w-[44px] min-h-[44px] flex items-center justify-center text-surface-600 dark:text-surface-400">
+                    <button type="button" onClick={onClose} aria-label="창 닫기" className="absolute top-2 right-2 btn-icon min-w-[48px] min-h-[48px] flex items-center justify-center text-surface-600 dark:text-surface-400">
                         <svg aria-hidden="true" className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                         </svg>
@@ -250,7 +250,7 @@ export default function FeedbackForm({ onClose }: FeedbackFormProps) {
                                         type="button"
                                         aria-label={`첨부 ${idx + 1} 지우기`}
                                         onClick={() => removeImage(idx)}
-                                        className="absolute -top-2 -right-2 flex items-center justify-center opacity-100 pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity min-w-[44px] min-h-[44px]"
+                                        className="absolute -top-2 -right-2 flex items-center justify-center opacity-100 pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity min-w-[48px] min-h-[48px]"
                                     >
                                         {/* 사진 위에서도 보이도록 흰 원 위에 X를 그린다 */}
                                         <svg aria-hidden="true" className="w-6 h-6 p-1 rounded-full bg-white/95 dark:bg-surface-800/95 shadow text-red-700 dark:text-red-300" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

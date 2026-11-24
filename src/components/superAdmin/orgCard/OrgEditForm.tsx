@@ -68,7 +68,7 @@ export default memo(function OrgEditForm({ orgId, initialName, initialAddress, o
                     type="button"
                     onClick={() => { void handleSave(); }}
                     disabled={saving || !form.name.trim()}
-                    className="btn-primary btn-sm min-h-[44px]"
+                    className="btn-primary btn-sm min-h-[48px]"
                 >
                     {saving ? (<><div className="w-3 h-3 spinner" aria-hidden="true" />저장 중...</>) : '저장'}
                 </button>
@@ -76,7 +76,7 @@ export default memo(function OrgEditForm({ orgId, initialName, initialAddress, o
                     type="button"
                     onClick={onCancel}
                     disabled={saving}
-                    className="btn-secondary btn-sm min-h-[44px]"
+                    className="btn-secondary btn-sm min-h-[48px]"
                 >
                     취소
                 </button>

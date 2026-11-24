@@ -23,7 +23,7 @@ export default memo(function OrgRestoreForm({ orgId, onRestoreUser }: Props) {
                 type="button"
                 onClick={() => setShowRestore(true)}
                 aria-expanded={false}
-                className="btn-secondary btn-sm min-h-[44px]"
+                className="btn-secondary btn-sm min-h-[48px]"
             >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" d={RESTORE_ICON} />
@@ -60,7 +60,7 @@ export default memo(function OrgRestoreForm({ orgId, onRestoreUser }: Props) {
                     type="button"
                     onClick={() => { setShowRestore(false); setForm({ email: '', name: '' }); }}
                     aria-expanded={true}
-                    className="btn-secondary btn-sm min-h-[44px]"
+                    className="btn-secondary btn-sm min-h-[48px]"
                 >
                     닫기
                 </button>
@@ -76,7 +76,7 @@ export default memo(function OrgRestoreForm({ orgId, onRestoreUser }: Props) {
                         type="text"
                         value={form.name}
                         onChange={e => setForm(prev => ({ ...prev, name: e.target.value }))}
-                        className="input text-sm min-h-[44px]"
+                        className="input text-sm min-h-[48px]"
                         placeholder="이름"
                     />
                 </div>
@@ -87,7 +87,7 @@ export default memo(function OrgRestoreForm({ orgId, onRestoreUser }: Props) {
                         type="email"
                         value={form.email}
                         onChange={e => setForm(prev => ({ ...prev, email: e.target.value }))}
-                        className="input text-sm min-h-[44px]"
+                        className="input text-sm min-h-[48px]"
                         placeholder="이메일"
                     />
                 </div>
@@ -95,7 +95,7 @@ export default memo(function OrgRestoreForm({ orgId, onRestoreUser }: Props) {
                     type="button"
                     onClick={() => { void handleRestore(); }}
                     disabled={restoring || !form.email.trim()}
-                    className="btn-primary btn-sm min-h-[44px] whitespace-nowrap"
+                    className="btn-primary btn-sm min-h-[48px] whitespace-nowrap"
                 >
                     {restoring ? <><div className="w-3 h-3 spinner" aria-hidden="true" />복원 중...</> : '복원'}
                 </button>

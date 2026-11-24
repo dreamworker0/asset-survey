@@ -75,7 +75,7 @@ export default function AdminDashboard() {
                     <p className="flex-1 min-w-[12rem] text-sm text-red-700 dark:text-red-300">
                         현황을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 다시 불러오세요.
                     </p>
-                    <button type="button" className="btn-secondary btn-sm min-h-[44px]" onClick={() => setReloadKey(k => k + 1)}>다시 불러오기</button>
+                    <button type="button" className="btn-secondary btn-sm min-h-[48px]" onClick={() => setReloadKey(k => k + 1)}>다시 불러오기</button>
                 </div>
             )}
 

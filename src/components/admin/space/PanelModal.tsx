@@ -67,7 +67,7 @@ export default function PanelModal({ open, title, titleId, onClose, children }: 
             >
                 <div className="flex items-start justify-between gap-2 mb-4">
                     <h2 id={titleId} className="text-lg font-bold text-surface-900 dark:text-surface-100 pt-2">{title}</h2>
-                    <button type="button" data-close className="btn-icon min-h-[44px] min-w-[44px] -mr-2" aria-label="창 닫기" onClick={onClose}>
+                    <button type="button" data-close className="btn-icon min-h-[48px] min-w-[48px] -mr-2" aria-label="창 닫기" onClick={onClose}>
                         <svg aria-hidden="true" className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
                         </svg>

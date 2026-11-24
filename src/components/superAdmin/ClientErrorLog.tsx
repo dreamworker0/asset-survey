@@ -86,11 +86,11 @@ export default function ClientErrorLog() {
                         <p className="text-sm text-surface-700 dark:text-surface-300 tabular-nums mr-auto" aria-live="polite">
                             오류 {errors.length}종 · 모두 {total.toLocaleString('ko-KR')}번
                         </p>
-                        <label className="flex items-center gap-2 min-h-[44px] text-sm text-surface-700 dark:text-surface-300 cursor-pointer">
+                        <label className="flex items-center gap-2 min-h-[48px] text-sm text-surface-700 dark:text-surface-300 cursor-pointer">
                             <input type="checkbox" className="w-5 h-5 accent-primary-600" checked={recentOnly} onChange={(e) => setRecentOnly(e.target.checked)} />
                             최근 24시간만
                         </label>
-                        <button type="button" className="btn-secondary min-h-[44px] px-4" onClick={() => void load()}>새로 고침</button>
+                        <button type="button" className="btn-secondary min-h-[48px] px-4" onClick={() => void load()}>새로 고침</button>
                     </div>
 
                     {shown.length === 0 ? (
@@ -129,7 +129,7 @@ export default function ClientErrorLog() {
                                             )}
                                             {e.stack && (
                                                 <details className="mt-2">
-                                                    <summary className="text-xs text-primary-700 dark:text-primary-300 cursor-pointer min-h-[32px] inline-flex items-center">스택 보기</summary>
+                                                    <summary className="text-xs text-primary-700 dark:text-primary-300 cursor-pointer min-h-[48px] inline-flex items-center">스택 보기</summary>
                                                     <pre className="mt-1 text-[11px] leading-relaxed whitespace-pre-wrap break-all bg-surface-50 dark:bg-surface-800 rounded-lg p-2 text-surface-700 dark:text-surface-300">{e.stack}</pre>
                                                 </details>
                                             )}

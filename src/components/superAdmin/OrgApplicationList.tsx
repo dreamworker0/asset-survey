@@ -319,7 +319,7 @@ export default function OrgApplicationList({ onCountChange }: OrgApplicationList
                     <button
                         type="button"
                         onClick={() => { setLoading(true); void fetchData(); }}
-                        className="btn-secondary btn-sm min-h-[44px] mt-3"
+                        className="btn-secondary btn-sm min-h-[48px] mt-3"
                     >
                         다시 시도
                     </button>

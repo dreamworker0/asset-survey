@@ -79,7 +79,7 @@ export default function SurveyReport() {
 
     return (
         <div className="max-w-5xl mx-auto animate-fade-in">
-            <Link to="/admin/surveys" className="inline-flex items-center gap-1 text-sm font-medium text-primary-700 dark:text-primary-300 min-h-[44px]">
+            <Link to="/admin/surveys" className="inline-flex items-center gap-1 text-sm font-medium text-primary-700 dark:text-primary-300 min-h-[48px]">
                 <span aria-hidden="true">←</span> 재물조사
             </Link>
             <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
@@ -114,13 +114,13 @@ export default function SurveyReport() {
                         <ul className="flex flex-wrap gap-2">
                             {detailTables.map((t, i) => (
                                 <li key={t.title}>
-                                    <a href={`#${sectionId(i)}`} className="btn-secondary btn-sm min-h-[44px] px-3">
+                                    <a href={`#${sectionId(i)}`} className="btn-secondary btn-sm min-h-[48px] px-3">
                                         {t.title}{!['건물·층별', '공간별'].includes(t.title) && <span className="tabular-nums"> {t.rows.length}</span>}
                                     </a>
                                 </li>
                             ))}
                             {photos.length > 0 && (
-                                <li><a href="#photo-title" className="btn-secondary btn-sm min-h-[44px] px-3">{PHOTO_TABLE_TITLE} <span className="tabular-nums">{photos.length}</span></a></li>
+                                <li><a href="#photo-title" className="btn-secondary btn-sm min-h-[48px] px-3">{PHOTO_TABLE_TITLE} <span className="tabular-nums">{photos.length}</span></a></li>
                             )}
                         </ul>
                     </nav>
@@ -203,7 +203,7 @@ export default function SurveyReport() {
             )}
 
             <section className={card}>
-                <button type="button" className="btn-secondary btn-sm min-h-[44px] font-semibold" aria-expanded={showLog} onClick={() => setShowLog((v) => !v)}>
+                <button type="button" className="btn-secondary btn-sm min-h-[48px] font-semibold" aria-expanded={showLog} onClick={() => setShowLog((v) => !v)}>
                     <span aria-hidden="true">{showLog ? '▾' : '▸'}</span> 조사 이력 {r.events.length}건
                 </button>
                 {showLog && (
@@ -228,7 +228,7 @@ function TaskRow({ task, spaceName, onToggle }: { task: SyncTask; spaceName: (ke
         : task.kind === 'missing' ? `목록상 ${spaceName(task.fromSpaceId)}` : spaceName(task.toSpaceId);
     return (
         <li>
-            <label className="flex items-start gap-3 py-2 min-h-[44px] text-sm cursor-pointer">
+            <label className="flex items-start gap-3 py-2 min-h-[48px] text-sm cursor-pointer">
                 <input type="checkbox" className="w-5 h-5 mt-0.5 flex-shrink-0 accent-primary-600" checked={task.done} onChange={onToggle} />
                 <span className={task.done ? 'line-through text-surface-500 dark:text-surface-400' : 'text-surface-800 dark:text-surface-200'}>
                     <span className="font-mono">{task.code}</span> {task.name ?? ''}

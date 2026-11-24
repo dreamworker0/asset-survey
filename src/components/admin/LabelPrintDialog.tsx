@@ -139,7 +139,7 @@ export default function LabelPrintDialog({ assets, orgId, onClose, onTags, onRel
                                     {(LABEL_BRANDS.find((b) => b.id === 'formtec')?.presets ?? []).map((k) => {
                                         const p = LABEL_PRESETS[k];
                                         return (
-                                            <label key={k} className="flex items-center gap-3 min-h-[44px] text-sm text-surface-800 dark:text-surface-200">
+                                            <label key={k} className="flex items-center gap-3 min-h-[48px] text-sm text-surface-800 dark:text-surface-200">
                                                 <input type="radio" name="label-size" checked={lp.size === k} onChange={() => lp.setSize(k)} className="w-5 h-5 accent-primary-600 flex-shrink-0" />
                                                 <span><strong>{p.model}</strong> · {p.label} {p.w}×{p.h}mm <span className={sub}>(A4 {p.cols * p.rows}칸)</span></span>
                                             </label>
@@ -158,7 +158,7 @@ export default function LabelPrintDialog({ assets, orgId, onClose, onTags, onRel
                                             {f.label} {f.key !== 'cols' && f.key !== 'rows' && '(mm)'}
                                             <input
                                                 type="number" inputMode="decimal" step={f.step} min="0"
-                                                className="input min-h-[44px] mt-1"
+                                                className="input min-h-[48px] mt-1"
                                                 value={Number.isFinite(lp.custom[f.key]) ? lp.custom[f.key] : ''}
                                                 onChange={(e) => lp.setCustom({ ...lp.custom, [f.key]: e.target.value === '' ? NaN : Number(e.target.value) })}
                                             />
@@ -179,13 +179,13 @@ export default function LabelPrintDialog({ assets, orgId, onClose, onTags, onRel
                         </label>
 
                         {lp.managersText && (
-                            <label className="flex items-center gap-3 min-h-[44px] text-sm text-surface-800 dark:text-surface-200">
+                            <label className="flex items-center gap-3 min-h-[48px] text-sm text-surface-800 dark:text-surface-200">
                                 <input type="checkbox" checked={lp.showManagers} onChange={(e) => lp.setShowManagers(e.target.checked)} className="w-5 h-5 accent-primary-600 flex-shrink-0" />
                                 관리 책임자 넣기 <span className={sub}>({lp.managersText} · 작은 라벨에서는 빠져요)</span>
                             </label>
                         )}
 
-                        <label className="flex items-center gap-3 min-h-[44px] text-sm text-surface-800 dark:text-surface-200">
+                        <label className="flex items-center gap-3 min-h-[48px] text-sm text-surface-800 dark:text-surface-200">
                             <input type="checkbox" checked={lp.cutLines} onChange={(e) => lp.setCutLines(e.target.checked)} className="w-5 h-5 accent-primary-600 flex-shrink-0" />
                             재단선 표시 <span className={sub}>(일반 종이에 뽑아 자를 때. 칸이 나뉜 라벨지는 끄세요)</span>
                         </label>

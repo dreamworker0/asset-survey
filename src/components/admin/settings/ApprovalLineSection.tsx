@@ -69,7 +69,7 @@ export default function ApprovalLineSection({ form, setForm, handleSave, saving 
                 <button
                     type="button"
                     onClick={() => setForm({ ...form, approvalLine: [...form.approvalLine, { title: '' }] })}
-                    className="btn-secondary btn-sm min-h-[44px]"
+                    className="btn-secondary btn-sm min-h-[48px]"
                 >
                     + 결재자 추가
                 </button>

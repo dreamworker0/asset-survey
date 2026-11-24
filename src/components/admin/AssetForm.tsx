@@ -57,7 +57,7 @@ export default function AssetForm() {
 
     return (
         <div className="max-w-2xl mx-auto animate-fade-in">
-            <Link to={f.isNew ? '/admin/assets' : detailPath(assetId!)} className="inline-flex items-center gap-1 text-sm font-medium text-primary-700 dark:text-primary-300 min-h-[44px] pr-2">
+            <Link to={f.isNew ? '/admin/assets' : detailPath(assetId!)} className="inline-flex items-center gap-1 text-sm font-medium text-primary-700 dark:text-primary-300 min-h-[48px] pr-2">
                 <span aria-hidden="true">←</span> {f.isNew ? '재물 목록' : '재물 정보'}
             </Link>
             <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mt-1 mb-2">{f.isNew ? '재물 등록' : '재물 고치기'}</h1>
@@ -218,8 +218,8 @@ function PhotoPicker({ file, onChange }: { file: File | null; onChange: (f: File
                 <div className="flex items-end gap-3">
                     <img src={preview} alt="고른 사진 미리보기" className="w-32 h-32 object-cover rounded-xl border border-surface-200 dark:border-surface-700" />
                     <div className="flex flex-col gap-2">
-                        <button type="button" className="btn-secondary min-h-[44px] px-4" onClick={() => inputRef.current?.click()}>다른 사진</button>
-                        <button type="button" className="btn-secondary min-h-[44px] px-4" onClick={() => onChange(null)}>사진 빼기</button>
+                        <button type="button" className="btn-secondary min-h-[48px] px-4" onClick={() => inputRef.current?.click()}>다른 사진</button>
+                        <button type="button" className="btn-secondary min-h-[48px] px-4" onClick={() => onChange(null)}>사진 빼기</button>
                     </div>
                 </div>
             ) : (

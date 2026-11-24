@@ -44,7 +44,7 @@ export default function OrgInfoSection({
                         <p id="org-locked-hint" className="text-xs text-surface-600 dark:text-surface-400 flex-1 min-w-[12rem]">
                             기관명과 주소 변경은 슈퍼관리자에게 요청하세요.
                         </p>
-                        <button type="button" onClick={onRequestFeedback} className="btn-secondary btn-sm min-h-[44px]">변경 요청하기</button>
+                        <button type="button" onClick={onRequestFeedback} className="btn-secondary btn-sm min-h-[48px]">변경 요청하기</button>
                     </div>
                 </div>
                 <div>

@@ -60,7 +60,7 @@ export default function EmployeeListItem({
     const teamSelect = (onChange: (v: string) => void) => (
         <div>
             <label htmlFor={`${ids}-team`} className={smallLabel}>팀</label>
-            <select id={`${ids}-team`} value={teamId} onChange={(e) => onChange(e.target.value)} className="input min-h-[44px] py-2 text-sm">
+            <select id={`${ids}-team`} value={teamId} onChange={(e) => onChange(e.target.value)} className="input min-h-[48px] py-2 text-sm">
                 <option value="">팀 없음</option>
                 {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
             </select>
@@ -117,7 +117,7 @@ export default function EmployeeListItem({
                                 <div>
                                     <label htmlFor={`${ids}-role`} className={smallLabel}>역할</label>
                                     <select id={`${ids}-role`} value={member.role || 'employee'} disabled={loadingSelf}
-                                        onChange={(e) => onChangeRole(member.original, e.target.value as UserRole)} className="input min-h-[44px] py-2 text-sm">
+                                        onChange={(e) => onChangeRole(member.original, e.target.value as UserRole)} className="input min-h-[48px] py-2 text-sm">
                                         <option value="employee">직원</option>
                                         <option value="admin">관리자</option>
                                     </select>
@@ -133,25 +133,25 @@ export default function EmployeeListItem({
                     <div className="flex flex-wrap gap-2 mt-3">
                         {isActive && (
                             <>
-                                <button type="button" onClick={() => onEdit(member.original)} className="btn-secondary btn-sm min-h-[44px] px-3">이름 고치기</button>
+                                <button type="button" onClick={() => onEdit(member.original)} className="btn-secondary btn-sm min-h-[48px] px-3">이름 고치기</button>
                                 {!isSelf && (
                                     <button type="button" onClick={() => onDelete(member.original)} disabled={loadingSelf}
-                                        className="btn-secondary btn-sm min-h-[44px] px-3 text-red-700 dark:text-red-300">비활성화</button>
+                                        className="btn-secondary btn-sm min-h-[48px] px-3 text-red-700 dark:text-red-300">비활성화</button>
                                 )}
                                 {isSelf && <p className="text-xs text-surface-600 dark:text-surface-400 self-center">내 역할과 비활성화는 다른 관리자가 바꿀 수 있어요.</p>}
                             </>
                         )}
                         {isPending && (
                             <button type="button" onClick={() => onDeletePreRegistered(member.id)}
-                                className="btn-secondary btn-sm min-h-[44px] px-3 text-red-700 dark:text-red-300" aria-label={`${who} 사전 등록 취소`}>
+                                className="btn-secondary btn-sm min-h-[48px] px-3 text-red-700 dark:text-red-300" aria-label={`${who} 사전 등록 취소`}>
                                 등록 취소
                             </button>
                         )}
                         {isDisabled && (
                             <>
-                                <button type="button" onClick={() => onRestore(member.original)} className="btn-secondary btn-sm min-h-[44px] px-3">다시 활성화</button>
+                                <button type="button" onClick={() => onRestore(member.original)} className="btn-secondary btn-sm min-h-[48px] px-3">다시 활성화</button>
                                 <button type="button" onClick={() => onDeletePermanently(member.original)}
-                                    className="btn-secondary btn-sm min-h-[44px] px-3 text-red-700 dark:text-red-300" aria-label={`${who} 계정 영구 삭제(조사 기록은 남음)`}>
+                                    className="btn-secondary btn-sm min-h-[48px] px-3 text-red-700 dark:text-red-300" aria-label={`${who} 계정 영구 삭제(조사 기록은 남음)`}>
                                     영구 삭제
                                 </button>
                             </>

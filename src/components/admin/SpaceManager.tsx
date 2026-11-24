@@ -140,7 +140,7 @@ export default function SpaceManager() {
                         aria-selected={tab === key}
                         aria-controls={`space-panel-${key}`}
                         onClick={() => setTab(key)}
-                        className={`flex-1 sm:flex-none min-h-[44px] px-4 rounded-lg text-sm font-medium transition-colors ${tab === key
+                        className={`flex-1 sm:flex-none min-h-[48px] px-4 rounded-lg text-sm font-medium transition-colors ${tab === key
                             ? 'bg-white dark:bg-surface-700 text-surface-900 dark:text-surface-100 shadow-sm'
                             : 'text-surface-600 dark:text-surface-400'}`}
                     >
@@ -187,7 +187,7 @@ export default function SpaceManager() {
                         {hasBuildings && (
                             <LocationSelects idPrefix="new-space" buildings={activeBuildings} value={newLocation} onChange={setNewLocation} disabled={busy} />
                         )}
-                        <button type="button" className="btn-secondary btn-sm min-h-[44px] self-start" onClick={() => setBulkAddOpen(true)}>
+                        <button type="button" className="btn-secondary btn-sm min-h-[48px] self-start" onClick={() => setBulkAddOpen(true)}>
                             여러 공간 한꺼번에 추가
                         </button>
                     </form>
@@ -213,16 +213,16 @@ export default function SpaceManager() {
                             {/* 찾기·거르기 */}
                             <div className="flex flex-wrap items-center gap-2 mb-3">
                                 <label htmlFor="space-search" className="sr-only">공간 이름으로 찾기</label>
-                                <input id="space-search" type="search" className="input flex-1 min-w-[10rem] min-h-[44px]" placeholder="공간 이름으로 찾기"
+                                <input id="space-search" type="search" className="input flex-1 min-w-[10rem] min-h-[48px]" placeholder="공간 이름으로 찾기"
                                     value={search} onChange={(e) => setSearch(e.target.value)} />
-                                <label className="flex items-center gap-2 min-h-[44px] text-sm text-surface-700 dark:text-surface-300">
+                                <label className="flex items-center gap-2 min-h-[48px] text-sm text-surface-700 dark:text-surface-300">
                                     <input type="checkbox" className="w-5 h-5 accent-primary-600" checked={onlyUnassigned} onChange={(e) => setOnlyUnassigned(e.target.checked)} />
                                     담당 없음만 <span className="tabular-nums text-surface-600 dark:text-surface-400">({unassignedCount})</span>
                                 </label>
                                 {hasBuildings && !filtering && (
                                     <span className="flex gap-1">
-                                        <button type="button" className="btn-secondary btn-sm min-h-[44px] px-3" onClick={() => setAllCollapsed(false)}>모두 펼치기</button>
-                                        <button type="button" className="btn-secondary btn-sm min-h-[44px] px-3" onClick={() => setAllCollapsed(true)}>모두 접기</button>
+                                        <button type="button" className="btn-secondary btn-sm min-h-[48px] px-3" onClick={() => setAllCollapsed(false)}>모두 펼치기</button>
+                                        <button type="button" className="btn-secondary btn-sm min-h-[48px] px-3" onClick={() => setAllCollapsed(true)}>모두 접기</button>
                                     </span>
                                 )}
                             </div>
@@ -235,7 +235,7 @@ export default function SpaceManager() {
                                     <p className="text-sm text-surface-700 dark:text-surface-300 mb-3">
                                         {onlyUnassigned && !search.trim() ? '담당이 없는 공간이 없습니다. 🎉' : '조건에 맞는 공간이 없습니다.'}
                                     </p>
-                                    <button type="button" className="btn-secondary min-h-[44px] px-4" onClick={() => { setSearch(''); setOnlyUnassigned(false); }}>찾기·거르기 지우기</button>
+                                    <button type="button" className="btn-secondary min-h-[48px] px-4" onClick={() => { setSearch(''); setOnlyUnassigned(false); }}>찾기·거르기 지우기</button>
                                 </div>
                             ) : (
                                 <SpaceList
@@ -264,19 +264,19 @@ export default function SpaceManager() {
                                     role="region" aria-label="고른 공간에 할 일">
                                     <span className="text-sm font-semibold text-surface-900 dark:text-surface-100 tabular-nums mr-auto">{selectedIds.length}곳 고름</span>
                                     <label htmlFor="bulk-assign" className="sr-only">고른 공간에 담당 지정</label>
-                                    <select id="bulk-assign" value="" disabled={busy} className="input w-auto min-w-[10rem] min-h-[44px] text-sm"
+                                    <select id="bulk-assign" value="" disabled={busy} className="input w-auto min-w-[10rem] min-h-[48px] text-sm"
                                         onChange={(e) => { const v = e.target.value; if (v) void bulkAssign(selectedIds, v); }}>
                                         <option value="">+ 담당 지정 (팀·직원)</option>
                                         <AssigneeOptions teams={teamsState.activeTeams} members={members} roleLabel={ROLE_LABEL} />
                                     </select>
                                     {hasBuildings && (
-                                        <button type="button" className="btn-secondary btn-sm min-h-[44px] px-3" disabled={busy} onClick={() => setMoveOpen(true)}>위치 옮기기</button>
+                                        <button type="button" className="btn-secondary btn-sm min-h-[48px] px-3" disabled={busy} onClick={() => setMoveOpen(true)}>위치 옮기기</button>
                                     )}
-                                    <button type="button" className="btn-secondary btn-sm min-h-[44px] px-3 text-red-700 dark:text-red-300" disabled={busy}
+                                    <button type="button" className="btn-secondary btn-sm min-h-[48px] px-3 text-red-700 dark:text-red-300" disabled={busy}
                                         onClick={async () => { if (await bulkArchive(selectedIds)) setSelected(new Set()); }}>
                                         삭제
                                     </button>
-                                    <button type="button" className="btn-ghost btn-sm min-h-[44px] px-3" onClick={() => setSelected(new Set())}>고르기 해제</button>
+                                    <button type="button" className="btn-ghost btn-sm min-h-[48px] px-3" onClick={() => setSelected(new Set())}>고르기 해제</button>
                                 </div>
                                 </div>
                             )}
@@ -290,7 +290,7 @@ export default function SpaceManager() {
                                 type="button"
                                 onClick={() => setShowArchived((v) => !v)}
                                 aria-expanded={showArchived}
-                                className="btn-secondary btn-sm min-h-[44px]"
+                                className="btn-secondary btn-sm min-h-[48px]"
                             >
                                 <span aria-hidden="true">{showArchived ? '▾' : '▸'}</span> 삭제한 공간 {archivedSpaces.length}개
                             </button>
@@ -303,7 +303,7 @@ export default function SpaceManager() {
                                                 type="button"
                                                 onClick={() => restoreSpace(space)}
                                                 disabled={busy}
-                                                className="btn-secondary btn-sm min-h-[44px] px-3 flex-shrink-0"
+                                                className="btn-secondary btn-sm min-h-[48px] px-3 flex-shrink-0"
                                                 aria-label={`${space.name} 되살리기`}
                                             >
                                                 되살리기
@@ -403,7 +403,7 @@ function AssigneeEditor({ space, busy, members, nameOf, teams, teamName, onAddMa
                         <li key={`t-${id}`} className="inline-flex items-center gap-1 pl-3 pr-1 rounded-full bg-accent-50 dark:bg-accent-900/30 text-accent-800 dark:text-accent-300 text-sm">
                             <span aria-hidden="true">👥</span> {teamName(id) ?? '(삭제한 팀)'}
                             <button type="button" onClick={() => onRemoveTeam(id)} disabled={busy}
-                                className="w-11 h-11 -my-1 flex items-center justify-center rounded-full hover:bg-accent-100 dark:hover:bg-accent-800/50"
+                                className="w-12 h-12 -my-1 flex items-center justify-center rounded-full hover:bg-accent-100 dark:hover:bg-accent-800/50"
                                 aria-label={`${teamName(id) ?? '팀'} 담당에서 빼기`}>
                                 <span aria-hidden="true">✕</span>
                             </button>
@@ -413,7 +413,7 @@ function AssigneeEditor({ space, busy, members, nameOf, teams, teamName, onAddMa
                         <li key={`u-${uid}`} className="inline-flex items-center gap-1 pl-3 pr-1 rounded-full bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-sm">
                             {nameOf(uid)}
                             <button type="button" onClick={() => onRemoveManager(uid)} disabled={busy}
-                                className="w-11 h-11 -my-1 flex items-center justify-center rounded-full hover:bg-primary-100 dark:hover:bg-primary-800/50"
+                                className="w-12 h-12 -my-1 flex items-center justify-center rounded-full hover:bg-primary-100 dark:hover:bg-primary-800/50"
                                 aria-label={`${nameOf(uid)} 담당에서 빼기`}>
                                 <span aria-hidden="true">✕</span>
                             </button>
@@ -476,7 +476,7 @@ function SpaceEditForm({ space, buildings, busy, onCancel, onSave, onDelete }: {
                 <p className="flex-1 min-w-[12rem] text-xs text-surface-600 dark:text-surface-400">
                     더 쓰지 않는 공간은 삭제하세요. 이 공간의 재물은 지워지지 않고, 나중에 되살릴 수 있습니다.
                 </p>
-                <button type="button" disabled={busy} className="btn-secondary btn-sm min-h-[44px] text-red-700 dark:text-red-300"
+                <button type="button" disabled={busy} className="btn-secondary btn-sm min-h-[48px] text-red-700 dark:text-red-300"
                     onClick={async () => { if (await onDelete()) onCancel(); }}>
                     공간 삭제
                 </button>

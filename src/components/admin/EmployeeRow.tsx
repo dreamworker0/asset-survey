@@ -32,7 +32,7 @@ export default function EmployeeRow({ member, checked, onCheck, teamName, isSelf
     const invitedText = invitedAt ? `${invitedAt.getMonth() + 1}/${invitedAt.getDate()}` : null;
     return (
         <li className={`flex items-center gap-1 pr-2 ${checked ? 'bg-primary-50/70 dark:bg-primary-900/20' : ''}`}>
-            <label className="w-11 h-11 flex items-center justify-center flex-shrink-0 cursor-pointer">
+            <label className="w-12 h-12 flex items-center justify-center flex-shrink-0 cursor-pointer">
                 <input type="checkbox" className="w-5 h-5 accent-primary-600" checked={checked} onChange={(e) => onCheck(e.target.checked)}
                     aria-label={`${who} 고르기`} />
             </label>
@@ -49,7 +49,7 @@ export default function EmployeeRow({ member, checked, onCheck, teamName, isSelf
                     {invitedText && <span className="break-keep"> · ✉️ {invitedText} 초대 메일 보냄</span>}
                 </p>
             </div>
-            <button type="button" onClick={onEdit} className="btn-secondary btn-sm min-h-[44px] px-3 flex-shrink-0" aria-label={`${who} 고치기`}>
+            <button type="button" onClick={onEdit} className="btn-secondary btn-sm min-h-[48px] px-3 flex-shrink-0" aria-label={`${who} 고치기`}>
                 고치기
             </button>
         </li>

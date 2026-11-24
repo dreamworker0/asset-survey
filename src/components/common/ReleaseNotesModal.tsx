@@ -93,7 +93,7 @@ export default function ReleaseNotesModal({ onClose }: { onClose: () => void }) 
                         <button
                             type="button"
                             onClick={() => { setLoading(true); setAttempt((n) => n + 1); }}
-                            className="btn-secondary btn-sm min-h-[44px]"
+                            className="btn-secondary btn-sm min-h-[48px]"
                         >
                             다시 시도
                         </button>
@@ -126,7 +126,7 @@ export default function ReleaseNotesModal({ onClose }: { onClose: () => void }) 
                             <button
                                 type="button"
                                 onClick={() => setShowAll(true)}
-                                className="btn-secondary btn-sm w-full min-h-[44px]"
+                                className="btn-secondary btn-sm w-full min-h-[48px]"
                             >
                                 이전 업데이트 소식 모두 보기 ({hiddenCount}개) <span aria-hidden="true">▾</span>
                             </button>

@@ -118,11 +118,11 @@ export default function AssetDetailView({ admin, renderLabelPrint }: Props) {
     return (
         <div className="max-w-2xl mx-auto animate-fade-in space-y-4">
             <div className="flex items-center justify-between gap-2">
-                <Link to={listPath} className="inline-flex items-center gap-1 text-sm font-medium text-primary-700 dark:text-primary-300 min-h-[44px] pr-2">
+                <Link to={listPath} className="inline-flex items-center gap-1 text-sm font-medium text-primary-700 dark:text-primary-300 min-h-[48px] pr-2">
                     <span aria-hidden="true">←</span> 재물 목록
                 </Link>
                 {admin && (
-                    <Link to={`/admin/assets/${encodeURIComponent(a.id)}/edit`} className="btn-secondary btn-sm min-h-[44px] px-4">고치기</Link>
+                    <Link to={`/admin/assets/${encodeURIComponent(a.id)}/edit`} className="btn-secondary btn-sm min-h-[48px] px-4">고치기</Link>
                 )}
             </div>
 

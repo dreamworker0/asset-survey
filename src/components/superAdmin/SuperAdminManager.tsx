@@ -119,7 +119,7 @@ export default function SuperAdminManager() {
                 ) : loadError ? (
                     <div className="p-6 text-center" role="alert">
                         <p className="text-sm text-red-700 dark:text-red-300">목록을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 다시 시도해 주세요.</p>
-                        <button type="button" onClick={() => void load()} className="btn-secondary btn-sm min-h-[44px] mt-3">
+                        <button type="button" onClick={() => void load()} className="btn-secondary btn-sm min-h-[48px] mt-3">
                             다시 시도
                         </button>
                     </div>
@@ -144,7 +144,7 @@ export default function SuperAdminManager() {
                                 <button
                                     type="button"
                                     onClick={() => handleRemove(admin)}
-                                    className="btn-secondary btn-sm min-h-[44px] text-red-700 dark:text-red-300 flex-shrink-0"
+                                    className="btn-secondary btn-sm min-h-[48px] text-red-700 dark:text-red-300 flex-shrink-0"
                                     aria-label={`${admin.name || admin.email || '이 계정'} 슈퍼관리자에서 제거`}
                                 >
                                     제거

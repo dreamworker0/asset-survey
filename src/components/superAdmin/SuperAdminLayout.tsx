@@ -40,7 +40,7 @@ function NavItem({ to, icon, label, badge, onNavigate }: NavItemProps) {
             to={to}
             onClick={onNavigate}
             className={({ isActive }) =>
-                `sidebar-link min-h-[44px] ${isActive ? 'sidebar-link-active' : ''}`
+                `sidebar-link min-h-[48px] ${isActive ? 'sidebar-link-active' : ''}`
             }
         >
             {icon}
@@ -356,14 +356,14 @@ export default function SuperAdminLayout() {
                         <button
                             type="button"
                             onClick={() => { void startTestMode('admin'); }}
-                            className="btn-secondary btn-sm min-h-[44px]"
+                            className="btn-secondary btn-sm min-h-[48px]"
                         >
                             <span aria-hidden="true">🏢</span> 관리자<span className="hidden sm:inline"> 화면 보기</span>
                         </button>
                         <button
                             type="button"
                             onClick={() => { void startTestMode('employee'); }}
-                            className="btn-secondary btn-sm min-h-[44px]"
+                            className="btn-secondary btn-sm min-h-[48px]"
                         >
                             <span aria-hidden="true">🙋</span> 직원<span className="hidden sm:inline"> 화면 보기</span>
                         </button>

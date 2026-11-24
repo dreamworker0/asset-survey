@@ -106,7 +106,7 @@ export default memo(function OrgAppCard({
                                     href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(app.address)}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-0.5 min-h-[44px] px-2 rounded text-xs font-medium text-primary-700 dark:text-primary-300 underline underline-offset-2 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors break-keep"
+                                    className="inline-flex items-center gap-0.5 min-h-[48px] px-2 rounded text-xs font-medium text-primary-700 dark:text-primary-300 underline underline-offset-2 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors break-keep"
                                 >
                                     <span aria-hidden="true">📍</span> 지도에서 보기<span className="sr-only">(구글 지도, 새 창)</span>
                                 </a>
@@ -145,7 +145,7 @@ export default memo(function OrgAppCard({
                                 type="button"
                                 onClick={() => onToggleImage(app.id)}
                                 aria-expanded={selectedApp === app.id}
-                                className="btn-secondary btn-sm min-h-[44px]"
+                                className="btn-secondary btn-sm min-h-[48px]"
                             >
                                 <span aria-hidden="true">{selectedApp === app.id ? '▾' : '▸'}</span>
                                 증빙서류 사본 {selectedApp === app.id ? '닫기' : '보기'}
@@ -163,7 +163,7 @@ export default memo(function OrgAppCard({
                                 type="button"
                                 onClick={() => onAiReanalyze(app)}
                                 disabled={!!actionLoading[app.id]}
-                                className="btn-secondary btn-sm min-h-[44px]"
+                                className="btn-secondary btn-sm min-h-[48px]"
                             >
                                 {actionLoading[app.id] === 'ai' ? (
                                     <><div className="w-3.5 h-3.5 spinner" aria-hidden="true" /> AI 분석 중...</>
@@ -183,7 +183,7 @@ export default memo(function OrgAppCard({
                                     type="button"
                                     onClick={() => onAiReanalyze(app)}
                                     disabled={!!actionLoading[app.id]}
-                                    className="btn-secondary btn-sm min-h-[44px]"
+                                    className="btn-secondary btn-sm min-h-[48px]"
                                 >
                                     {actionLoading[app.id] === 'ai' ? '분석 중...' : 'AI 다시 분석'}
                                 </button>
@@ -222,7 +222,7 @@ export default memo(function OrgAppCard({
                                             href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(app.aiVerifyDetail.address)}`}
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-0.5 min-h-[44px] px-2 rounded text-xs font-medium text-primary-700 dark:text-primary-300 underline underline-offset-2 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors break-keep"
+                                            className="inline-flex items-center gap-0.5 min-h-[48px] px-2 rounded text-xs font-medium text-primary-700 dark:text-primary-300 underline underline-offset-2 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors break-keep"
                                         >
                                             <span aria-hidden="true">📍</span> 지도에서 보기<span className="sr-only">(구글 지도, 새 창)</span>
                                         </a>
@@ -247,7 +247,7 @@ export default memo(function OrgAppCard({
                                     type="button"
                                     onClick={() => onApprove(app)}
                                     disabled={!!actionLoading[app.id]}
-                                    className="btn-success btn-sm min-h-[44px] flex-1 md:flex-none"
+                                    className="btn-success btn-sm min-h-[48px] flex-1 md:flex-none"
                                 >
                                     {actionLoading[app.id] === 'approve' ? (
                                         <><div className="w-4 h-4 spinner" aria-hidden="true" />승인 중…</>
@@ -257,7 +257,7 @@ export default memo(function OrgAppCard({
                                     type="button"
                                     onClick={handleRejectClick}
                                     disabled={!!actionLoading[app.id]}
-                                    className="btn-danger btn-sm flex-1 md:flex-none min-h-[44px]"
+                                    className="btn-danger btn-sm flex-1 md:flex-none min-h-[48px]"
                                 >
                                     {actionLoading[app.id] === 'reject' ? (
                                         <><div className="w-4 h-4 spinner" aria-hidden="true" />거절 중…</>
@@ -281,7 +281,7 @@ export default memo(function OrgAppCard({
                                     <button
                                         type="button"
                                         onClick={() => setIsRejecting(false)}
-                                        className="btn-secondary btn-sm min-h-[44px]"
+                                        className="btn-secondary btn-sm min-h-[48px]"
                                     >
                                         취소
                                     </button>
@@ -291,7 +291,7 @@ export default memo(function OrgAppCard({
                                             setIsRejecting(false);
                                             onReject(app, rejectReason);
                                         }}
-                                        className="btn-danger btn-sm min-h-[44px]"
+                                        className="btn-danger btn-sm min-h-[48px]"
                                         disabled={!!actionLoading[app.id] || !rejectReason.trim()}
                                     >
                                         {actionLoading[app.id] === 'reject' ? '처리 중...' : '거절 및 이메일 발송'}
@@ -308,7 +308,7 @@ export default memo(function OrgAppCard({
                             type="button"
                             onClick={() => onMoveToPending(app)}
                             disabled={!!actionLoading[app.id]}
-                            className="btn-secondary btn-sm min-h-[44px] flex-1 md:flex-none"
+                            className="btn-secondary btn-sm min-h-[48px] flex-1 md:flex-none"
                         >
                             {actionLoading[app.id] === 'moveToPending' ? (
                                 <><div className="w-4 h-4 spinner" aria-hidden="true" />되돌리는 중…</>
@@ -318,7 +318,7 @@ export default memo(function OrgAppCard({
                             type="button"
                             onClick={() => onDelete(app)}
                             disabled={!!actionLoading[app.id]}
-                            className="btn-danger btn-sm min-h-[44px] flex-1 md:flex-none"
+                            className="btn-danger btn-sm min-h-[48px] flex-1 md:flex-none"
                         >
                             {actionLoading[app.id] === 'delete' ? (
                                 <><div className="w-4 h-4 spinner" aria-hidden="true" />삭제 중…</>

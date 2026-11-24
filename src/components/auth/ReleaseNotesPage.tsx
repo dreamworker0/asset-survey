@@ -49,7 +49,7 @@ export default function ReleaseNotesPage() {
                     ) : notes.length === 0 ? (
                         <div className="text-center py-8 space-y-3">
                             <p className="text-sm text-surface-700 dark:text-surface-300">업데이트 소식을 불러오지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요.</p>
-                            <button type="button" onClick={retry} className="btn-secondary btn-sm min-h-[44px]">다시 시도</button>
+                            <button type="button" onClick={retry} className="btn-secondary btn-sm min-h-[48px]">다시 시도</button>
                         </div>
                     ) : (
                         notes.map((note, noteIdx) => (

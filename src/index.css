@@ -190,8 +190,8 @@
 
   .btn-sm {
     @apply text-sm px-3 py-1.5 rounded-lg;
-    min-height: 44px;
-    /* 모바일 접근성: 최소 터치 타겟 */
+    min-height: 48px;
+    /* 모바일 접근성: 최소 터치 타겟 48px (.agent/agents.md D16) */
   }
 
   @media (min-width: 640px) {
@@ -206,8 +206,8 @@
 
   .btn-icon {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-medium transition-all duration-200 ease-out focus:outline-hidden focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] dark:focus-visible:ring-offset-surface-900 p-2.5 rounded-xl;
-    min-height: 44px;
-    min-width: 44px;
+    min-height: 48px;
+    min-width: 48px;
   }
 
   /* 입력 필드 */

@@ -67,7 +67,7 @@ export default function SpaceList({
                         <div className="glass-card overflow-hidden">
                             {/* 묶음 머리 — 모두 고르기 + 접기 */}
                             <div className="flex items-center gap-1 border-b border-surface-100 dark:border-surface-700 bg-surface-50/60 dark:bg-surface-800/60">
-                                <label className="w-11 h-11 flex items-center justify-center flex-shrink-0 cursor-pointer">
+                                <label className="w-12 h-12 flex items-center justify-center flex-shrink-0 cursor-pointer">
                                     <input
                                         type="checkbox"
                                         className="w-5 h-5 accent-primary-600"
@@ -84,7 +84,7 @@ export default function SpaceList({
                                     aria-expanded={open}
                                     aria-controls={listId}
                                     disabled={forceOpen}
-                                    className="flex-1 min-w-0 flex items-center gap-2 min-h-[44px] pr-3 text-left text-sm disabled:cursor-default"
+                                    className="flex-1 min-w-0 flex items-center gap-2 min-h-[48px] pr-3 text-left text-sm disabled:cursor-default"
                                 >
                                     {!forceOpen && <span aria-hidden="true" className="text-surface-500">{open ? '▾' : '▸'}</span>}
                                     <span className="font-semibold text-primary-700 dark:text-primary-300">{grouped ? (sec.floor || '층 미지정') : '전체 공간'}</span>
@@ -142,7 +142,7 @@ function SpaceRow({ space, checked, onCheck, isFirst, isLast, busy, nameOf, team
     ].join(' · ');
     return (
         <li className={`flex items-center gap-1 pr-2 ${checked ? 'bg-primary-50/70 dark:bg-primary-900/20' : ''}`}>
-            <label className="w-11 h-11 flex items-center justify-center flex-shrink-0 cursor-pointer">
+            <label className="w-12 h-12 flex items-center justify-center flex-shrink-0 cursor-pointer">
                 <input type="checkbox" className="w-5 h-5 accent-primary-600" checked={checked} onChange={(e) => onCheck(e.target.checked)}
                     aria-label={`${space.name} 고르기`} />
             </label>
@@ -155,16 +155,16 @@ function SpaceRow({ space, checked, onCheck, isFirst, isLast, busy, nameOf, team
             {canMove && (
                 <>
                     <button type="button" onClick={() => onMove(-1)} disabled={busy || isFirst}
-                        className="btn-icon min-h-[44px] min-w-[36px] hidden sm:inline-flex" aria-label={`${space.name} 위로`} title="위로">
+                        className="btn-icon min-h-[48px] min-w-[48px] hidden sm:inline-flex" aria-label={`${space.name} 위로`} title="위로">
                         <span aria-hidden="true">▲</span>
                     </button>
                     <button type="button" onClick={() => onMove(1)} disabled={busy || isLast}
-                        className="btn-icon min-h-[44px] min-w-[36px] hidden sm:inline-flex" aria-label={`${space.name} 아래로`} title="아래로">
+                        className="btn-icon min-h-[48px] min-w-[48px] hidden sm:inline-flex" aria-label={`${space.name} 아래로`} title="아래로">
                         <span aria-hidden="true">▼</span>
                     </button>
                 </>
             )}
-            <button type="button" onClick={onEdit} disabled={busy} className="btn-secondary btn-sm min-h-[44px] px-3 flex-shrink-0"
+            <button type="button" onClick={onEdit} disabled={busy} className="btn-secondary btn-sm min-h-[48px] px-3 flex-shrink-0"
                 aria-label={`${space.name} 고치기`}>
                 고치기
             </button>

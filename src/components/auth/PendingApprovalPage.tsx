@@ -46,7 +46,7 @@ export default function PendingApprovalPage() {
                 <button
                     type="button"
                     onClick={logout}
-                    className="btn-secondary btn-sm min-h-[44px] px-4"
+                    className="btn-secondary btn-sm min-h-[48px] px-4"
                 >
                     로그아웃
                 </button>

@@ -260,7 +260,7 @@ export default function OrgManagement() {
                     <p className="mt-1 text-sm text-surface-700 dark:text-surface-300">
                         인터넷 연결을 확인한 뒤 다시 시도해 주세요. 계속 안 되면 화면을 새로고침해 주세요.
                     </p>
-                    <button type="button" onClick={() => void fetchOrganizations()} className="btn-secondary btn-sm min-h-[44px] mt-3">
+                    <button type="button" onClick={() => void fetchOrganizations()} className="btn-secondary btn-sm min-h-[48px] mt-3">
                         다시 시도
                     </button>
                 </div>
@@ -346,7 +346,7 @@ export default function OrgManagement() {
                             type="text"
                             value={searchQuery}
                             onChange={e => setSearchQuery(e.target.value)}
-                            className="input pl-10 min-h-[44px]"
+                            className="input pl-10 min-h-[48px]"
                             aria-label="기관 검색"
                             placeholder="기관명, 고유번호, 주소, 신청자 검색"
                         />

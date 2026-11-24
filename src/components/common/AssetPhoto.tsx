@@ -73,11 +73,11 @@ export default function AssetPhoto({ asset, admin, onChanged }: Props) {
             {admin && (
                 <div className="flex flex-wrap gap-2 mt-2">
                     <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={(e) => void handleFile(e)} aria-label="재물 사진 고르기" />
-                    <button type="button" className="btn-secondary btn-sm min-h-[44px] px-4" disabled={busy} onClick={() => inputRef.current?.click()}>
+                    <button type="button" className="btn-secondary btn-sm min-h-[48px] px-4" disabled={busy} onClick={() => inputRef.current?.click()}>
                         {busy ? '처리하는 중…' : asset.photoUrl ? '사진 바꾸기' : '사진 올리기'}
                     </button>
                     {asset.photoUrl && (
-                        <button type="button" className="btn-secondary btn-sm min-h-[44px] px-4 text-red-700 dark:text-red-300" disabled={busy} onClick={() => void handleRemove()}>
+                        <button type="button" className="btn-secondary btn-sm min-h-[48px] px-4 text-red-700 dark:text-red-300" disabled={busy} onClick={() => void handleRemove()}>
                             사진 지우기
                         </button>
                     )}

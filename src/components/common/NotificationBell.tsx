@@ -188,7 +188,7 @@ export default function NotificationBell() {
                     ) : listState === 'error' ? (
                         <div className="p-6 text-center space-y-3">
                             <p className="text-sm text-surface-700 dark:text-surface-300">알림을 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.</p>
-                            <button type="button" onClick={() => { void loadList(); }} className="btn-secondary btn-sm min-h-[44px]">
+                            <button type="button" onClick={() => { void loadList(); }} className="btn-secondary btn-sm min-h-[48px]">
                                 다시 시도
                             </button>
                         </div>
@@ -214,7 +214,7 @@ export default function NotificationBell() {
                                                     <button
                                                         type="button"
                                                         onClick={(e) => handleDelete(e, n.id)}
-                                                        className="text-surface-600 dark:text-surface-400 hover:text-red-700 dark:hover:text-red-300 transition-colors p-1 -mr-2 min-w-[44px] min-h-[44px] flex items-center justify-center flex-shrink-0"
+                                                        className="text-surface-600 dark:text-surface-400 hover:text-red-700 dark:hover:text-red-300 transition-colors p-1 -mr-2 min-w-[48px] min-h-[48px] flex items-center justify-center flex-shrink-0"
                                                         aria-label={`'${n.title}' 알림 지우기`}
                                                     >
                                                         <svg aria-hidden="true" className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">

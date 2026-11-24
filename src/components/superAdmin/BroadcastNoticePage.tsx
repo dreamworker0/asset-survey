@@ -274,7 +274,7 @@ export default function BroadcastNoticePage() {
                         <p className="text-sm text-red-700 dark:text-red-300">
                             발송 이력을 불러오지 못했습니다. 같은 공지를 두 번 보내지 않도록 다시 불러와 확인한 뒤 발송하세요.
                         </p>
-                        <button type="button" onClick={() => void loadHistory()} className="btn-secondary btn-sm min-h-[44px] mt-2">
+                        <button type="button" onClick={() => void loadHistory()} className="btn-secondary btn-sm min-h-[48px] mt-2">
                             이력 다시 불러오기
                         </button>
                     </div>
@@ -306,7 +306,7 @@ export default function BroadcastNoticePage() {
                                     type="button"
                                     onClick={() => toggleHistory(b.id)}
                                     aria-expanded={openHistory.has(b.id)}
-                                    className="btn-secondary btn-sm min-h-[44px] mt-2"
+                                    className="btn-secondary btn-sm min-h-[48px] mt-2"
                                 >
                                     <span aria-hidden="true">{openHistory.has(b.id) ? '▾' : '▸'}</span>
                                     {openHistory.has(b.id) ? '본문 접기' : '본문 전체 보기'}

@@ -195,7 +195,7 @@ export default function FeedbackManagement() {
                         {feedbacks.length === 0 ? '받은 의견이 없습니다' : searchQuery.trim() ? '검색 결과가 없습니다' : '이 조건에 맞는 의견이 없습니다'}
                     </p>
                     {feedbacks.length > 0 && filter !== 'all' && (
-                        <button type="button" onClick={() => setFilter('all')} className="btn-secondary btn-sm min-h-[44px] mt-3">
+                        <button type="button" onClick={() => setFilter('all')} className="btn-secondary btn-sm min-h-[48px] mt-3">
                             전체 의견 보기
                         </button>
                     )}
@@ -219,7 +219,7 @@ export default function FeedbackManagement() {
                                             type="button"
                                             aria-expanded={isGroupOpen}
                                             onClick={() => toggleGroup(group.key)}
-                                            className="flex-1 min-w-0 min-h-[44px] flex items-center gap-3 text-left rounded-xl p-1 hover:bg-surface-50/70 dark:hover:bg-surface-700/30 transition-colors"
+                                            className="flex-1 min-w-0 min-h-[48px] flex items-center gap-3 text-left rounded-xl p-1 hover:bg-surface-50/70 dark:hover:bg-surface-700/30 transition-colors"
                                         >
                                             <span aria-hidden="true" className="w-9 h-9 rounded-full bg-primary-100 dark:bg-primary-900/40 flex items-center justify-center flex-shrink-0 text-sm font-bold text-primary-700 dark:text-primary-300">
                                                 {(group.name || '?')[0]}

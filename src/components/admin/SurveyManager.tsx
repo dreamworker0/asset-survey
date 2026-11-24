@@ -172,8 +172,8 @@ function Dashboard({ s, onReview, onClose }: {
                         <p className={sub}>{open.startDate} ~ {open.endDate} · {MODE_LABEL[open.mode]}</p>
                     </div>
                     <div className="flex gap-2">
-                        <Link to={`/admin/surveys/${open.id}`} className="btn-secondary btn-sm min-h-[44px] px-3">중간 보고서</Link>
-                        <Link to="/employee/scan" className="btn-primary btn-sm min-h-[44px] px-4">직접 스캔</Link>
+                        <Link to={`/admin/surveys/${open.id}`} className="btn-secondary btn-sm min-h-[48px] px-3">중간 보고서</Link>
+                        <Link to="/employee/scan" className="btn-primary btn-sm min-h-[48px] px-4">직접 스캔</Link>
                     </div>
                 </div>
 
@@ -188,7 +188,7 @@ function Dashboard({ s, onReview, onClose }: {
                 </div>
 
                 <details className="mt-4 group">
-                    <summary className="btn-secondary btn-sm min-h-[44px] list-none [&::-webkit-details-marker]:hidden inline-flex cursor-pointer">
+                    <summary className="btn-secondary btn-sm min-h-[48px] list-none [&::-webkit-details-marker]:hidden inline-flex cursor-pointer">
                         <span aria-hidden="true" className="group-open:rotate-90 transition-transform">▸</span> 숫자가 무슨 뜻인가요?
                     </summary>
                     <dl className="mt-2 grid gap-1 text-sm text-surface-700 dark:text-surface-300 sm:grid-cols-2">
@@ -221,12 +221,12 @@ function Dashboard({ s, onReview, onClose }: {
                                         {isNone ? <span className={sub}>관리자 확인</span> : <SubmissionBadge sub={x} names={s.names} />}
                                         {!isNone && x?.state === 'submitted' && (
                                             <div className="flex gap-2 mt-2">
-                                                <button type="button" className="btn-primary min-h-[44px] px-4 flex-1" onClick={() => void onReview(r.key, r.name, 'approved', x)}>승인</button>
-                                                <button type="button" className="btn-secondary min-h-[44px] px-4 flex-1" onClick={() => void onReview(r.key, r.name, 'rejected', x)}>반려</button>
+                                                <button type="button" className="btn-primary min-h-[48px] px-4 flex-1" onClick={() => void onReview(r.key, r.name, 'approved', x)}>승인</button>
+                                                <button type="button" className="btn-secondary min-h-[48px] px-4 flex-1" onClick={() => void onReview(r.key, r.name, 'rejected', x)}>반려</button>
                                             </div>
                                         )}
                                         {!isNone && !x && (
-                                            <button type="button" className="btn-secondary min-h-[44px] px-4 mt-2 w-full" onClick={() => void onReview(r.key, r.name, 'approved', null)}>대신 승인</button>
+                                            <button type="button" className="btn-secondary min-h-[48px] px-4 mt-2 w-full" onClick={() => void onReview(r.key, r.name, 'approved', null)}>대신 승인</button>
                                         )}
                                     </div>
                                 )}
@@ -267,12 +267,12 @@ function Dashboard({ s, onReview, onClose }: {
                                             <td className="py-2 whitespace-nowrap">
                                                 {!isNone && x?.state === 'submitted' && (
                                                     <span className="flex gap-1">
-                                                        <button type="button" className="btn-primary btn-sm min-h-[44px] px-3" onClick={() => void onReview(r.key, r.name, 'approved', x)}>승인</button>
-                                                        <button type="button" className="btn-secondary btn-sm min-h-[44px] px-3" onClick={() => void onReview(r.key, r.name, 'rejected', x)}>반려</button>
+                                                        <button type="button" className="btn-primary btn-sm min-h-[48px] px-3" onClick={() => void onReview(r.key, r.name, 'approved', x)}>승인</button>
+                                                        <button type="button" className="btn-secondary btn-sm min-h-[48px] px-3" onClick={() => void onReview(r.key, r.name, 'rejected', x)}>반려</button>
                                                     </span>
                                                 )}
                                                 {!isNone && !x && (
-                                                    <button type="button" className="btn-secondary btn-sm min-h-[44px] px-3" onClick={() => void onReview(r.key, r.name, 'approved', null)}>대신 승인</button>
+                                                    <button type="button" className="btn-secondary btn-sm min-h-[48px] px-3" onClick={() => void onReview(r.key, r.name, 'approved', null)}>대신 승인</button>
                                                 )}
                                             </td>
                                         )}
@@ -373,7 +373,7 @@ function StartFormView({ form, setForm, spaces, buildings, preview, error, mode,
     };
     const spaceRow = (x: Space) => (
         <li key={x.id}>
-            <label className="flex items-center gap-3 min-h-[44px] text-sm text-surface-800 dark:text-surface-200">
+            <label className="flex items-center gap-3 min-h-[48px] text-sm text-surface-800 dark:text-surface-200">
                 <input type="checkbox" className="w-5 h-5 accent-primary-600 flex-shrink-0" checked={form.spaceIds.includes(x.id)} onChange={() => toggle(x.id)} />
                 <span className="flex-1 break-keep">{x.name}</span>
                 <span className={sub}>{preview?.count(x.id) ?? 0}건 · 담당 {x.managerUids.length}명{(x.teamIds ?? []).length > 0 ? ` · 팀 ${(x.teamIds ?? []).length}` : ''}</span>
@@ -437,7 +437,7 @@ function StartFormView({ form, setForm, spaces, buildings, preview, error, mode,
                     })}
                     {(preview?.unassigned ?? 0) > 0 && (
                         <li>
-                            <label className="flex items-center gap-3 min-h-[44px] text-sm text-surface-800 dark:text-surface-200">
+                            <label className="flex items-center gap-3 min-h-[48px] text-sm text-surface-800 dark:text-surface-200">
                                 <input type="checkbox" className="w-5 h-5 accent-primary-600 flex-shrink-0" checked={form.includesUnassigned} onChange={(e) => setForm({ ...form, includesUnassigned: e.target.checked })} />
                                 <span className="flex-1">공간 미지정 재물</span>
                                 <span className={sub}>{preview?.unassigned}건 · 어디서 찍든 '다른 공간'으로 나옴</span>
@@ -470,7 +470,7 @@ function GroupCheck({ label, display, level, picked, total, onToggle }: {
     label: string; display?: string; level: 'building' | 'floor'; picked: number; total: number; onToggle: () => void;
 }) {
     return (
-        <label className={`flex items-center gap-3 min-h-[44px] text-sm ${level === 'building'
+        <label className={`flex items-center gap-3 min-h-[48px] text-sm ${level === 'building'
             ? 'font-semibold text-surface-900 dark:text-surface-100'
             : 'font-medium text-primary-700 dark:text-primary-300'}`}>
             <input
