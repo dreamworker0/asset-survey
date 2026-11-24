@@ -117,9 +117,9 @@ export default defineConfig({
                 'src/lib/offline/**': {
                     lines: 94, statements: 92, functions: 94, branches: 80,
                 },
-                // Firestore 도메인 — organizationId 격리가 사는 자리 (실측 65.4/64.7/51.7/67.4)
+                // Firestore 도메인 — organizationId 격리가 사는 자리 (실측 65.4/64.7/51.7/67.4, 2026-11-25 70.3/69.8/65.3/72.4)
                 'src/lib/firestore/**': {
-                    lines: 62, statements: 61, functions: 48, branches: 64,
+                    lines: 67, statements: 66, functions: 62, branches: 69,
                 },
                 // 문서 스키마 — 필드 누락이 조용한 데이터 유실로 이어지는 경계 (실측 100/100/100/66.7)
                 'src/schemas/**': {
@@ -158,10 +158,10 @@ export default defineConfig({
                 'src/lib/firestore/assetChecks.ts': {
                     lines: 84, statements: 84, functions: 76, branches: 78,
                 },
-                // 회차·스캔·제출·마감 — 함수 커버리지가 낮다(32%: 구독·마감 이력 함수 다수가 화면 테스트에서만 지나간다).
-                // 지금 선을 지키고, 테스트를 보태면서 올린다 (실측 57.3/56.5/32.1/57.0)
+                // 회차·스캔·제출·마감 — 조회·구독·마감 시작/취소 테스트를 보태 함수 32%→92%로 올렸다(2026-11-25).
+                // 조회의 기관 필터·마감 계산의 서버 읽기·구독의 '보내는 중' 표시를 지킨다 (실측 85.9/86.5/92.5/79.7)
                 'src/lib/firestore/surveys.ts': {
-                    lines: 54, statements: 53, functions: 29, branches: 54,
+                    lines: 82, statements: 83, functions: 89, branches: 76,
                 },
                 // 현장 스캔 훅 — 판정·중복·마감 중 잠금 (실측 88.2/83.4/69.2/73.8)
                 'src/hooks/useScanner.ts': {
