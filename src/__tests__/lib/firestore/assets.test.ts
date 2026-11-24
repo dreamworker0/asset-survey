@@ -131,6 +131,45 @@ describe('commitImport', () => {
         expect(batches[1].ops[batches[1].ops.length - 1].label).toMatch(/^doc:imports\//);
     });
 
+    it('한 재물의 재물·금액·이력은 같은 배치에 넣는다 — 멈춘 뒤 다시 비교할 때 반쪽 저장이 없게(2026-11-24)', async () => {
+        // 바뀜 1건 = 재물·금액·이력 3문서. 134건이면 402문서라, 400에서 자르면 마지막 재물이 갈라진다
+        const n = 134;
+        const existing = Array.from({ length: n }, (_, i) => ({
+            id: `org-A__c${i}`, organizationId: 'org-A', code: `c${i}`, name: '옛 이름', category: null, spec: null, acquiredAt: null,
+            acquiredQuantity: null, quantity: 1, status: 'active', statusRaw: null, locationRaw: '101호', spaceId: null,
+            department: null, usage: null, missingFromSource: false, manual: false, lastImportId: 'old', tagId: null,
+        })) as Asset[];
+        const rows = existing.map((a) => row(a.code, { name: '새 이름', amount: 2000 }));
+        const diff = diffAssets('org-A', rows, {}, existing, new Map());
+        expect(diff.changed).toHaveLength(n);
+        await commitImport({
+            orgId: 'org-A', fileName: 'f', sheetName: 's', columnMap: {}, locationMap: {}, parsed: parsedOf(rows), diff, reportedTotal: null,
+        });
+        expect(batches.map((b) => b.ops.length)).toEqual([399, 5]);
+        for (const b of batches) {
+            const assets = b.ops.filter((o) => o.label.startsWith('doc:assets/')).length;
+            const accounting = b.ops.filter((o) => o.label.startsWith('doc:assetAccounting/')).length;
+            const history = b.ops.filter((o) => o.label.startsWith('doc:history/')).length;
+            expect(accounting).toBe(assets);
+            expect(history).toBe(assets);
+        }
+    });
+
+    it('다시 확정할 때는 처음 기록 ID와 처음 건수로 기록을 남긴다 — 두 번에 나눠 쓴 재물·이력이 한 기록을 가리킨다', async () => {
+        const rows = [row('a')];
+        const diff = diffAssets('org-A', rows, {}, [], new Map());
+        const id = await commitImport({
+            orgId: 'org-A', fileName: 'f', sheetName: 's', columnMap: {}, locationMap: {}, parsed: parsedOf(rows), diff, reportedTotal: null,
+            importId: 'imp-first', recordDiff: { added: 5, changed: 0, missing: 0, unchanged: 0 },
+        });
+        expect(id).toBe('imp-first');
+        const ops = batches[0].ops;
+        expect(ops[0].data).toMatchObject({ lastImportId: 'imp-first' });
+        const record = ops.find((o) => o.label.startsWith('doc:imports/'))!;
+        expect(record.label).toBe('doc:imports/imp-first');
+        expect(record.data).toMatchObject({ diff: { added: 5, changed: 0, missing: 0, unchanged: 0 } });
+    });
+
     it('커밋이 실패하면 보고한 뒤 다시 던진다', async () => {
         vi.mocked(fs.writeBatch).mockImplementationOnce(() => ({
             set: vi.fn(), update: vi.fn(), commit: vi.fn().mockRejectedValue(new Error('denied')),

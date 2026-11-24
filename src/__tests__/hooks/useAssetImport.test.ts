@@ -25,6 +25,7 @@ vi.mock('../../lib/firestore', async () => {
     return {
         getOrganization: vi.fn(), getSpaces: vi.fn(), createSpace: vi.fn(), getAssets: vi.fn(),
         getAccountingMap: vi.fn(), commitImport: vi.fn(), getBuildings: vi.fn(async () => []),
+        newImportId: vi.fn(() => 'imp-first'), importRecordExists: vi.fn(async () => false),
         validateSpaceName: spaces.validateSpaceName, normalizeSpaceName: spaces.normalizeSpaceName,
     };
 });
@@ -143,6 +144,71 @@ describe('useAssetImport', () => {
         await act(async () => { await result.current.confirmImport(); });
         expect(result.current.step).toBe('compare');
         expect(result.current.error).toMatch(/다시 확정하면/);
+    });
+
+    it('멈춘 가져오기를 다시 확정하면 처음 기록 ID·건수로 이어서 저장한다(2026-11-24)', async () => {
+        const { result } = renderHook(() => useAssetImport());
+        await act(async () => { await result.current.pickFile(fakeFile()); });
+        mockConfirm.mockResolvedValueOnce(true);
+        await act(async () => { await result.current.goCompare(); });
+
+        // 처음: 2건 새로 등록하다 멈춤
+        mockConfirm.mockResolvedValueOnce(true);
+        vi.mocked(firestore.commitImport).mockRejectedValueOnce(new Error('unavailable'));
+        // 멈추기 전에 1-1-1은 저장됐다 — 다시 읽으면 앱에 있다
+        vi.mocked(firestore.getAssets).mockResolvedValueOnce([{
+            id: 'org-A__1-1-1', organizationId: 'org-A', code: '1-1-1', name: 'TV', category: null, spec: null, acquiredAt: null,
+            acquiredQuantity: null, quantity: null, usefulLife: null, status: 'active', statusRaw: null, locationRaw: '101호', spaceId: 'sp-101',
+            department: null, usage: null, missingFromSource: false, manual: false, lastImportId: 'imp-first', tagId: null,
+        }] as never);
+        vi.mocked(firestore.getAccountingMap).mockResolvedValueOnce(new Map([['org-A__1-1-1', {
+            id: 'org-A__1-1-1', organizationId: 'org-A', amount: 450000, depreciation: null, residual: null,
+        }]]) as never);
+        await act(async () => { await result.current.confirmImport(); });
+        expect(result.current.diff?.added).toHaveLength(1);
+        expect(result.current.diff?.unchanged).toBe(1);
+
+        // 다시 확정 — 이어서 저장한다고 알리고, 같은 기록 ID·처음 건수(2건)를 넘긴다
+        mockConfirm.mockResolvedValueOnce(true);
+        await act(async () => { await result.current.confirmImport(); });
+        expect(mockConfirm.mock.calls[mockConfirm.mock.calls.length - 1][0]).toMatchObject({ title: '가져오기 이어서 저장' });
+        expect(firestore.newImportId).toHaveBeenCalledTimes(1);
+        expect(vi.mocked(firestore.commitImport).mock.calls.map((c) => c[0].importId)).toEqual(['imp-first', 'imp-first']);
+        expect(vi.mocked(firestore.commitImport).mock.calls[1][0].recordDiff).toEqual({ added: 2, changed: 0, missing: 0, unchanged: 0 });
+        expect(result.current.step).toBe('done');
+        expect(result.current.result).toEqual({ added: 2, changed: 0, missing: 0, unchanged: 0 });
+    });
+
+    it('남은 것이 없고 기록이 이미 있으면(응답만 못 받음) 다시 쓰지 않고 끝낸다', async () => {
+        const { result } = renderHook(() => useAssetImport());
+        await act(async () => { await result.current.pickFile(fakeFile()); });
+        mockConfirm.mockResolvedValueOnce(true);
+        await act(async () => { await result.current.goCompare(); });
+
+        mockConfirm.mockResolvedValueOnce(true);
+        vi.mocked(firestore.commitImport).mockRejectedValueOnce(new Error('deadline-exceeded'));
+        const saved = (code: string, name: string, amount: number) => ({
+            asset: { id: `org-A__${code}`, organizationId: 'org-A', code, name, category: null, spec: null, acquiredAt: null,
+                acquiredQuantity: null, quantity: null, usefulLife: null, status: 'active', statusRaw: null, locationRaw: null, spaceId: null,
+                department: null, usage: null, missingFromSource: false, manual: false, lastImportId: 'imp-first', tagId: null },
+            acc: [`org-A__${code}`, { id: `org-A__${code}`, organizationId: 'org-A', amount, depreciation: null, residual: null }] as const,
+        });
+        const a = saved('1-1-1', 'TV', 450000);
+        const b = saved('1-5-1', '냉장고', 1200000);
+        a.asset.locationRaw = '101호' as never; a.asset.spaceId = 'sp-101' as never;
+        b.asset.locationRaw = '창고' as never; b.asset.spaceId = 'sp-store' as never;
+        vi.mocked(firestore.getAssets).mockResolvedValueOnce([a.asset, b.asset] as never);
+        vi.mocked(firestore.getAccountingMap).mockResolvedValueOnce(new Map([a.acc, b.acc]) as never);
+        await act(async () => { await result.current.confirmImport(); });
+        expect(result.current.diff?.unchanged).toBe(2);
+
+        vi.mocked(firestore.importRecordExists).mockResolvedValueOnce(true);
+        mockConfirm.mockResolvedValueOnce(true);
+        await act(async () => { await result.current.confirmImport(); });
+        expect(firestore.importRecordExists).toHaveBeenCalledWith('imp-first');
+        expect(firestore.commitImport).toHaveBeenCalledTimes(1);
+        expect(result.current.step).toBe('done');
+        expect(result.current.importId).toBe('imp-first');
     });
 
     it('위치 이름으로 공간을 만들어 바로 연결한다', async () => {

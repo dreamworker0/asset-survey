@@ -161,6 +161,8 @@ export {
     getAssetCounts,
     getRecentImports,
     commitImport,
+    newImportId,
+    importRecordExists,
 } from './assets';
 export type { CommitImportInput } from './assets';
 
