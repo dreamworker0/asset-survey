@@ -4,26 +4,45 @@
 
 ---
 
+## 외부 참여자께
+
+- 운영 Firebase 프로젝트·비밀값에는 접근할 수 없고, 필요하지도 않습니다. **로컬 에뮬레이터만으로** 개발·테스트합니다.
+- 저장소를 포크해 브랜치에서 작업하고 `master`로 PR을 올려 주세요. 외부 PR의 CI는 **관리자가 승인한 뒤** 돌고, PR 미리보기 배포는 만들어지지 않습니다.
+- 배포는 관리자가 PR을 머지할 때 CI가 합니다(`master`는 보호되어 있고 `ci`·`security-audit`·`e2e` 통과가 필요합니다).
+- 보안 취약점은 이슈가 아니라 [SECURITY.md](SECURITY.md)의 비공개 제보로 알려 주세요.
+- 화면 캡처·테스트 데이터에 실제 사람 이름·연락처·기관 정보를 넣지 마세요.
+
 ## 개발 환경 세팅
 
 ```bash
-# 1. Node.js 22 LTS 사용 (필수, Node 24는 Rollup 빌드 실패)
+# 1. Node.js 22 LTS (CI 기준). fnm이 있으면:
 fnm use 22
 npm run check:node   # 현재 Node 메이저가 22인지 확인 (불일치 시 경고)
 
-# 2. 의존성 설치
-npm install
-cd functions && npm install && cd ..
+# 2. 의존성 설치 — npm 10으로 lockfile 그대로 (npm 11이 만든 lockfile은 CI의 npm ci를 깬다)
+npx -y npm@10 ci
+cd functions && npx -y npm@10 ci && cd ..
 
-# 3. E2E 브라우저 설치 (E2E 테스트를 돌릴 경우만)
+# 3. 에뮬레이터용 가짜 Firebase 값 (처음 한 번)
+cp .env.emulator.local.example .env.emulator.local
+
+# 4. 에뮬레이터 켜기 (Java 필요) — 터미널 하나
+npx firebase-tools emulators:start --only auth,firestore,functions,storage --project demo-asset-survey
+
+# 5. 다른 터미널에서 테스트 데이터 넣기 — 관리자·직원 계정과 기관 (비밀번호는 e2e/emulator/seed.ts)
+FIREBASE_AUTH_EMULATOR_HOST=127.0.0.1:9099 FIRESTORE_EMULATOR_HOST=127.0.0.1:8080 \
+  npx tsx -e "import('./e2e/emulator/seed.ts').then(m => m.seedEmulator())"
+
+# 6. 앱을 에뮬레이터 모드로 실행 → http://localhost:5173
+npx vite --mode emulator
+
+# 7. E2E 브라우저 설치 (E2E 테스트를 돌릴 경우만)
 npx playwright install chromium webkit
-
-# 4. 환경변수 설정
-# .env 파일 생성 (README.md 참고)
-
-# 5. 개발 서버 실행
-npm run dev
 ```
+
+- 에뮬레이터 모드에서는 구글 로그인 대신 에뮬레이터의 가짜 계정 화면이 뜹니다. 시드 계정(`e2e-admin@test.local` 관리자, `e2e-emp@test.local` 직원)으로 들어가세요.
+- **`--project demo-asset-survey`를 항상 붙이세요.** `demo-`로 시작하는 프로젝트는 운영에 닿지 않습니다.
+- Windows PowerShell에서는 5번을 `$env:FIREBASE_AUTH_EMULATOR_HOST='127.0.0.1:9099'; $env:FIRESTORE_EMULATOR_HOST='127.0.0.1:8080'; npx tsx -e "..."`처럼 씁니다.
 
 ---
 

@@ -43,7 +43,7 @@ npx.cmd -y npm@10 ci
 
 ## 환경변수
 
-프론트엔드는 `.env`([.env.example](.env.example)), 에뮬레이터 모드는 `.env.emulator`를 씁니다. Firebase 프로젝트를 만들기 전에는 `.firebaserc`의 기본 프로젝트가 `demo-asset-survey`(에뮬레이터 전용)라 실수로 배포해도 어디에도 닿지 않습니다.
+프론트엔드는 `.env`([.env.example](.env.example)), 에뮬레이터 모드는 `.env.emulator`와 `.env.emulator.local`([예시](.env.emulator.local.example) — 가짜 값, 복사해서 씀)을 씁니다. 운영 Firebase 값·비밀값은 관리자만 갖고 있고, 외부 참여자는 에뮬레이터만으로 개발합니다 → [CONTRIBUTING.md](CONTRIBUTING.md). 에뮬레이터 명령에는 항상 `--project demo-asset-survey`를 붙여 운영에 닿지 않게 합니다.
 
 서비스 주소가 정해지지 않았으므로 코드에 도메인을 박지 않습니다.
 
