@@ -124,7 +124,7 @@ export default function ScanPage() {
             <div className="flex gap-2" role="group" aria-label="입력 방법">
                 {(['camera', 'manual'] as const).map((m) => (
                     <button key={m} type="button" aria-pressed={mode === m} onClick={() => setMode(m)}
-                        className={`flex-1 min-h-[44px] rounded-xl text-sm font-medium ${mode === m
+                        className={`flex-1 min-h-[48px] rounded-xl text-sm font-medium ${mode === m
                             ? 'bg-primary-600 text-white dark:bg-primary-500'
                             : 'bg-white dark:bg-surface-800 text-surface-700 dark:text-surface-300 border border-surface-200 dark:border-surface-700'}`}>
                         {m === 'camera' ? 'QR 카메라' : '코드 직접 입력'}
@@ -139,7 +139,7 @@ export default function ScanPage() {
                             <QrCamera onScan={(t) => sc.handle(t, 'qr')} onStateChange={setCamState} />
                             {camState === 'denied' && <p className="mt-2 text-sm text-red-700 dark:text-red-300" role="alert">카메라 사용이 막혀 있습니다. 브라우저 설정에서 카메라를 허용하거나 '코드 직접 입력'을 쓰세요.</p>}
                             {camState === 'unsupported' && <p className="mt-2 text-sm text-red-700 dark:text-red-300" role="alert">이 브라우저에서는 카메라를 쓸 수 없습니다. '코드 직접 입력'을 쓰세요.</p>}
-                            <button type="button" className="btn-secondary w-full min-h-[44px] mt-2" onClick={() => setCameraOn(false)}>카메라 끄기</button>
+                            <button type="button" className="btn-secondary w-full min-h-[48px] mt-2" onClick={() => setCameraOn(false)}>카메라 끄기</button>
                         </>
                     ) : (
                         <button type="button" className="btn-primary w-full min-h-[56px] text-base" onClick={() => setCameraOn(true)}>📷 카메라 켜고 찍기</button>
@@ -182,7 +182,7 @@ export default function ScanPage() {
                 <ul className="glass-card divide-y divide-surface-100 dark:divide-surface-700">
                     {sc.here.map((s) => (
                         <li key={s.id} className="px-4 py-2.5 text-sm">
-                            <button type="button" className="w-full text-left min-h-[44px] flex items-start gap-2" onClick={() => setEditing(editing === s.id ? null : s.id)} aria-expanded={editing === s.id}>
+                            <button type="button" className="w-full text-left min-h-[48px] flex items-start gap-2" onClick={() => setEditing(editing === s.id ? null : s.id)} aria-expanded={editing === s.id}>
                                 <span className="flex-1 min-w-0">
                                 <span className="font-mono font-medium text-surface-900 dark:text-surface-100">{s.code}</span>
                                 <span className="text-surface-600 dark:text-surface-300"> · {s.name ?? '-'}</span>
@@ -288,7 +288,7 @@ function Notice({ icon, title, text, retry = false }: { icon: string; title: str
 function TabButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
     return (
         <button type="button" aria-pressed={active} onClick={onClick}
-            className={`flex-1 min-h-[44px] rounded-xl text-sm font-medium ${active
+            className={`flex-1 min-h-[48px] rounded-xl text-sm font-medium ${active
                 ? 'bg-surface-800 text-white dark:bg-surface-200 dark:text-surface-900'
                 : 'bg-white text-surface-700 border border-surface-300 dark:bg-surface-800 dark:text-surface-200 dark:border-surface-600'}`}>
             {children}
@@ -309,6 +309,15 @@ interface ResultCardProps {
 }
 
 function ResultCard({ last, spaceName, scan, onCondition, onUndo }: ResultCardProps) {
+    if (last.kind === 'lookupFailed') {
+        return (
+            <section className={`rounded-2xl border-2 p-4 ${RESULT_STYLE.unregistered}`} role="alert" key={last.at}>
+                <p className="text-lg font-bold">확인 못 함 · 저장 안 됨</p>
+                <p className="font-mono">{last.code}</p>
+                <p className="text-sm mt-1">조사 목록에 없는 라벨이라 대장에서 찾아야 하는데, 인터넷 연결이 불안정해 찾지 못했습니다. 연결된 곳에서 이 물건을 다시 찍어 주세요.</p>
+            </section>
+        );
+    }
     if (last.kind === 'duplicate') {
         const j = last.judgement;
         return (
@@ -349,7 +358,7 @@ function ConditionEditor({ scan, onSave, onUndo, compact = false }: {
             <div className="flex flex-wrap gap-2" role="group" aria-label="물건 상태">
                 {(Object.keys(CONDITION_LABEL) as ScanCondition[]).map((c) => (
                     <button key={c} type="button" aria-pressed={condition === c} onClick={() => setCondition(c)}
-                        className={`px-3 min-h-[44px] rounded-xl text-sm font-medium border ${condition === c
+                        className={`px-3 min-h-[48px] rounded-xl text-sm font-medium border ${condition === c
                             ? 'bg-surface-900 text-white border-surface-900 dark:bg-surface-100 dark:text-surface-900'
                             : 'bg-white/70 dark:bg-surface-900/40 border-surface-300 dark:border-surface-600 text-surface-800 dark:text-surface-200'}`}>
                         {CONDITION_LABEL[c]}
@@ -359,14 +368,14 @@ function ConditionEditor({ scan, onSave, onUndo, compact = false }: {
             {(condition !== 'normal' || memo) && (
                 <label className="block mt-2 text-sm">
                     메모 <span className="opacity-70">(예외만 짧게)</span>
-                    <input className="input min-h-[44px] mt-1" maxLength={SCAN_MEMO_MAX} value={memo} onChange={(e) => setMemo(e.target.value)} placeholder="예: 다리 한쪽 부러짐" />
+                    <input className="input min-h-[48px] mt-1" maxLength={SCAN_MEMO_MAX} value={memo} onChange={(e) => setMemo(e.target.value)} placeholder="예: 다리 한쪽 부러짐" />
                 </label>
             )}
             <ScanPhoto scan={scan} />
             <div className="flex flex-wrap gap-2 mt-2">
-                <button type="button" className="btn-primary min-h-[44px] px-4 text-sm" disabled={!dirty} onClick={() => onSave(scan.id, condition, memo)}>상태 저장</button>
+                <button type="button" className="btn-primary min-h-[48px] px-4 text-sm" disabled={!dirty} onClick={() => onSave(scan.id, condition, memo)}>상태 저장</button>
                 {/* 지우기는 저장과 떨어뜨리고(ml-auto) 묻고 지운다 — 휴대폰에서 잘못 누르기 쉬웠다 */}
-                <button type="button" className="btn-secondary min-h-[44px] px-3 text-sm text-red-700 dark:text-red-300 ml-auto" onClick={() => onUndo(scan.id)}>잘못 찍음 · 지우기</button>
+                <button type="button" className="btn-secondary min-h-[48px] px-3 text-sm text-red-700 dark:text-red-300 ml-auto" onClick={() => onUndo(scan.id)}>잘못 찍음 · 지우기</button>
             </div>
         </div>
     );
@@ -417,11 +426,11 @@ function ScanPhoto({ scan }: { scan: Scan }) {
             )}
             <input ref={inputRef} type="file" accept="image/*" capture="environment" className="hidden"
                 aria-label="현장 사진 찍기" onChange={(e) => { const f = e.target.files?.[0]; e.target.value = ''; void pick(f); }} />
-            <button type="button" className="btn-secondary min-h-[44px] px-3 text-sm" disabled={busy} onClick={() => inputRef.current?.click()}>
+            <button type="button" className="btn-secondary min-h-[48px] px-3 text-sm" disabled={busy} onClick={() => inputRef.current?.click()}>
                 {busy ? '올리는 중…' : scan.photoUrl ? '📷 사진 바꾸기' : '📷 사진 찍기'}
             </button>
             {scan.photoUrl && (
-                <button type="button" className="btn-secondary min-h-[44px] px-3 text-sm" disabled={busy} onClick={() => void remove()}>사진 지우기</button>
+                <button type="button" className="btn-secondary min-h-[48px] px-3 text-sm" disabled={busy} onClick={() => void remove()}>사진 지우기</button>
             )}
         </div>
     );

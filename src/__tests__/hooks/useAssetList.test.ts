@@ -122,4 +122,17 @@ describe('useAssetList', () => {
         expect(result.current.assets[0].tagId).toBe('ABCDEFGH23');
         expect(firestore.getAssets).toHaveBeenCalledTimes(1);
     });
+
+    it('마지막 확인 기록을 못 읽으면 목록은 보이고 실패를 알린 뒤, 기록만 다시 읽는다', async () => {
+        vi.mocked(firestore.getAssetChecks).mockRejectedValueOnce(new Error('unavailable'));
+        const { result } = renderHook(() => useAssetList());
+        await waitFor(() => expect(result.current.loading).toBe(false));
+        expect(result.current.error).toBe(false);
+        expect(result.current.assets).toHaveLength(150);
+        expect(result.current.checksError).toBe(true);
+
+        await act(() => result.current.reloadChecks());
+        expect(result.current.checksError).toBe(false);
+        expect(firestore.getAssets).toHaveBeenCalledTimes(1);
+    });
 });

@@ -115,6 +115,8 @@ export default function useAssetList() {
     const [checks, setChecks] = useState<Map<string, AssetCheck>>(new Map());
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
+    /** 마지막 확인 기록 조회 실패 — 목록은 보이지만 확인 날짜·필터를 믿을 수 없다 */
+    const [checksError, setChecksError] = useState(false);
     const [filters, setFilters] = useState<AssetFilters>(DEFAULT_FILTERS);
     const [shown, setShown] = useState(LIST_PAGE);
     const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -126,13 +128,14 @@ export default function useAssetList() {
         try {
             const [a, s, b, c] = await Promise.all([
                 getAssets(orgId), getSpaces(orgId), getBuildings(orgId),
-                // 마지막 확인은 못 읽어도 목록은 보인다
-                getAssetChecks(orgId).catch(() => new Map<string, AssetCheck>()),
+                // 마지막 확인은 못 읽어도 목록은 보인다 — 대신 실패를 알려 '한 번도 확인 안 됨'으로 오해하지 않게 한다
+                getAssetChecks(orgId).catch(() => null),
             ]);
             setAssets(sortAssets(a));
             setSpaces(s);
             setBuildings(b);
-            setChecks(c);
+            setChecks(c ?? new Map());
+            setChecksError(c === null);
         } catch {
             setError(true);
         } finally {
@@ -141,6 +144,17 @@ export default function useAssetList() {
     }, [orgId]);
 
     useEffect(() => { void load(); }, [load]);
+
+    /** 마지막 확인 기록만 다시 읽는다 — 목록 전체를 다시 그리지 않는다 */
+    const reloadChecks = useCallback(async () => {
+        if (!orgId) return;
+        try {
+            setChecks(await getAssetChecks(orgId));
+            setChecksError(false);
+        } catch {
+            setChecksError(true);
+        }
+    }, [orgId]);
 
     const places = useMemo(() => spacePlaceIndex(spaces), [spaces]);
     const filtered = useMemo(() => filterAssets(assets, filters, places, checks), [assets, filters, places, checks]);
@@ -191,7 +205,7 @@ export default function useAssetList() {
     }, []);
 
     return {
-        orgId, assets, spaces, buildings, spaceName, checks, loading, error, reload: load, applySpace,
+        orgId, assets, spaces, buildings, spaceName, checks, checksError, reloadChecks, loading, error, reload: load, applySpace,
         filters, setFilter, resetFilters, filtered,
         visible: filtered.slice(0, shown), hasMore: filtered.length > shown, showMore: () => setShown((n) => n + LIST_PAGE),
         selected, toggle, setMany, selectFiltered, clearSelection, selectedAssets, applyTags,

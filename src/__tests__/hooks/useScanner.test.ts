@@ -125,6 +125,20 @@ describe('찍기', () => {
         vi.mocked(fs.saveScan).mock.calls[0][0].onRejected?.(new Error('denied'));
         expect(showToast).toHaveBeenCalledWith(expect.stringMatching(/저장되지 않았습니다/), 'error');
     });
+
+    it('대상 목록에 없는 코드를 대장에서 찾다 실패하면 미등록으로 남기지 않고 다시 찍게 한다', async () => {
+        vi.mocked(fs.findAssetByCode).mockRejectedValue(new Error('offline'));
+        const h = await ready();
+        await scan(h, 'zzz', 'manual');
+        expect(fs.saveScan).not.toHaveBeenCalled();
+        expect(h.result.current.last).toMatchObject({ kind: 'lookupFailed', code: 'zzz' });
+
+        // 연결이 돌아오면 같은 코드를 다시 찍어 정상 판정된다
+        vi.mocked(fs.findAssetByCode).mockResolvedValue(null);
+        vi.mocked(fs.peekScan).mockResolvedValue(undefined);
+        await scan(h, 'zzz', 'manual');
+        expect(vi.mocked(fs.saveScan).mock.calls[0][0].draft.result).toBe('unregistered');
+    });
 });
 
 describe('공간 제출 (기획서 F13)', () => {

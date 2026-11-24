@@ -76,6 +76,13 @@ export default function AssetList() {
                 </div>
             ) : (
                 <>
+                    {al.checksError && (
+                        // 확인 기록을 못 읽으면 모든 재물이 '한 번도 확인 안 됨'처럼 보인다 — 필터를 믿기 전에 알린다
+                        <div role="alert" className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl bg-amber-50 dark:bg-amber-900/20 p-3 text-sm text-amber-800 dark:text-amber-300">
+                            <span>마지막 확인 기록을 불러오지 못했습니다. 확인 날짜와 &lsquo;마지막 확인&rsquo; 필터 결과가 실제와 다를 수 있습니다.</span>
+                            <button type="button" className="btn-secondary min-h-[48px] px-4" onClick={() => void al.reloadChecks()}>확인 기록 다시 불러오기</button>
+                        </div>
+                    )}
                     {unplacedCount > 0 && (
                         <div className="glass-card p-3 mb-3 flex flex-wrap items-center gap-2 border border-amber-200 dark:border-amber-800/60">
                             <p className="flex-1 min-w-[12rem] text-sm text-amber-800 dark:text-amber-300">

@@ -27,7 +27,9 @@ import type { Space } from '../types/space';
 
 export type LastScan =
     | { kind: 'saved'; draft: ScanDraft; method: ScanMethod; at: number }
-    | { kind: 'duplicate'; judgement: Extract<Judgement, { kind: 'duplicate' }>; at: number };
+    | { kind: 'duplicate'; judgement: Extract<Judgement, { kind: 'duplicate' }>; at: number }
+    /** 대상 목록에 없는데 대장 조회도 실패 — 저장하지 않고 연결 뒤 다시 찍게 한다 */
+    | { kind: 'lookupFailed'; code: string; at: number };
 
 function vibrate(pattern: number | number[]) {
     try { navigator.vibrate?.(pattern); } catch { /* 진동 없는 기기 */ }
@@ -136,7 +138,11 @@ export default function useScanner(initialSpaceId: string | null) {
                         if (asset) target = index.byId.get(asset.id) ?? null;
                         if (asset && !target) found = { id: asset.id, code: asset.code, name: asset.name, status: asset.status };
                     } catch {
-                        // 오프라인 — 대상 목록에 없으면 미등록으로 남기고 관리자가 확인한다
+                        // 조회 실패(오프라인 등) — 미등록으로 남기면 시작 뒤에 다시 뽑은 라벨의 대상까지
+                        // '미등록'+'못 찾음'으로 갈라진다. 저장하지 않고 연결 뒤 다시 찍게 한다(2026-11-24)
+                        vibrate([200, 100, 200]);
+                        setLast({ kind: 'lookupFailed', code: lookup.kind === 'tag' ? lookup.tag : lookup.code, at: Date.now() });
+                        return;
                     }
                 }
                 let j = judge({ surveyId: survey.id, spaceId, lookup, target, found, existing: (id) => scanMap.get(id) ?? null });
