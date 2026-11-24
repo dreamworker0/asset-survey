@@ -21,7 +21,7 @@
 ## 스택 & 환경
 
 - React 19 + Vite 7 + TypeScript / TailwindCSS v4 / Zustand
-- Firebase (Auth + Firestore + Functions + Hosting + FCM) / Sentry / Gemini OCR
+- Firebase (Auth + Firestore + Functions + Hosting + FCM) / Gemini OCR (Sentry는 2026-11-24 제거 — 오류는 자체 보고)
 - **Node 22 LTS 필수**(CI 기준). 차량운행일지에서는 Node 24로 Rollup 빌드가 실패했다(2026-11-21 이 PC에서는 Node 24 빌드가 통과했지만 기준은 그대로 22). `fnm use 22` 후 작업. fnm이 없는 PC에서는 빌드만 PR CI로 확인하고 lint·타입·테스트는 Node 24로 돌린다 → [agents.md §2.1](.agent/agents.md)
 - Cloud Functions는 Node 22. 소스는 `import`/`export`로 쓰지만 컴파일 결과는 CommonJS다 (`module: "commonjs"`) — ESM 전용 구문 금지. → [cloud-functions.md](.agent/rules/cloud-functions.md) §1
 
@@ -83,7 +83,7 @@
 | PWA 기능 추가 | [add-pwa-feature](.agent/skills/add-pwa-feature/SKILL.md) |
 | 테스트 작성 | [write-test](.agent/skills/write-test/SKILL.md) |
 | 배포 문제 진단 | [troubleshoot-deployment](.agent/skills/troubleshoot-deployment/SKILL.md) |
-| Sentry 노이즈 에러 필터 | [sentry-noise-filter](.agent/skills/sentry-noise-filter/SKILL.md) |
+| 오류 기록 노이즈 에러 필터 | [error-noise-filter](.agent/skills/error-noise-filter/SKILL.md) |
 | 업데이트 소식(공지) · FAQ 갱신 | [release-notes](.agent/skills/release-notes/SKILL.md) |
 | Gemini OCR 연동 | [gemini-ocr-integration](.agent/skills/gemini-ocr-integration/SKILL.md) |
 | 배포 전 점검 · 배포 | `/deploy` 워크플로 ([deploy.md](.agent/workflows/deploy.md)) |
@@ -99,8 +99,9 @@
 
 ## 에러/로깅
 
-- 프론트엔드 Sentry: [src/lib/sentry.ts](src/lib/sentry.ts) — `ignoreErrors` 리스트 + `beforeSend` 훅. 노이즈 에러는 여기에만 추가.
-- Functions Sentry: [functions/src/core/sentry.ts](functions/src/core/sentry.ts) — `captureError(err, ctx)` 사용. Discord 웹훅 병행.
+- 프론트엔드: [src/lib/monitoring.ts](src/lib/monitoring.ts)의 `captureError(err, ctx)` → 자체 보고([src/lib/errorReport.ts](src/lib/errorReport.ts)) → 슈퍼관리자 [오류 기록]. 노이즈는 `errorReport.ts`의 `NOISE`에만 추가. 압축된 스택은 배포 아티팩트 `sourcemaps-<SHA>`와 `npm run symbolicate`로 푼다.
+- Functions: [functions/src/core/monitoring.ts](functions/src/core/monitoring.ts)의 `captureError(err, ctx)`(Discord 설정 시). 배치 실패·보안 경보는 운영자 메일([adminAlertMail.ts](functions/src/core/adminAlertMail.ts)).
+- Sentry는 쓰지 않는다(2026-11-24 코드·패키지 제거). 다시 붙이려면 처리방침 수탁자·국외 이전 고지부터 고친다.
 - 사용자 메시지 출력은 커스텀 토스트 — 컴포넌트에서는 `useToast().showToast`, 비-React 모듈에서는 `notifyUser`([src/lib/notify.ts](src/lib/notify.ts)). `alert()`·react-hot-toast 금지 (Phase 90에서 패키지 제거).
 
 ## 작업 스타일

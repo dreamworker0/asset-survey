@@ -24,7 +24,7 @@ jest.mock('../utils/constants', () => ({
     getRateLimits: jest.fn(async () => ({ max: 5, windowSec: 60 })),
 }));
 jest.mock('firebase-admin/storage', () => ({ getStorage: () => ({ bucket: () => ({ file: mockFile }) }) }));
-jest.mock('../core/sentry', () => ({ captureError: jest.fn(), flushSentry: jest.fn().mockResolvedValue(undefined) }));
+jest.mock('../core/monitoring', () => ({ captureError: jest.fn() }));
 jest.mock('firebase-admin/auth', () => ({ getAuth: jest.fn() }));
 jest.mock('firebase-admin/firestore', () => ({ getFirestore: jest.fn(), FieldValue: {} }));
 jest.mock('firebase-functions/v2/https', () => ({

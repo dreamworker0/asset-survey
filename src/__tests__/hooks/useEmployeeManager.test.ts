@@ -27,7 +27,7 @@ vi.mock('firebase/firestore', async (importOriginal) => ({
     getDoc: mockGetDoc,
     updateDoc: mockUpdateDoc,
 }));
-vi.mock('../../lib/sentry', () => ({ captureError: mockCaptureError }));
+vi.mock('../../lib/monitoring', () => ({ captureError: mockCaptureError }));
 
 vi.mock('../../hooks/useAuth', () => ({
     useAuth: () => ({

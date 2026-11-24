@@ -25,7 +25,7 @@ description: 공격자 관점 주기적 보안 감사 — 멀티테넌트 격리
 취약점 스캔 전에 공격면을 먼저 지도화한다:
 - **Functions 엔드포인트**: [functions/src/index.ts](../../functions/src/index.ts)의 export — callable / HTTP / Firestore 트리거 / 스케줄. 각 진입점의 인증·권한 경계.
 - **데이터 경계**: [src/lib/firestore/](../../src/lib/firestore/) 도메인 파일, [firestore.rules](../../firestore.rules), [storage.rules](../../storage.rules), [firestore.indexes.json](../../firestore.indexes.json).
-- **외부 통합**: Gemini OCR, Google Calendar OAuth, FCM, 알림톡/이메일 발신, Discord 웹훅(functions Sentry).
+- **외부 통합**: Gemini OCR, Google Calendar OAuth, FCM, 알림톡/이메일 발신, Discord 웹훅(functions core/monitoring)·운영자 경보 메일(core/adminAlertMail).
 - **시크릿 표면**: `.env`/`.env.local`, `.firebaserc`, [firebase.json](../../firebase.json), 서비스계정, CI 시크릿.
 
 산출: 진입점·경계 목록(다음 Phase의 스캔 대상).

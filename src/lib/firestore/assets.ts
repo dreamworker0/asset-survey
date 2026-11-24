@@ -13,7 +13,7 @@ import { db, auth } from '../firebase';
 import {
     createZodConverter, assetSchema, assetAccountingSchema, importRecordSchema, historySchema,
 } from '../../schemas';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 import { actorStamp } from './actorStamp';
 import type { Asset, AssetAccounting, ImportRecord, AssetStatus, HistoryEntry } from '../../types/asset';
 import { newTagId } from '../labels/tag';

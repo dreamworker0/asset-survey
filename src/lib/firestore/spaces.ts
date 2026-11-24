@@ -13,7 +13,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '../firebase';
 import { createZodConverter, spaceSchema, SPACE_NAME_MAX } from '../../schemas';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 import { actorStamp } from './actorStamp';
 import type { Space, SpacePatch } from '../../types/space';
 

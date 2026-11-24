@@ -29,7 +29,7 @@ vi.mock('firebase/firestore', () => ({
     serverTimestamp: vi.fn(() => '__ts__'),
 }));
 vi.mock('../../../lib/firebase', () => ({ db: {}, auth: { currentUser: { uid: 'u1' } } }));
-vi.mock('../../../lib/sentry', () => ({ captureError: vi.fn() }));
+vi.mock('../../../lib/monitoring', () => ({ captureError: vi.fn() }));
 const trackWrite = vi.fn(async () => undefined);
 vi.mock('../../../lib/offline/syncQueue', () => ({ trackWrite: (...a: unknown[]) => trackWrite(...(a as [])) }));
 

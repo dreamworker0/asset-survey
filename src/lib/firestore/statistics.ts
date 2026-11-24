@@ -7,7 +7,7 @@
 import { doc, getDoc } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { db, firebaseFunctions } from '../firebase';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 import { dashboardStatsSchema, type DashboardStats } from '../../schemas/dashboard';
 
 /** 집계 문서를 읽는다 — 아직 한 번도 집계하지 않았으면 null */

@@ -31,7 +31,7 @@
 |------|------|
 | 프론트엔드 | Vite + React 19 + TypeScript, TailwindCSS v4, Zustand |
 | 백엔드 | Firebase (Auth · Firestore 서울 · Storage · Functions · Hosting · FCM) |
-| 모니터링 | 자체 오류 보고(`clientErrors`) + 운영자 경보 메일. Sentry·Discord 코드는 남아 있지만 운영에서는 끔([OPERATIONS.md](OPERATIONS.md)) |
+| 모니터링 | 자체 오류 보고(`clientErrors` → 슈퍼관리자 [오류 기록]) + 운영자 경보 메일. Sentry는 쓰지 않는다(2026-11-24 제거) |
 | 테스트 | Vitest(단위), Firestore/Storage 규칙 테스트(에뮬레이터), Jest(Functions), Playwright(E2E) |
 
 **Node 22 필수.** 의존성 설치·변경은 **npm 10**으로 합니다(npm 11이 만든 lockfile은 CI의 `npm ci`를 깹니다).
@@ -57,12 +57,10 @@ Cloud Functions의 `functions/.env` 예시:
 GMAIL_USER=...
 ALIMTALK_PROXY_URL=...
 ADMIN_NOTIFICATION_EMAIL=...
-SENTRY_DSN_FUNCTIONS=...     # 없으면 Functions 예외가 Sentry로 가지 않음
 DISCORD_WEBHOOK_URL=...      # 선택 (운영 알림)
 FIRESTORE_BACKUP_BUCKET=     # 선택. 비우면 {projectId}-backups (기본 버킷은 리전이 달라 못 씀)
 SERVICE_URL=                 # 선택. 이메일·알림톡 링크 주소
 ALLOW_TEST_WHITELIST=        # 운영에서는 비워 둔다
-SENTRY_RELEASE=              # 비워 둔다. 배포 워크플로가 배포 커밋 SHA로 채운다
 ```
 
 > 이 목록은 `npm run check:functions-env`가 코드(`defineString`/`process.env`)와 대조합니다.

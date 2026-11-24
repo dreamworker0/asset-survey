@@ -169,7 +169,7 @@ export function registerSyncFailureNotice(): void {
     // 유실을 사용자가 듣지 못한 채 지나간다. 알리는 일은 확인이 어떻게 끝났든 해야 한다.
     //
     // 뒤에 `catch`를 달지 않은 것도 의도다. `finally`는 거부를 그대로 흘려보내므로 이 체인은
-    // 처리되지 않은 거부로 남고, 그래야 모르는 확인 실패가 Sentry에 드러난다. 삼키면
+    // 처리되지 않은 거부로 남고, 그래야 모르는 확인 실패가 오류 기록에 드러난다. 삼키면
     // 위 한 줄이 무의미해진다.
     window.addEventListener('online', () => {
         void reconcileLedgerQuietly().finally(() => reportFailedSync());

@@ -40,8 +40,8 @@ const app = initializeApp(firebaseConfig);
  * 즉 화면에는 `permission-denied`만 보이지만 원인은 권한도 네트워크도 아니고,
  * **새로고침으로는 풀리지 않는다.**
  *
- * 그런데 App Check 경고는 sentry.ts·이 파일의 console.warn 후킹에서 의도적으로 걸러진다
- * (노이즈라서). 그래서 원인이 화면에도 Sentry에도 남지 않아, 사용자는 "새로고침 하세요"
+ * 그런데 App Check 경고는 이 파일의 console.warn 후킹에서 의도적으로 걸러진다
+ * (노이즈라서). 그래서 원인이 화면에도 오류 기록에도 남지 않아, 사용자는 "새로고침 하세요"
  * 안내를 받고 하루 종일 새로고침만 반복하게 된다. 그 오안내를 막으려고 상태를 남긴다.
  */
 let appCheckBlock: { code: string; at: number } | null = null;
@@ -175,7 +175,7 @@ if (USE_EMULATOR && typeof window !== 'undefined' && !(auth as unknown as { emul
 // authReady도 거기서 만든 Promise를 재수출한다(중복 대기 없이 ~200-500ms 절감).
 export const authReady = _authReady;
 
-// IndexedDB / Firestore 비동기 에러 억제 (Sentry 노이즈 방지)
+// IndexedDB / Firestore 비동기 에러 억제 (오류 보고 노이즈 방지)
 function isFirestorePersistenceError(msg: string) {
     if (!msg) return false;
     return (
@@ -274,7 +274,7 @@ if (typeof window !== 'undefined') {
             event.preventDefault();
         }
         // permission-denied 에러는 useAuth의 onSnapshot에서 재시도/로그아웃으로
-        // 이미 처리되므로 unhandledrejection으로 Sentry에 중복 리포트되지 않도록 억제
+        // 이미 처리되므로 unhandledrejection으로 오류 보고에 중복으로 올라가지 않도록 억제
         if (event?.reason?.code === 'permission-denied' || msg.includes('Missing or insufficient permissions')) {
             console.warn('[Firestore] 권한 에러 억제 (앱 로직에서 처리됨):', msg);
             event.preventDefault();

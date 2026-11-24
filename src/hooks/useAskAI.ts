@@ -12,7 +12,7 @@ import { useCallback, useRef, useState } from 'react';
 import {
     callWithRetry, isAuthExpiredError, isCallableUnreachable, isRateLimitedError,
 } from '../lib/callableRetry';
-import { captureError } from '../lib/sentry';
+import { captureError } from '../lib/monitoring';
 
 /** 질문 길이 상한 — 서버(ASK_AI_MAX_QUESTION_LENGTH)와 같은 값 */
 export const ASK_AI_MAX_LENGTH = 300;

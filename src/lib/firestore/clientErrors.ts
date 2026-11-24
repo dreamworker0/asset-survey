@@ -8,7 +8,7 @@ import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { createZodConverter, clientErrorSchema } from '../../schemas';
 import type { ClientError } from '../../types/clientError';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 
 const clientErrorConverter = createZodConverter(clientErrorSchema);
 

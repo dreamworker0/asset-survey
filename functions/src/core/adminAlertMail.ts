@@ -1,7 +1,7 @@
 /**
  * adminAlertMail — 운영자에게 가는 장애·보안 경보 메일
  *
- * 운영 결정(OPERATIONS.md, 2026-11-21)으로 Discord·Sentry를 비워 두면 captureError·captureWarning·
+ * 운영 결정(OPERATIONS.md, 2026-11-21)으로 Discord를 비워 두고 Sentry는 걷어내(2026-11-24) captureError·captureWarning·
  * sendDiscordAlert가 모두 조용히 빠진다. 그러면 백업 실패·기관 파기 실패·superAdmin 승격 같은
  * "사람이 꼭 알아야 하는 것"이 아무에게도 닿지 않는다. 이미 처리방침에 있는 Gmail 발송으로
  * 그 공백을 메운다 — Discord가 켜져 있어도 병행해서 보낸다(메일이 운영자가 늘 보는 곳이다).

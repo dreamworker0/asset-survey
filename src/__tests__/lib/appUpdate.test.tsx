@@ -5,7 +5,7 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { isChunkLoadError } from '../../lib/appUpdate';
 
-vi.mock('../../lib/sentry', () => ({ captureError: vi.fn() }));
+vi.mock('../../lib/monitoring', () => ({ captureError: vi.fn() }));
 import ErrorBoundary from '../../components/common/ErrorBoundary';
 
 function Boom({ error }: { error: Error }): never { throw error; }

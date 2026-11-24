@@ -2,7 +2,7 @@
  * 사용자·기관 문서 구독이 `permission-denied`로 막혔을 때의 안내·보고.
  */
 import { getAppCheckBlock } from '../firebase';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 import { useToastStore } from '../../store/useToastStore';
 
 /** App Check 차단으로 인한 접근 실패는 세션당 1회만 보고한다 — 원인이 하나라 반복 보고는 노이즈다. */
@@ -31,7 +31,7 @@ export function notifyAccessDenied(scope: 'org' | 'user', fallbackMessage: strin
 
     if (appCheckDenialReported) return;
     appCheckDenialReported = true;
-    // App Check 경고 자체는 노이즈라서 sentry.ts·firebase.ts에서 걸러진다. 그래서 **실제로
+    // App Check 경고 자체는 노이즈라서 firebase.ts에서 걸러진다. 그래서 **실제로
     // 피해가 난 순간**만 남긴다 — 이게 없으면 몇 명이 겪는지 알 수 없다(지금까지는 downstream
     // 401 한 건으로 추정해 왔다).
     captureError(new Error('[AppCheck] 보안 인증 차단으로 데이터 접근 실패'), {

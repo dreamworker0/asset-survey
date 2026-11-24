@@ -6,7 +6,7 @@
 import { collection, doc, query, where, getDocs, addDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db } from '../firebase';
 import { createZodConverter, teamSchema, TEAM_NAME_MAX } from '../../schemas';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 import { actorStamp } from './actorStamp';
 import type { Team, TeamPatch } from '../../types/team';
 

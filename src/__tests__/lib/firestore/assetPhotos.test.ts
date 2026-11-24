@@ -24,7 +24,7 @@ vi.mock('firebase/firestore', () => ({
     })),
 }));
 vi.mock('../../../lib/firebase', () => ({ db: {}, storage: {}, auth: { currentUser: { uid: 'admin-1' } } }));
-vi.mock('../../../lib/sentry', () => ({ captureError: vi.fn() }));
+vi.mock('../../../lib/monitoring', () => ({ captureError: vi.fn() }));
 
 import { uploadAssetPhoto, removeAssetPhoto } from '../../../lib/firestore/assetPhotos';
 

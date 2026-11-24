@@ -1,14 +1,13 @@
 /**
- * errorReport — Sentry 없이 화면 오류를 운영자에게 알리는 최소 보고 (2026-11-23)
+ * errorReport — 화면 오류를 운영자에게 알리는 최소 보고 (2026-11-23)
  *
- * Sentry를 쓰지 않기로 해(2026-11-21, 처리방침에서 뺌) 사용자가 겪은 오류를 알 길이 없었다.
+ * Sentry를 쓰지 않기로 해(2026-11-21 처리방침에서 빼고 2026-11-24 코드도 걷어냄) 사용자가 겪은 오류를 알 길이 없었다.
  * `captureError`와 처리하지 못한 오류(window error·unhandledrejection)를 `reportClientError` 함수로
  * 보내면, 서버가 같은 오류끼리 묶어 슈퍼관리자 [오류 기록]에 보여 준다(30일 뒤 저절로 지움).
  *
  * 보내는 것은 오류 이름·문구·어느 기능(context)·오류 코드·스택 앞부분·화면 경로·앱 버전뿐이다.
  * 사용자 정보·입력값(context의 나머지)은 보내지 않고, 문구의 이메일·전화번호·긴 ID는 여기와 서버에서 지운다.
  *
- * - Sentry가 켜져 있으면(VITE_SENTRY_DSN) 보내지 않는다 — 두 곳에 겹쳐 보내지 않게.
  * - 운영 빌드의 실제 주소에서만 보낸다(개발 서버·CI가 띄운 localhost 제외).
  * - 한 화면에서 같은 오류는 한 번, 모두 합쳐 15건까지만 보낸다. 오프라인이면 보내지 않는다.
  * - 보내다 실패해도 조용히 넘어간다 — 오류 보고가 다시 오류를 낳지 않게.
@@ -19,7 +18,7 @@ const sentKeys = new Set<string>();
 let sentCount = 0;
 
 /** 앱 버전 — 배포 워크플로가 빌드 때 넣는 커밋 SHA 앞 7자리 */
-const VERSION = ((import.meta.env.VITE_SENTRY_RELEASE as string | undefined) ?? '').slice(0, 7);
+const VERSION = ((import.meta.env.VITE_APP_VERSION as string | undefined) ?? '').slice(0, 7);
 
 /** 보고해도 소용없는 환경 소음(브라우저 확장·네트워크·App Check 지연) */
 const NOISE = [
@@ -35,7 +34,7 @@ const NOISE = [
 ];
 
 function enabled(): boolean {
-    if (!import.meta.env.PROD || import.meta.env.VITE_SENTRY_DSN) return false;
+    if (!import.meta.env.PROD) return false;
     if (typeof location === 'undefined' || typeof navigator === 'undefined') return false;
     if (['localhost', '127.0.0.1', '[::1]'].includes(location.hostname)) return false;
     return navigator.onLine !== false;

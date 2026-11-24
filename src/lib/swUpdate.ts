@@ -4,7 +4,7 @@
  * `registration.update()`는 SW 스크립트를 다시 받아 파싱하므로, 모바일 회선에서 전송이
  * 잘리면 그대로 거부된다. iOS Safari는 이때 `TypeError: SyntaxError: Unexpected end of script`를
  * 던진다(JAVASCRIPT-REACT-63 — iOS 18.7 / Mobile Safari 26.2, `/employee/today`).
- * 받아 주는 곳이 없으면 unhandledrejection으로 새어 **앱 버그처럼** Sentry에 올라온다.
+ * 받아 주는 곳이 없으면 unhandledrejection으로 새어 **앱 버그처럼** 오류 기록에 올라온다.
  * 이미 필터로 막아 두고 있던 `Failed to update a ServiceWorker`·`Script … load failed`도
  * 같은 호출이 다른 브라우저에서 낸 변종이었다 — 원인은 하나였고 필터가 늘고 있었다.
  *

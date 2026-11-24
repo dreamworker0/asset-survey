@@ -163,12 +163,13 @@ export default defineConfig({
     }),
   ],
   build: {
-    // 소스맵은 **배포 워크플로에서만** 켠다(SENTRY_SOURCEMAPS=1).
+    // 소스맵은 **배포 워크플로에서만** 켠다(BUILD_SOURCEMAPS=1).
     // 'hidden'이라 번들에 sourceMappingURL 주석이 남지 않고, .map 파일은
     // firebase.json의 hosting.ignore가 제외해 프로덕션으로 나가지 않는다 —
-    // Sentry에만 업로드되어 스택트레이스가 원본 코드로 풀린다.
+    // 배포 워크플로가 Actions 아티팩트로 보관해, [오류 기록]의 압축된 스택을
+    // `npm run symbolicate`로 원본 파일·줄로 풀 때 쓴다.
     // 로컬·CI 빌드에서 켜면 빌드 시간과 디스크만 늘어나므로 기본은 끈다.
-    sourcemap: process.env.SENTRY_SOURCEMAPS === '1' ? 'hidden' : false,
+    sourcemap: process.env.BUILD_SOURCEMAPS === '1' ? 'hidden' : false,
     reportCompressedSize: true,
     chunkSizeWarningLimit: 500,
     rollupOptions: {
@@ -197,9 +198,6 @@ export default defineConfig({
           // `index-*.js`가 되어 위 globPatterns의 셸 패턴('assets/index-*')에 걸려 프리캐시로 들어간다
           // (2026-11-21 4단계에서 프리캐시 게이트가 잡음 — 98KB가 설치 즉시 내려받아졌다).
           'html5-qrcode': ['html5-qrcode'],
-          // sentryClient(재수출 파사드)를 SDK와 같은 청크에 강제 배치 — 파사드가 자체 코드가 없어
-          // Rollup이 공유 청크로 접어 넣으면 SDK로의 정적 엣지가 생겨 지연 로딩이 무력화된다
-          'sentry': ['@sentry/react', './src/lib/sentryClient.ts'],
           'image-compression': ['browser-image-compression'],
         },
       },

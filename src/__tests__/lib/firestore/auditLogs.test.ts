@@ -33,10 +33,10 @@ vi.mock('firebase/firestore', () => ({
 }));
 
 vi.mock('../../../lib/firebase', () => ({ db: {}, auth: { currentUser: null }, firebaseFunctions: {} }));
-vi.mock('../../../lib/sentry', () => ({ captureError: vi.fn() }));
+vi.mock('../../../lib/monitoring', () => ({ captureError: vi.fn() }));
 
 import * as fs from 'firebase/firestore';
-import { captureError } from '../../../lib/sentry';
+import { captureError } from '../../../lib/monitoring';
 import {
     getAuditLogs, getAuditLogsForExport, AUDIT_LOG_PAGE_SIZE, AUDIT_LOG_EXPORT_MAX,
 } from '../../../lib/firestore/auditLogs';

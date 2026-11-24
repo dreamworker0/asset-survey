@@ -11,7 +11,7 @@
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { doc, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db, storage, auth } from '../firebase';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 import { actorStamp } from './actorStamp';
 import { shrinkPhoto, PHOTO_SOURCE_MAX_BYTES, type AssetPhotoFields } from './assetPhotos';
 import type { Scan } from '../../types/survey';

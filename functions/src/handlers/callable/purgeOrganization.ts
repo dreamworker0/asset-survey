@@ -13,7 +13,7 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { getStorage } from "firebase-admin/storage";
 import { requireSuperAdmin } from "../../utils/helpers";
-import { captureError, flushSentry } from "../../core/sentry";
+import { captureError } from "../../core/monitoring";
 import { purgeOrganizationData, OrgNotRetiredError } from "../../services/organization/purgeOrganizationData";
 
 export const purgeOrganization = onCall(
@@ -42,7 +42,6 @@ export const purgeOrganization = onCall(
             }
             console.error(`[purgeOrganization] 파기 실패 org=${orgId}:`, (err as Error).message);
             captureError(err, { context: "purgeOrganization", orgId });
-            await flushSentry();
             throw new HttpsError("internal", "영구 삭제 중 오류가 발생했습니다. 다시 시도하면 남은 데이터부터 이어서 지웁니다.");
         }
     },

@@ -8,7 +8,7 @@ vi.mock('../../hooks/useToast', () => ({
 }));
 
 const mockCaptureError = vi.fn();
-vi.mock('../../lib/sentry', () => ({
+vi.mock('../../lib/monitoring', () => ({
     captureError: (...args: unknown[]) => mockCaptureError(...args),
 }));
 

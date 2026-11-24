@@ -1,6 +1,6 @@
 import { Component, ReactNode, ErrorInfo } from 'react';
 import { isChunkLoadError, isOffline, updateAndReload } from '../../lib/appUpdate';
-import { captureError } from '../../lib/sentry';
+import { captureError } from '../../lib/monitoring';
 
 interface Props {
     children: ReactNode;
@@ -34,7 +34,7 @@ export default class ErrorBoundary extends Component<Props, State> {
     }
 
     componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-        // DOM NotFoundError는 Sentry에도 보내지 않음 (sentry.ts에서도 필터링하지만 이중 방어)
+        // DOM NotFoundError는 오류 보고로도 보내지 않는다(브라우저 확장·번역기가 DOM을 건드린 소음)
         if (ErrorBoundary.isDomNotFoundError(error)) return;
         captureError(error, { componentStack: errorInfo?.componentStack });
     }

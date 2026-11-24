@@ -16,7 +16,7 @@
  * 같은 exportId를 재사용하므로 재시도가 중복 기록을 만들지 않는다.
  */
 import { callWithRetry, isTransientCallableError } from '../callableRetry';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 
 /** 서버(recordExport.ts)의 DATASETS 화이트리스트와 1:1로 맞춘다 */
 export type ExportDataset =
@@ -49,7 +49,7 @@ export function recordExport(format: ExportFormat, dataset: ExportDataset, recor
     void callWithRetry('recordExport', { format, dataset, recordCount, exportId }).catch((err) => {
         if (isTransientCallableError(err)) {
             // 네트워크가 끊겼거나 응답이 돌아오지 않은 경우. 재시도까지 실패했다면
-            // 사용자도 우리도 더 할 수 있는 것이 없다 — Sentry에 올려도 조치로 이어지지 않는다.
+            // 사용자도 우리도 더 할 수 있는 것이 없다 — 오류 보고에 올려도 조치로 이어지지 않는다.
             console.warn('[recordExport] 반출 기록 실패 (네트워크)', err);
             return;
         }

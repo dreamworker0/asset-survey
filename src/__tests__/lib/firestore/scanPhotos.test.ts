@@ -19,7 +19,7 @@ vi.mock('firebase/firestore', () => ({
     writeBatch: vi.fn(), updateDoc: vi.fn(async (_r: unknown, data: Record<string, unknown>) => { updates.push(data); }),
 }));
 vi.mock('../../../lib/firebase', () => ({ db: {}, storage: {}, auth: { currentUser: { uid: 'emp-1' } } }));
-vi.mock('../../../lib/sentry', () => ({ captureError: vi.fn() }));
+vi.mock('../../../lib/monitoring', () => ({ captureError: vi.fn() }));
 
 import { uploadScanPhoto, removeScanPhoto } from '../../../lib/firestore/scanPhotos';
 

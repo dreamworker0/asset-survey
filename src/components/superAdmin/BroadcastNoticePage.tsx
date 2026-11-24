@@ -15,7 +15,7 @@ import { httpsCallable } from 'firebase/functions';
 import { firebaseFunctions } from '../../lib/firebase';
 import { useToast } from '../../hooks/useToast';
 import { useConfirm } from '../../hooks/useConfirm';
-import { captureError } from '../../lib/sentry';
+import { captureError } from '../../lib/monitoring';
 import { TERMS_VERSION, formatLegalVersion } from '../../lib/constants';
 import { getRecentBroadcasts } from '../../lib/firestore';
 import type { Broadcast } from '../../types/broadcast';

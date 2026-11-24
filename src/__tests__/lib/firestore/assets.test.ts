@@ -48,7 +48,7 @@ vi.mock('firebase/firestore', () => ({
     Timestamp: { fromMillis: (ms: number) => ({ ms }) },
 }));
 vi.mock('../../../lib/firebase', () => ({ db: {}, auth: { currentUser: { uid: 'admin-1' } } }));
-vi.mock('../../../lib/sentry', () => ({ captureError: vi.fn() }));
+vi.mock('../../../lib/monitoring', () => ({ captureError: vi.fn() }));
 
 import * as fs from 'firebase/firestore';
 import {

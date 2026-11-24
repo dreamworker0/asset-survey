@@ -12,7 +12,7 @@ import { callWithRetry, isTransientCallableError } from '../lib/callableRetry';
 import { useAuth } from './useAuth';
 import { getOrganization } from '../lib/firestore';
 import { TERMS_VERSION, PRIVACY_VERSION } from '../lib/constants';
-import { captureError } from '../lib/sentry';
+import { captureError } from '../lib/monitoring';
 
 export type ConsentRequirement = 'none' | 'admin' | 'employee';
 

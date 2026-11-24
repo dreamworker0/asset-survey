@@ -48,7 +48,6 @@ if ! write_env_from_var "${ENV_FILE:-}" ".env"; then
             echo "VITE_FIREBASE_MEASUREMENT_ID=${VITE_FIREBASE_MEASUREMENT_ID:-}"
             echo "VITE_FIREBASE_VAPID_KEY=${VITE_FIREBASE_VAPID_KEY:-}"
             echo "VITE_RECAPTCHA_SITE_KEY=${VITE_RECAPTCHA_SITE_KEY:-}"
-            echo "VITE_SENTRY_DSN=${VITE_SENTRY_DSN:-}"
             echo "VITE_TMAP_API_KEY=${VITE_TMAP_API_KEY:-}"
             echo "VITE_HOLIDAY_API_KEY=${VITE_HOLIDAY_API_KEY:-}"
         } > .env

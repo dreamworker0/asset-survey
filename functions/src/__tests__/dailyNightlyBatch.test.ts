@@ -16,7 +16,7 @@ jest.mock('../services/alimtalk/sendNotification', () => ({
     createInAppNotification: jest.fn(),
     sendPushToUser: jest.fn(),
 }));
-jest.mock('../core/sentry', () => ({ captureError: jest.fn(), captureWarning: jest.fn() }));
+jest.mock('../core/monitoring', () => ({ captureError: jest.fn(), captureWarning: jest.fn() }));
 // export 호출 자체를 검증해야 하므로 Admin 클라이언트를 통째로 갈아 끼운다.
 jest.mock('@google-cloud/firestore', () => {
     const exportDocuments = jest.fn();
@@ -30,7 +30,7 @@ jest.mock('@google-cloud/firestore', () => {
 });
 
 import { getStorage } from 'firebase-admin/storage';
-import { captureWarning } from '../core/sentry';
+import { captureWarning } from '../core/monitoring';
 import {
     buildBackupUri,
     buildBackupPrefix,

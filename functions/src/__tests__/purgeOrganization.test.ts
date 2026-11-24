@@ -13,9 +13,8 @@ jest.mock("../services/organization/purgeOrganizationData", () => {
 });
 jest.mock("firebase-admin/storage", () => ({ getStorage: () => ({ bucket: () => ({ name: "default-bucket" }) }) }));
 const mockCaptureError = jest.fn();
-jest.mock("../core/sentry", () => ({
+jest.mock("../core/monitoring", () => ({
     captureError: (...args: unknown[]) => mockCaptureError(...args),
-    flushSentry: jest.fn().mockResolvedValue(undefined),
 }));
 
 import { purgeOrganization } from "../handlers/callable/purgeOrganization";

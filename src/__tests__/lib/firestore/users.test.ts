@@ -36,11 +36,11 @@ vi.mock('firebase/firestore', () => ({
 
 // ── 앱 모듈 mock ──
 vi.mock('../../../lib/firebase', () => ({ db: {}, auth: { currentUser: null }, firebaseFunctions: {} }));
-vi.mock('../../../lib/sentry', () => ({ captureError: vi.fn() }));
+vi.mock('../../../lib/monitoring', () => ({ captureError: vi.fn() }));
 
 // mock 선언 뒤에 import (호이스팅 주의)
 import * as fs from 'firebase/firestore';
-import { captureError } from '../../../lib/sentry';
+import { captureError } from '../../../lib/monitoring';
 import {
     getUser, createUser, updateUser, leaveOrganization,
     clearUserOrganization, recheckDeniedTarget,

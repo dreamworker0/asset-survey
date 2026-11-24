@@ -9,7 +9,7 @@ import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { createZodConverter, broadcastSchema } from '../../schemas';
 import type { Broadcast } from '../../types/broadcast';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 
 const broadcastConverter = createZodConverter(broadcastSchema);
 

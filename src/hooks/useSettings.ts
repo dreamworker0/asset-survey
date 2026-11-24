@@ -5,7 +5,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from './useAuth';
 import { useToast } from './useToast';
-import { captureError } from '../lib/sentry';
+import { captureError } from '../lib/monitoring';
 import { useConfirm } from './useConfirm';
 import { getOrganization, updateOrganization, regenerateInviteCode } from '../lib/firestore';
 import { getFunctions, httpsCallable } from 'firebase/functions';

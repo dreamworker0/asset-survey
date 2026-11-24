@@ -12,7 +12,7 @@
 import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
 import { doc, collection, writeBatch, serverTimestamp } from 'firebase/firestore';
 import { db, storage } from '../firebase';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 import { actorStamp } from './actorStamp';
 import type { Asset } from '../../types/asset';
 

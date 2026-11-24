@@ -16,7 +16,7 @@ import { matchSpaceByLocation, parseLocation } from '../lib/import/locationMatch
 import { readWorkbook, toImportTable, parseAssets, blockingReasons, type SheetTable } from '../lib/import/parseSheet';
 import { autoMapColumns, type ColumnMap, type ImportField, missingRecommended, FIELD_DEF } from '../lib/import/columns';
 import { diffAssets, countByLocation, type LocationSpaceMap } from '../lib/import/diff';
-import { captureError } from '../lib/sentry';
+import { captureError } from '../lib/monitoring';
 import type { Space } from '../types/space';
 import type { Building } from '../types/building';
 import type { Asset, AssetAccounting } from '../types/asset';

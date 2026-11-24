@@ -29,7 +29,7 @@ vi.mock('../../lib/firebase', () => ({
     getAppCheckBlock: () => mocks.appCheckBlock,
 }));
 vi.mock('../../hooks/useAuth', () => ({ useAuth: () => mocks.auth }));
-vi.mock('../../lib/sentry', () => ({ captureError: mocks.captureError }));
+vi.mock('../../lib/monitoring', () => ({ captureError: mocks.captureError }));
 
 import useSessionRecord from '../../hooks/useSessionRecord';
 

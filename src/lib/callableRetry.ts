@@ -4,7 +4,7 @@
  * ## 왜 필요한가 — `FirebaseError: deadline-exceeded`의 정체
  * firebase/functions SDK는 콜러블 응답을 **기본 70초**까지 기다리고, 그 안에 오지 않으면
  * `FirebaseError('deadline-exceeded', 'deadline-exceeded')`를 던진다(코드와 메시지가 같은
- * 문자열이라 Sentry에는 `FirebaseError: deadline-exceeded` 한 줄로만 남는다).
+ * 문자열이라 오류 기록에는 `FirebaseError: deadline-exceeded` 한 줄로만 남는다).
  * 요청을 중단시키지도 않는다 — 타이머가 먼저 끝났을 뿐 서버는 계속 처리한다.
  *
  * 즉 이 에러는 "서버가 거부했다"가 아니라 **"응답이 70초 안에 돌아오지 않았다"**는 뜻이다.
@@ -72,7 +72,7 @@ export function isTransientCallableError(err: unknown): boolean {
  *
  * 오프라인에서 예약을 확정하면 SDK 오류 문구 `internal [0]`이 토스트에 그대로 떴다(2026-11-11 확인).
  * 사용자가 할 수 있는 일(연결된 뒤 다시 시도)을 말해 주는 문구로 바꿔 던진다.
- * 예상된 실패라 Sentry에 올리지 않는다 — 호출부는 `isNetworkUnavailableError`로 거른다.
+ * 예상된 실패라 오류 보고에 올리지 않는다 — 호출부는 `isNetworkUnavailableError`로 거른다.
  */
 export class NetworkUnavailableError extends Error {
     readonly code = 'network-unavailable';

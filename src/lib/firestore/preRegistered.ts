@@ -7,7 +7,7 @@ import {
 } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { db, firebaseFunctions } from '../firebase';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 
 export interface PreRegisteredEmployee {
     id: string;

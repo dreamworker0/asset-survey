@@ -23,7 +23,7 @@ vi.mock('firebase/functions', () => ({ httpsCallable: () => mocks.callable }));
 vi.mock('../../lib/firebase', () => ({ firebaseFunctions: {}, db: {}, auth: {} }));
 vi.mock('../../hooks/useToast', () => ({ useToast: () => ({ showToast: mocks.showToast }) }));
 vi.mock('../../hooks/useConfirm', () => ({ useConfirm: () => ({ confirm: mocks.confirm }) }));
-vi.mock('../../lib/sentry', () => ({ captureError: mocks.captureError }));
+vi.mock('../../lib/monitoring', () => ({ captureError: mocks.captureError }));
 vi.mock('../../lib/firestore', () => ({ getRecentBroadcasts: mocks.getRecentBroadcasts }));
 
 import BroadcastNoticePage from '../../components/superAdmin/BroadcastNoticePage';

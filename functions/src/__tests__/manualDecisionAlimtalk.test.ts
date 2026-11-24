@@ -16,7 +16,7 @@ jest.mock('../services/alimtalk/sendAlimtalk', () => ({
     sendRejectionAlimtalk: (...args: unknown[]) => mockSendRejectionAlimtalk(...args),
 }));
 jest.mock('../core/params', () => ({ ALIMTALK_PROXY_TOKEN: {} }));
-jest.mock('../core/sentry', () => ({ captureError: jest.fn(), flushSentry: jest.fn() }));
+jest.mock('../core/monitoring', () => ({ captureError: jest.fn() }));
 jest.mock('firebase-admin/auth', () => ({ getAuth: jest.fn() }));
 jest.mock('firebase-functions/v2/https', () => ({
     onCall: (_opts: unknown, handler: (req: unknown) => unknown) => handler,

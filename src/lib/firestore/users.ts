@@ -9,7 +9,7 @@ import {
 import { db } from '../firebase';
 import type { User } from '../../types/user';
 import { createZodConverter, userSchema } from '../../schemas';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 import { actorStamp } from './actorStamp';
 import { cachedQuery, invalidateCache } from './cache';
 

@@ -12,7 +12,7 @@ const mockConfirm = vi.fn();
 vi.mock('../../hooks/useAuth', () => ({ useAuth: () => ({ userData: { organizationId: 'org-A' } }) }));
 vi.mock('../../hooks/useToast', () => ({ useToast: () => ({ showToast: mockShowToast }) }));
 vi.mock('../../hooks/useConfirm', () => ({ useConfirm: () => ({ confirm: mockConfirm }) }));
-vi.mock('../../lib/sentry', () => ({ captureError: vi.fn() }));
+vi.mock('../../lib/monitoring', () => ({ captureError: vi.fn() }));
 
 const mockReadWorkbook = vi.fn();
 vi.mock('../../lib/import/parseSheet', async () => {

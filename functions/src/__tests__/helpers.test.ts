@@ -123,7 +123,7 @@ describe('helpers — 공통 유틸리티', () => {
             const wrapped = wrapHandler('submitOrgApplication', handler);
 
             await expect(wrapped()).rejects.toBe(rejection);
-            // ERROR로 찍히면 captureError → Sentry·Discord 알림이 나간다
+            // ERROR로 찍히면 captureError → Discord 알림이 나간다
             expect(console.error).not.toHaveBeenCalled();
             const entry = JSON.parse((console.warn as jest.Mock).mock.calls[0][0]);
             expect(entry.severity).toBe('WARNING');

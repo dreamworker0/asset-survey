@@ -19,7 +19,7 @@ import {
     createZodConverter, surveySchema, surveyTargetSchema, scanSchema, surveySubmissionSchema, surveyEventSchema, syncTaskSchema,
     NO_SPACE_KEY,
 } from '../../schemas';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 import { actorStamp } from './actorStamp';
 import { trackWrite } from '../offline/syncQueue';
 import { recordAssetCheck } from './assetChecks';

@@ -10,7 +10,7 @@
 const mockCheckRateLimit = jest.fn().mockResolvedValue(undefined);
 jest.mock('../utils/rateLimit', () => ({ checkRateLimitByUid: mockCheckRateLimit }));
 jest.mock('../utils/constants', () => ({ getRateLimits: jest.fn().mockResolvedValue({ max: 10, windowSec: 3600 }) }));
-jest.mock('../core/sentry', () => ({ captureError: jest.fn(), flushSentry: jest.fn().mockResolvedValue(undefined) }));
+jest.mock('../core/monitoring', () => ({ captureError: jest.fn() }));
 jest.mock('../core/params', () => ({ GMAIL_APP_PASSWORD: {} }));
 
 const mockSendMail = jest.fn().mockResolvedValue(undefined);

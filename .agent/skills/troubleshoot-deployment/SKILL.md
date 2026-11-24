@@ -150,7 +150,7 @@ Pub/Sub 전달이 at-least-once, `retryCount: 1` 재실행, 운영자의 수동 
 만들면 되지"로 풀지 말 것 — 관리형 export는 전체 문서를 읽어 읽기 비용이 그대로 청구된다.
 
 ### 2.7 야간 배치 쿼리가 `9 FAILED_PRECONDITION: The query requires an index`
-**증상**: 스케줄 함수 로그/Sentry에 인덱스 생성 링크가 포함된 에러. 예: `organizations`의
+**증상**: 스케줄 함수 로그·경보 메일에 인덱스 생성 링크가 포함된 에러. 예: `organizations`의
 `status` + `deletedAt`.
 
 **원인**: `orderBy` 없이 부등호(`<=`, `<`)로 거르는 쿼리는 Firestore가 **부등호 필드 오름차순**을
@@ -167,7 +167,7 @@ Pub/Sub 전달이 at-least-once, `retryCount: 1` 재실행, 운영자의 수동 
 (`[Batch] dailyNightlyBatch completed`)는 1차 실행에 없다.
 
 **어떻게 알게 되나**: OOM은 인스턴스를 통째로 죽이므로 `captureError`가 실행될 기회조차 없다 —
-**Sentry·Discord에 스스로를 신고하지 못한다.** 그래서 재실행이 백업을 건너뛸 때 나가는
+**메일·Discord로 스스로를 신고하지 못한다.** 그래서 재실행이 백업을 건너뛸 때 나가는
 주황색 `⚠️ 야간 배치가 같은 날 두 번 실행됨` 경고가 사실상 **유일한 탐지 수단**이다
 (`warnDuplicateRun`). 이 경고를 노이즈로 보고 지우면 다음 OOM은 아무도 모르는 채
 집계·통계 비용만 두 배로 나간다. 경고를 받으면 여기부터 확인한다.

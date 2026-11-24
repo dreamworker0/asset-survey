@@ -2,7 +2,7 @@
  * sessionBoot — 부팅 시점의 세션 장부
  *
  * 여기 있는 것은 전부 **Firebase를 건드리지 않는** 로컬 표식이다. 의존성이 없어야 경량
- * 진입점(main.tsx)이 이걸 쓰면서도 firebase.ts·Sentry를 끌고 오지 않는다 — 비인증
+ * 진입점(main.tsx)이 이걸 쓰면서도 firebase.ts·오류 보고를 끌고 오지 않는다 — 비인증
  * 방문자의 초기 번들을 지키는 것이 lightEntry 분리의 목적이므로 이 제약이 곧 설계다.
  *
  * 담는 것은 세 가지다.
@@ -133,7 +133,7 @@ export function clearSessionMarkers(): void {
 // ③ 세션 소실 증거
 // ─────────────────────────────────────────────────────────────────────────────
 
-/** 다음 로그인 때 Sentry로 올릴 증거를 담아 두는 자리. 한 건만 유지한다. */
+/** 다음 로그인 때 남길 증거를 담아 두는 자리. 한 건만 유지한다. */
 const SESSION_LOSS_KEY = 'vdl:session-loss';
 
 /**
@@ -193,11 +193,10 @@ function takeBootSnapshot(): BootSnapshot {
 const bootSnapshot = takeBootSnapshot();
 
 /**
- * Sentry로 올릴 증거.
+ * 다음 로그인 때 경고(captureWarning — 지금은 콘솔)로 남길 증거.
  *
- * **전부 숫자·불리언이다.** 문자열은 `sentryScrub`의 기본 차단에 걸려 `[redacted string(n)]`로
- * 바뀐다 — 허용 목록은 자유 입력이 새는 것을 막으려고 일부러 좁게 두었으므로, 진단값을
- * 문자열로 실으면 도착하지 않는다. 기기·브라우저 종류는 Sentry가 자체 컨텍스트로 붙인다.
+ * **전부 숫자·불리언이다.** 자유 입력이 섞일 여지를 두지 않으려고 문자열은 싣지 않는다
+ * (예전 Sentry 스크러버의 허용 목록에 맞춘 규칙을 그대로 지킨다).
  */
 export interface SessionLossEvidence {
     /** 기록 시각 (epoch ms) */
@@ -260,8 +259,8 @@ async function collectEvidence(): Promise<SessionLossEvidence> {
  * 내린다"로 나누면 두 줄의 순서가 계약이 되는데, 뒤바꿔도 타입도 테스트도 통과하고 계측만
  * 조용히 죽는다. 판정 근거는 부팅 스냅숏이라 정리를 먼저 해도 결과가 달라지지 않는다.
  *
- * **왜 여기서 바로 Sentry로 보내지 않나.** 이 시점은 경량 진입점이라 Sentry가 초기화돼
- * 있지 않다. 여기서 올리려면 랜딩 화면에 @sentry/react를 통째로 끌어와야 하는데, 그건
+ * **왜 여기서 바로 남기지 않나.** 이 시점은 경량 진입점이라 오류 보고 모듈이 올라와
+ * 있지 않다. 여기서 남기려면 랜딩 화면에 그 모듈(→ firebase)을 끌어와야 하는데, 그건
  * lightEntry 분리로 아낀 것을 그대로 되돌리는 일이다. 사용자는 어차피 곧 다시 로그인하므로
  * 그때 appEntry가 `takePendingSessionLoss()`로 집어 올린다.
  *

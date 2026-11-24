@@ -33,7 +33,7 @@ export default defineConfig({
     // ── 브라우저·뷰포트 프로젝트 ──
     // 여기 projects가 없어 **Chromium 데스크톱 단독**으로만 돌고 있었다. 이 앱은 PWA·오프라인·
     // IndexedDB가 핵심인데 그 셋은 WebKit에서 동작이 가장 많이 갈리는 영역이고, 실제로
-    // src/lib/sentry.ts의 무시 목록 절반이 iOS Safari IndexedDB 예외다 — 프로덕션에서만
+    // (예전) Sentry 무시 목록 절반이 iOS Safari IndexedDB 예외였다 — 프로덕션에서만
     // 드러나던 공백이라는 뜻이다.
     //
     // ⚠️ 실행 비용 때문에 CI에서 프로젝트를 나눠 돌린다(ci.yml / e2e-cross-browser.yml 주석 참고).

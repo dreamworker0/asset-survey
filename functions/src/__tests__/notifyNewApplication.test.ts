@@ -18,7 +18,7 @@ jest.mock('../core/mailer', () => ({
     systemMailFrom: () => '"재물조사" <noreply@example.com>',
 }));
 jest.mock('../core/params', () => ({ GMAIL_APP_PASSWORD: {} }));
-jest.mock('../core/sentry', () => ({ captureError: jest.fn(), flushSentry: jest.fn() }));
+jest.mock('../core/monitoring', () => ({ captureError: jest.fn() }));
 jest.mock('firebase-admin/auth', () => ({ getAuth: jest.fn() }));
 jest.mock('firebase-functions/v2/firestore', () => ({
     onDocumentWritten: (_opts: unknown, handler: unknown) => handler,

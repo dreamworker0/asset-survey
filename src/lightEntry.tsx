@@ -2,7 +2,7 @@
  * lightEntry — 비인증 사용자용 경량 엔트리포인트
  *
  * main.tsx에서 Firebase Auth 상태 확인 후 비인증 사용자일 때 동적 import됨.
- * AuthProvider, Firestore 리스너, Sentry 등 무거운 모듈을 제외하고
+ * AuthProvider, Firestore 리스너, 오류 보고 등 무거운 모듈을 제외하고
  * 랜딩·로그인·기관 신청 등 비인증 화면만 담는다.
  *
  * 로그인 성공 시 전체 앱(appEntry)으로 전환한다.

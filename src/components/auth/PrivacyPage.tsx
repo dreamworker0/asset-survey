@@ -21,7 +21,7 @@ const EFFECTIVE_DATE = formatLegalVersion(PRIVACY_VERSION);
  * ⛔ 코드는 있지만 쓰지 않기로 한 연동(2026-11-21 결정) — 목록에서 뺐다. **설정값을 넣으면 개인정보가
  *    나가는데 처리방침에 없게 된다.** 켜려면 먼저 여기에 수탁자를 되살리고 시행일을 옮긴다.
  *    - Discord(운영자 알림): functions/src/core/discord.ts — `DISCORD_WEBHOOK_URL`을 비워 둔다
- *    - Sentry(오류 수집): src/lib/sentry.ts, functions/src/core/sentry.ts — `VITE_SENTRY_DSN`·`SENTRY_DSN_FUNCTIONS`를 비워 둔다
+ *    - Sentry(오류 수집)는 2026-11-24 코드까지 걷어냈다. 오류는 자체 보고(src/lib/errorReport.ts → clientErrors)로만 모은다
  *
  * 차량운행일지에서 쓰던 Calendar·Slack·Tmap·계기판 OCR·챗봇 연동은 이 서비스에 없다(0단계에서 걷어냄).
  * 그래서 '기관 선택 연동' 수탁자 구분과 제11조의 "외부 연동 인증 토큰 암호화 보관" 문구도 뺐다(2026-11-21,

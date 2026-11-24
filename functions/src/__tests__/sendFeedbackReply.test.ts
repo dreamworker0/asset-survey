@@ -31,7 +31,7 @@ jest.mock('../core/mailer', () => ({
 }));
 jest.mock('../core/params', () => ({ GMAIL_APP_PASSWORD: {} }));
 // requireSuperAdmin·escapeHtml은 실제 코드를 쓴다 — 권한 판정과 이스케이프가 이 테스트의 대상이다
-jest.mock('../core/sentry', () => ({ captureError: jest.fn(), flushSentry: jest.fn() }));
+jest.mock('../core/monitoring', () => ({ captureError: jest.fn() }));
 jest.mock('firebase-admin/auth', () => ({ getAuth: jest.fn() }));
 jest.mock('firebase-functions/v2/https', () => ({
     onCall: (_opts: unknown, handler: (req: unknown) => unknown) => handler,

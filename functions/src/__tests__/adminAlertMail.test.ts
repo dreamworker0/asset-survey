@@ -1,7 +1,7 @@
 /**
  * adminAlertMail.test.ts — 운영 경보 메일
  *
- * Discord·Sentry를 비워 둔 운영에서 백업 실패·권한 승격을 알리는 유일한 경로다.
+ * Discord를 비워 둔 운영에서 백업 실패·권한 승격을 알리는 유일한 경로다.
  * 지키려는 것: 받는 사람 결정, 값 escape(오류 메시지에 태그가 섞여도 깨지지 않음), 실패해도 던지지 않음.
  */
 const mockSendMail = jest.fn();

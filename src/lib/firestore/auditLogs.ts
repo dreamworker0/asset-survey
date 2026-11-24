@@ -20,7 +20,7 @@ import {
 import { db } from '../firebase';
 import { createZodConverter, auditLogSchema } from '../../schemas';
 import type { AuditAction, AuditLog } from '../../types/auditLog';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 
 const auditLogConverter = createZodConverter(auditLogSchema);
 

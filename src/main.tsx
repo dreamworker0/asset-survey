@@ -4,7 +4,7 @@
  * Firebase Auth 상태만 최소한으로 확인한 뒤, 인증 여부에 따라
  * 서로 다른 엔트리포인트를 동적으로 로드한다.
  *
- * - 인증 사용자: appEntry.tsx  (전체 앱 — AuthProvider, Sentry 등 포함)
+ * - 인증 사용자: appEntry.tsx  (전체 앱 — AuthProvider, 오류 보고 등 포함)
  * - 비인증 사용자: lightEntry.tsx (Landing/Login만 — 경량)
  *
  * 이를 통해 비인증 사용자의 초기 번들 크기를 ~300KB 절감하여

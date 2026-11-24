@@ -13,7 +13,7 @@
  * - 원문 대신 고정 문구를 띄우던 catch(`useAdminLogExport` 등)는 이 함수로 가려
  *   `STALE_CHUNK_MESSAGE`를 넘긴다.
  *
- * 패턴은 브라우저별 원문이다. Sentry `ignoreErrors`의 청크 항목과 같은 범위를 본다.
+ * 패턴은 브라우저별 원문이다.
  */
 const STALE_CHUNK_PATTERNS: RegExp[] = [
     /Failed to fetch dynamically imported module/i, // Chrome·Edge

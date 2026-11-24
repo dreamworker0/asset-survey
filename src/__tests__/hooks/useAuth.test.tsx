@@ -34,8 +34,7 @@ vi.mock('../../lib/auth', () => ({
     logout: vi.fn(),
     wasIntentionalLogout: vi.fn(() => false),
 }));
-vi.mock('../../lib/sentry', () => ({
-    setSentryUser: vi.fn(),
+vi.mock('../../lib/monitoring', () => ({
     captureError: vi.fn(),
     captureWarning: vi.fn(),
 }));
@@ -51,7 +50,7 @@ import { AuthProvider, useAuth } from '../../hooks/useAuth';
 import { auth, getAppCheckBlock } from '../../lib/firebase';
 import { refreshToken, getLastTokenRefreshFailure } from '../../lib/tokenRefresh';
 import { wasIntentionalLogout } from '../../lib/auth';
-import { captureError, captureWarning } from '../../lib/sentry';
+import { captureError, captureWarning } from '../../lib/monitoring';
 import { useToastStore } from '../../store/useToastStore';
 
 function createWrapper() {

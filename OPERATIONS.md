@@ -17,13 +17,13 @@
 | Secret Manager 비밀값 등록 | 사용자 | `GEMINI_API_KEY` · `GMAIL_APP_PASSWORD` · `ALIMTALK_PROXY_TOKEN` → [README](README.md#환경변수) |
 | `functions/.env` 채우기 | 사용자 + AI | [functions/.env.example](functions/.env.example) |
 | 카카오 알림톡 | 사용자 + AI | 재물조사용 템플릿 4종(@소셜프리즘 채널, 강조표기형)을 2026-11-21 등록 — 신청접수 `UO_1053`·승인 `UO_1054`·반려 `UO_1055`·중복신청 `UO_1056`. 문구는 [sendAlimtalk.ts](functions/src/services/alimtalk/sendAlimtalk.ts)와 글자 하나까지 같아야 한다(테스트가 지킨다). 검수 완료 뒤 `FUNCTIONS_ENV_FILE`에 `ALIMTALK_PROXY_URL`을 넣는다 |
-| Discord·Sentry | **쓰지 않기로 함 (2026-11-21)** | 처리방침 수탁자 목록에서 뺐다. 코드는 남아 있으니 `DISCORD_WEBHOOK_URL`·`VITE_SENTRY_DSN`·`SENTRY_DSN_FUNCTIONS`를 **비워 둔다** — 넣으면 처리방침에 없는 곳으로 개인정보가 나간다. 켜려면 [PrivacyPage.tsx](src/components/auth/PrivacyPage.tsx) 목록부터 되살린다 |
+| Discord·Sentry | **쓰지 않기로 함 (2026-11-21)** | 처리방침 수탁자 목록에서 뺐다. **Sentry는 코드·패키지까지 걷어냈다(2026-11-24)** — 화면 오류는 자체 [오류 기록], 서버 경보는 운영자 메일로 간다. Discord 코드는 남아 있으니 `DISCORD_WEBHOOK_URL`을 **비워 둔다** — 넣으면 처리방침에 없는 곳으로 개인정보가 나간다. 켜려면 [PrivacyPage.tsx](src/components/auth/PrivacyPage.tsx) 목록부터 되살린다 |
 | 이용약관·개인정보 처리방침 검토 | 사용자 검토 | 6단계에서 재물조사 서비스용 첫 초안으로 바꿨다(차량 처리 제거, 재물·조사 기록 처리 추가). **법률 검토와 시행일 확정**이 남았다 — 시행일은 `src/lib/constants.ts`의 `TERMS_VERSION`·`PRIVACY_VERSION` |
 | Storage 버킷 리전 | 사용자 | 처리방침 제8조는 증빙서류 사본을 **미국(us-east1)**에 둔다고 적었다. 다른 리전으로 만들면 처리방침을 고친다 |
 | 앱 아이콘 교체 | **완료 (AI)** | `public/icons/`를 재물조사 아이콘(QR+체크, `app-icon.svg`에서 PNG·maskable·apple-touch 생성)으로 바꿨다 |
 | 백업 버킷 `{프로젝트 ID}-backups` (asia-northeast3) | **완료 (2026-11-21, AI)** | `asset-survey-sp-backups` 서울·공개 차단·90일 자동 삭제([storage-lifecycle-backups.json](storage-lifecycle-backups.json)). Firestore 서비스 에이전트에 버킷 `storage.admin`, 기본 컴퓨트 계정에 `datastore.importExportAdmin`. 수동 export 시험 통과 — [dailyNightlyBatch.ts](functions/src/handlers/scheduled/dailyNightlyBatch.ts) |
 | `auditLogs` TTL 정책 (`expiresAt`) | **배포가 자동으로 건다** | 접속기록 1년 보관(`RETENTION_DAYS = 365`). [firestore.indexes.json](firestore.indexes.json)의 `fieldOverrides`(`ttl: true`)라 인덱스 배포 때 함께 적용된다(`_rateLimits`도 같다). asset-survey-sp는 첫 배포(2026-11-21)에 ACTIVE 확인 — `gcloud firestore fields ttls list` |
-| GitHub 저장소·Actions Secrets | 사용자 | `ENV_FILE` · `FUNCTIONS_ENV_FILE` · `FIREBASE_SERVICE_ACCOUNT` · `SENTRY_AUTH_TOKEN` |
+| GitHub 저장소·Actions Secrets | 사용자 | `ENV_FILE` · `FUNCTIONS_ENV_FILE` · `FIREBASE_SERVICE_ACCOUNT` (예전 `SENTRY_AUTH_TOKEN`은 더 이상 쓰지 않으니 지워도 된다) |
 
 ## 2. 처음 배포까지 — 단계별
 
@@ -70,8 +70,8 @@
    - **첫 배포 뒤 호출형(onCall) 함수의 공개 호출 권한을 확인한다.** 첫 배포가 여러 번 실패·재시도하는 동안 22개 중 19개가 `allUsers` → Cloud Run 호출자 권한 없이 만들어졌고, 이후 배포는 이미 있는 함수의 권한을 다시 걸지 않는다. 증상은 앱에서 서버 함수를 부를 때 **CORS 오류**(사전 요청 403)다. 확인: `gcloud run services get-iam-policy <함수 이름 소문자> --region asia-northeast3`. 고침: 호출형 함수마다 `gcloud run services add-iam-policy-binding <이름> --region asia-northeast3 --member=allUsers --role=roles/run.invoker`. 이벤트·스케줄 함수에는 붙이지 않는다.
 2. 그 계정의 **키(JSON)**를 만든다.
 3. GitHub 저장소 → Settings → Secrets and variables → Actions:
-   - **Secrets**: `FIREBASE_SERVICE_ACCOUNT`(키 JSON 전체), `ENV_FILE`(완성한 `.env` 전체), `FUNCTIONS_ENV_FILE`(완성한 `functions/.env` 전체), `SENTRY_AUTH_TOKEN`(Sentry를 쓰면)
-   - **Variables**: `FIREBASE_PROJECT_ID`, (Sentry를 쓰면) `SENTRY_ORG` · `SENTRY_PROJECT` · `SENTRY_PROJECT_FUNCTIONS`
+   - **Secrets**: `FIREBASE_SERVICE_ACCOUNT`(키 JSON 전체), `ENV_FILE`(완성한 `.env` 전체), `FUNCTIONS_ENV_FILE`(완성한 `functions/.env` 전체)
+   - **Variables**: `FIREBASE_PROJECT_ID`
 4. 키 JSON 파일은 PC에서 지운다.
 
 ### 2.5 첫 배포와 확인 (AI + 사용자)

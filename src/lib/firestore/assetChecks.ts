@@ -2,13 +2,13 @@
  * Firestore — 재물 마지막 확인(assetChecks) 도메인 함수 (2026-11-22, 상시 확인 기록)
  *
  * 쓰기는 같은 기관 구성원이면 누구나(관리자·직원), 본인 이름·서버 시각으로만(firestore.rules `assetChecks`).
- * 확인 기록은 화면 흐름을 막으면 안 되므로 기다리지 않고 보낸다 — 실패해도 사용자에게 알리지 않고 Sentry에만 남긴다
+ * 확인 기록은 화면 흐름을 막으면 안 되므로 기다리지 않고 보낸다 — 실패해도 사용자에게 알리지 않고 오류 보고에만 남긴다
  * (재물 화면은 그대로 열려야 한다). 오프라인이면 Firestore가 들고 있다가 연결되면 보낸다.
  */
 import { collection, doc, getDoc, getDocs, query, setDoc, where, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { createZodConverter, assetCheckSchema } from '../../schemas';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 import { actorStamp } from './actorStamp';
 import type { AssetCheck, AssetCheckVia } from '../../types/assetCheck';
 

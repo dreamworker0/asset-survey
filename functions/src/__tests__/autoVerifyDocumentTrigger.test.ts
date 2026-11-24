@@ -43,7 +43,7 @@ jest.mock('../services/orgDocument/verifyHelpers', () => ({
     sendApprovalEmailServer: (...a: unknown[]) => mockApprovalEmail(...a),
     sendRejectionEmail: (...a: unknown[]) => mockRejectionEmail(...a),
 }));
-jest.mock('../core/sentry', () => ({ captureError: jest.fn(), flushSentry: jest.fn() }));
+jest.mock('../core/monitoring', () => ({ captureError: jest.fn() }));
 jest.mock('firebase-admin/auth', () => ({ getAuth: jest.fn() }));
 jest.mock('firebase-functions/firestore', () => ({ onDocumentWritten: (_o: unknown, handler: unknown) => handler }));
 

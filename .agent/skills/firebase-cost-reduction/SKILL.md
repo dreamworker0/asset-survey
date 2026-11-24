@@ -52,9 +52,9 @@ PR 프리뷰/임시 배포 채널은 만료 설정 없이 두면 Storage·Hostin
 - 업로드 이미지·임시 산출물은 Storage 수명주기 규칙으로 자동 삭제한다 → [storage-lifecycle 워크플로우](../../workflows/storage-lifecycle.md).
 - Gemini OCR은 호출당 과금이므로 호출 전 캐시/중복 방지를 확인한다 → [gemini-ocr-integration](../gemini-ocr-integration/SKILL.md), [ocr-cost-security 규칙](../../rules/ocr-cost-security.md).
 
-## 5. 모니터링 쿼터 (Sentry 등)
+## 5. 오류 보고 쓰기 (clientErrors)
 
-Sentry 이벤트 한도도 비용/쿼터 요인이다. 노이즈 에러가 한도를 잠식하지 않도록 [sentry-noise-filter](../sentry-noise-filter/SKILL.md)로 필터링한다.
+화면 오류 보고는 `reportClientError` 함수 호출 1번 + `clientErrors` 쓰기 1번이다(30일 TTL). 노이즈가 쓰기·함수 호출을 잠식하지 않도록 [error-noise-filter](../error-noise-filter/SKILL.md)로 거른다. 한 화면에서 같은 오류는 한 번, 모두 합쳐 15건까지만 보낸다(`errorReport.ts`).
 
 ## 6. 콜드스타트 번들 비용 — 무거운 패키지는 최상단에서 import하지 않는다
 
@@ -65,7 +65,7 @@ Cloud Functions v2는 Cloud Run으로 과금되고, **인스턴스 기동 시간
 | 패키지 | 로드 시간 | 실제 사용 함수 |
 |---|---|---|
 | `googleapis` | **874 ms** | 캘린더 관련 2곳 |
-| `@sentry/node` | 316 ms | 전역(필요) |
+| `@sentry/node` | 316 ms | 전역 — 2026-11-24 제거 |
 | `firebase-functions` | 264 ms | 전역(필요) |
 | `@google/genai` | 99 ms | Gemini 계열 소수 |
 

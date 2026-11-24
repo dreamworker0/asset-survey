@@ -17,7 +17,7 @@ import type { PreRegisteredEmployee } from '../lib/firestore/preRegistered';
 import { invalidateCache } from '../lib/firestore/cache';
 import type { User, UserRole, MemberStatus, UnifiedMember } from '../types/user';
 import type { Organization } from '../types/organization';
-import { captureError } from '../lib/sentry';
+import { captureError } from '../lib/monitoring';
 import { APP_URL } from '../lib/constants';
 
 /**
@@ -158,7 +158,7 @@ export default function useEmployeeManager() {
     /**
      * 이미 사라진 직원 행에서 실패했을 때의 공통 처리.
      *
-     * 안내 문구를 띄우고 목록을 다시 읽어 유령 행을 걷어낸다. Sentry 보고도 생략한다 —
+     * 안내 문구를 띄우고 목록을 다시 읽어 유령 행을 걷어낸다. 오류 보고도 생략한다 —
      * 서버가 규칙대로 거부한 예상된 결과이지 코드 결함이 아니다(isTargetUserMissing 주석 참고).
      * 대상이 같은 기관에 그대로 있는데 거부된 permission-denied는 여기 걸리지 않고 지금처럼 보고된다.
      *

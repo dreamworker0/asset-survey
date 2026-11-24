@@ -7,7 +7,7 @@
 import { auth } from '../firebase';
 import { getLastTokenRefreshFailure } from '../tokenRefresh';
 import { wasIntentionalLogout } from '../auth';
-import { captureError, captureWarning } from '../sentry';
+import { captureError, captureWarning } from '../monitoring';
 import { useToastStore } from '../../store/useToastStore';
 
 /**

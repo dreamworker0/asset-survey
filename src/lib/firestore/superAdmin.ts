@@ -8,7 +8,7 @@ import {
     type DocumentData,
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 import { actorStamp } from './actorStamp';
 
 /** 전체 슈퍼관리자 목록 조회 */

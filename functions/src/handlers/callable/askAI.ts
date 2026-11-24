@@ -10,7 +10,7 @@
  *    "규칙을 무시하라" 같은 글이 지시로 섞이지 않게 한다. 질문도 위생 처리한다.
  *  - 기관 소속(토큰 orgId)이 있어야 부를 수 있다.
  *  - 분 단위 한도(wrapCallableHandler)에 더해 **사용자당 일일 한도**를 건다. 둘 다 fail-closed.
- *  - 질문 글은 로그·Sentry·Discord 어디에도 남기지 않는다(개인정보를 적었을 수 있다).
+ *  - 질문 글은 로그·Discord 어디에도 남기지 않는다(개인정보를 적었을 수 있다).
  *    Gemini 오류도 메시지 원문 대신 오류 종류만 남긴다.
  */
 import { GEMINI_API_KEY } from "../../core/params";

@@ -96,7 +96,7 @@ const FUNCTIONS: FunctionEntry[] = [
     name: 'reportClientError',
     type: 'onCall',
     file: 'handlers/callable/reportClientError.ts',
-    description: '앱 화면에서 난 오류 요약(이름·문구·기능·코드·스택 앞부분·화면 경로·버전)을 받아 같은 오류끼리 `clientErrors/{묶음 열쇠}`에 횟수·처음/마지막 시각·브라우저 종류·겪은 기관과 함께 센다. Sentry를 쓰지 않아 생긴 운영 관측 공백을 메운다. 이메일·전화번호·긴 ID는 지우고 uid는 받지 않으며, 기관은 로그인 토큰에서만 읽는다. 30일 TTL(expiresAt). 로그인 전 오류도 받도록 인증·App Check를 요구하지 않고 IP당 시간당 60회·전역 시간당 600회로 막는다. 한도 초과·저장 실패도 오류를 던지지 않는다.',
+    description: '앱 화면에서 난 오류 요약(이름·문구·기능·코드·스택 앞부분·화면 경로·버전)을 받아 같은 오류끼리 `clientErrors/{묶음 열쇠}`에 횟수·처음/마지막 시각·브라우저 종류·겪은 기관과 함께 센다. Sentry 없이 운영 관측을 맡는다. 이메일·전화번호·긴 ID는 지우고 uid는 받지 않으며, 기관은 로그인 토큰에서만 읽는다. 30일 TTL(expiresAt). 로그인 전 오류도 받도록 인증·App Check를 요구하지 않고 IP당 시간당 60회·전역 시간당 600회로 막는다. 한도 초과·저장 실패도 오류를 던지지 않는다.',
     auth: '없음(로그인 전 화면 포함) — IP·전역 상한',
     params: '{ name?, message, where?, code?, stack?, path?, version? }',
     returns: '{ ok: boolean }',

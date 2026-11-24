@@ -12,7 +12,7 @@
 import { getStorage } from "firebase-admin/storage";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { getKSTDateString } from "../../utils/kstDate";
-import { captureWarning } from "../../core/sentry";
+import { captureWarning } from "../../core/monitoring";
 import { runStep, logBatchResult, noteBatchAlert } from "../../utils/batchStep";
 import { GMAIL_APP_PASSWORD } from "../../core/params";
 import { purgeOrganizationData, OrgNotRetiredError, type PurgeBucket } from "../../services/organization/purgeOrganizationData";
@@ -78,7 +78,7 @@ function isPermissionDenied(e: unknown): boolean {
 /**
  * export 실패를 **행동 가능한** 메시지로 바꾼다.
  *
- * 이 알림은 매일 밤 Sentry·Discord로 나가는데, 원문(`7 PERMISSION_DENIED: The caller does not
+ * 이 알림은 운영자 메일(·Discord)로 나가는데, 원문(`7 PERMISSION_DENIED: The caller does not
  * have permission`)만으로는 받는 사람이 문서를 뒤져야 한다. 그런데 여기까지 왔다는 것은 이미
  * **원인이 하나로 좁혀졌다는 뜻**이다 — 버킷 부재는 앞의 `exists()`에서 걸리고, 리전 불일치는
  * PERMISSION_DENIED가 아니라 `... is in location ...` 400으로 온다. 남는 것은 IAM뿐이다.
@@ -114,7 +114,7 @@ export function describeExportFailure(e: unknown, outputUri: string, projectId: 
  * "오늘 배치가 두 번 돌았다"는 뜻이고 그건 정상이 아니다.
  *
  * 이 알림이 필요한 이유는 **OOM·타임아웃이 스스로를 신고하지 못하기 때문**이다. 인스턴스가
- * 통째로 죽으면 `runStep`의 catch도 `captureError`도 실행될 기회가 없어 Sentry·Discord에
+ * 통째로 죽으면 `runStep`의 catch도 `captureError`도 실행될 기회가 없어 메일·Discord에
  * 아무것도 남지 않는다. 2026-08-15의 OOM을 우리가 알아챈 유일한 경로는 재실행이 낸
  * "Path already exists" 오알림이었는데, 그 오알림을 없애면서 **유일한 탐지 수단까지 사라졌다.**
  * 그 자리를 이 경고가 대신한다 — 없으면 다음 OOM은 아무도 모르는 채 집계·통계 비용만 두 배로 나간다.
@@ -308,7 +308,7 @@ export async function backupFirestoreData() {
             warnDuplicateRun("다른 실행이 이미 export를 걸어 건너뜀", outputUri);
             return;
         }
-        // 대상 URI를 에러 메시지에 실어야 Sentry만 보고도 버킷 오지정·위치 불일치·IAM 누락을 구분할 수 있다.
+        // 대상 URI를 에러 메시지에 실어야 알림만 보고도 버킷 오지정·위치 불일치·IAM 누락을 구분할 수 있다.
         // PERMISSION_DENIED면 원인이 IAM 하나로 좁혀지므로 조치 명령까지 함께 싣는다.
         throw new Error(describeExportFailure(e, outputUri, projectId, bucketName), { cause: e });
     }

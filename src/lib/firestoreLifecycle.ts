@@ -13,7 +13,7 @@
  * SDK 내부 필드(`db._terminated`)에 기대지 않고, terminate() 직전에 우리가 표시한다 —
  * terminate()를 await하는 동안에도 이미 종료 의도가 확정된 구간이므로 함께 막아야 한다.
  *
- * **왜 별도 모듈인가.** firebase.ts에 두면 이 플래그를 읽어야 하는 sentry.ts가
+ * **왜 별도 모듈인가.** firebase.ts에 두면 이 플래그를 읽어야 하는 모듈(예전의 sentry.ts 등)이
  * Firebase 초기화 모듈을 정적으로 끌어와, 지연 로딩·청크 분리(firebase-db 등)가 무너진다.
  * 의존성이 없는 이 모듈은 어느 쪽에서 import해도 부작용이 없다.
  */

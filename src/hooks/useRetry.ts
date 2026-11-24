@@ -4,7 +4,7 @@
  */
 import { useCallback, useEffect, useRef } from 'react';
 import { useToast } from './useToast';
-import { captureError } from '../lib/sentry';
+import { captureError } from '../lib/monitoring';
 
 interface RetryRunOptions {
     errorMessage?: string;
@@ -13,7 +13,7 @@ interface RetryRunOptions {
     /** 실행 타임아웃 (밀리초). 지정하지 않으면 대기(pending)합니다. */
     timeoutMs?: number;
     /**
-     * Sentry 보고 여부를 호출부가 판단한다. false를 반환하면 보고를 생략한다(기본: 보고).
+     * 오류 보고 여부를 호출부가 판단한다. false를 반환하면 보고를 생략한다(기본: 보고).
      *
      * **예상된 결과를 걸러내는 용도다.** 서버가 규칙대로 거부한 것(이미 삭제된 대상,
      * 중복 요청 등)은 코드 결함이 아니라 사용자에게 안내할 상태다. 그런 건까지 error로
@@ -85,12 +85,11 @@ export default function useRetry({ maxRetries = 2, retryLabel = '재시도' } = 
             if (isTimeoutOrDuplicate) {
                 console.warn(`[useRetry:${key}] ${err.message}`);
             } else if (opts.shouldReport && !opts.shouldReport(err)) {
-                // 호출부가 예상된 결과로 판정 — 콘솔에는 남기고 Sentry로는 올리지 않는다.
+                // 호출부가 예상된 결과로 판정 — 콘솔에는 남기고 오류 보고로는 올리지 않는다.
                 console.warn(`[useRetry:${key}] 예상된 실패로 보고를 생략합니다:`, err);
             } else {
                 console.error(`[useRetry:${key}]`, err);
-                // `key`가 아니라 `retryKey`로 넘긴다 — sentryScrub의 허용 목록은 일반 명사를
-                // 담지 않는다(어떤 문서에든 같은 이름의 자유 입력이 생길 수 있다).
+                // 오류 보고는 context 중 기능 이름(`context`)만 보낸다 — retryKey·횟수는 콘솔 진단용이다.
                 captureError(err, { retryKey: key, retryCount: retryCountRef.current.get(key) || 0, context: 'useRetry' });
             }
 

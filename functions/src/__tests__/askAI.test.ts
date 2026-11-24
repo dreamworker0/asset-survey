@@ -22,9 +22,8 @@ jest.mock('../utils/constants', () => ({
     ...jest.requireActual('../utils/constants'),
     getRateLimits: jest.fn(async (key: string) => (key === 'askAIDaily' ? { max: 20, windowSec: 86400 } : { max: 5, windowSec: 60 })),
 }));
-jest.mock('../core/sentry', () => ({
+jest.mock('../core/monitoring', () => ({
     captureError: (...args: unknown[]) => mockCaptureError(...args),
-    flushSentry: jest.fn().mockResolvedValue(undefined),
 }));
 jest.mock('firebase-admin/auth', () => ({ getAuth: jest.fn() }));
 jest.mock('firebase-admin/firestore', () => ({ getFirestore: jest.fn(), FieldValue: {} }));
@@ -59,7 +58,7 @@ beforeEach(() => {
 });
 afterEach(() => jest.restoreAllMocks());
 
-/** 콘솔·Sentry로 나간 모든 내용을 한 문자열로 */
+/** 콘솔·오류 보고로 나간 모든 내용을 한 문자열로 */
 function everythingLogged(): string {
     return JSON.stringify([...logSpies.map((s) => s.mock.calls), mockCaptureError.mock.calls]);
 }
@@ -167,7 +166,7 @@ describe('askAI — Gemini 실패와 개인정보', () => {
         });
     });
 
-    it('질문 글은 실패해도 성공해도 로그·Sentry에 남지 않는다', async () => {
+    it('질문 글은 실패해도 성공해도 로그·오류 보고에 남지 않는다', async () => {
         const secretQuestion = '홍길동 010-1234-5678 라벨 인쇄';
         mockGenerateAiContent.mockRejectedValueOnce(new Error('boom'));
         await expect(ask({ auth: employee, data: { question: secretQuestion } })).rejects.toBeDefined();

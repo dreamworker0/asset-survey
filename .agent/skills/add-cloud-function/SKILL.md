@@ -12,7 +12,7 @@ description: functions/src/ 디렉터리에 새 Cloud Function(스케줄 포함)
 ```
 functions/src/
 ├── index.ts        ← 엔트리 (모든 Cloud Function을 re-export — 여기 없으면 배포 안 됨)
-├── core/           ← 횡단 인프라 (sentry, mailer, discord, gemini, params 등)
+├── core/           ← 횡단 인프라 (monitoring, mailer, adminAlertMail, discord, gemini, params 등)
 ├── handlers/       ← 함수 진입점 — callable/ · https/ · scheduled/ · sync/ · triggers/
 ├── services/       ← 도메인 비즈니스 로직 (driveLog, calendar, alimtalk 등)
 ├── utils/          ← 순수 유틸 (constants, helpers, rateLimit, clientIp 등)

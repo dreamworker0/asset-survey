@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import type { QueryDocumentSnapshot, DocumentData, FirestoreDataConverter } from 'firebase/firestore';
-import { captureError } from '../lib/sentry';
+import { captureError } from '../lib/monitoring';
 
 export * from './common';
 export * from './user';
@@ -35,7 +35,7 @@ export function createZodConverter<T extends z.ZodObject<any>>(schema: T): Fires
             const data = snapshot.data() || {};
             const parsed = schema.safeParse(data);
             if (!parsed.success) {
-                // 파싱에 실패하더라도 애플리케이션 크래시를 막기 위해 Sentry에 경고성으로만 로깅합니다.
+                // 파싱에 실패하더라도 애플리케이션 크래시를 막기 위해 오류 보고에 경고성으로만 남깁니다.
                 const firstError = parsed.error.issues[0];
                 const errorDetail = firstError ? `${firstError.path.join('.')}: ${firstError.message}` : 'Unknown Zod Error';
                 const errorMsg = `[Zod] Parsing failed for ${snapshot.ref.path} - ${errorDetail}`;

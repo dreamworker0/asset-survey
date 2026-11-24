@@ -16,9 +16,8 @@ jest.mock('../utils/rateLimit', () => ({
 jest.mock('../utils/constants', () => ({
     getRateLimits: jest.fn().mockResolvedValue({ max: 5, windowSec: 3600 }),
 }));
-jest.mock('../core/sentry', () => ({
+jest.mock('../core/monitoring', () => ({
     captureError: jest.fn(),
-    flushSentry: jest.fn().mockResolvedValue(undefined),
 }));
 jest.mock('firebase-admin/auth', () => ({ getAuth: jest.fn() }));
 

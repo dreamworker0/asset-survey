@@ -5,13 +5,13 @@
  * 규약을 공유하도록 dailyNightlyBatch에 있던 runStep을 여기로 옮겼다. `context`만 배치별로
  * 다르게 넘긴다.
  */
-import { captureError, flushSentry } from "../core/sentry";
+import { captureError } from "../core/monitoring";
 import { sendAdminAlertMail } from "../core/adminAlertMail";
 
 /**
  * 이번 배치에서 운영자가 알아야 할 것 — 끝날 때 메일 1통으로 묶어 보낸다.
  *
- * Discord·Sentry를 비워 둔 운영(OPERATIONS.md)에서는 captureError·captureWarning이 아무 데도
+ * Discord를 비워 둔 운영(OPERATIONS.md)에서는 captureError·captureWarning이 아무 데도
  * 닿지 않는다. 스텝 실패와 스텝 안의 중요한 경고(기관 파기 실패 등)를 여기에 모아 두었다가
  * logBatchResult가 Gmail로 보낸다. 배치 하나에 메일 1통이라 기관 루프가 길어도 쏟아지지 않는다.
  *
@@ -59,15 +59,12 @@ export async function runStep(
 }
 
 /**
- * 배치 종료 처리 — 결과를 한 줄로 남기고, 모은 경보를 메일로 보내고, 스텝들이 남긴 보고를 전송한다.
+ * 배치 종료 처리 — 결과를 한 줄로 남기고, 모은 경보를 메일로 보낸다.
  * 실패 스텝이 있으면 error로 올린다.
  *
- * **flush가 여기 있는 이유**: Sentry 전송은 비동기라 핸들러가 반환하면 Cloud Run 인스턴스가
- * 동결·종료되면서 버퍼가 그대로 사라진다. HTTPS·콜러블은 utils/helpers의
- * wrapHttps·wrapCallableHandler가 경계에서 flush하지만 **스케줄 함수는 그 래퍼를 거치지 않는다.**
- * 그러면 runStep이 captureError로 올린 백업 실패가 전송 전에 없어져, 승격해 둔 의미가 사라진다.
- * 세 배치가 모두 마지막에 이 함수를 부르므로 여기가 공통 경계다 — 호출부는 반드시 await 한다.
- * 메일도 같은 이유로 여기서 기다린다. 이 함수를 부르는 배치는 `secrets: [GMAIL_APP_PASSWORD]`가 필요하다.
+ * **메일을 여기서 기다리는 이유**: 핸들러가 반환하면 Cloud Run 인스턴스가 동결·종료되면서
+ * 보내던 메일이 사라질 수 있다. 세 배치가 모두 마지막에 이 함수를 부르므로 여기가 공통 경계다 —
+ * 호출부는 반드시 await 한다. 이 함수를 부르는 배치는 `secrets: [GMAIL_APP_PASSWORD]`가 필요하다.
  */
 export async function logBatchResult(context: string, failed: string[]): Promise<void> {
     if (failed.length > 0) {
@@ -90,5 +87,4 @@ export async function logBatchResult(context: string, failed: string[]): Promise
             ],
         });
     }
-    await flushSentry();
 }

@@ -2,10 +2,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { z } from 'zod';
 import { createZodConverter } from '../../schemas/index';
-import { captureError } from '../../lib/sentry';
+import { captureError } from '../../lib/monitoring';
 
 // Sentry captureError 함수 Mocking
-vi.mock('../../lib/sentry', () => ({
+vi.mock('../../lib/monitoring', () => ({
     captureError: vi.fn(),
 }));
 

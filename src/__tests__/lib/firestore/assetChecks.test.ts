@@ -24,7 +24,7 @@ vi.mock('firebase/firestore', () => {
     };
 });
 vi.mock('../../../lib/firebase', () => ({ db: {}, auth: { currentUser: { uid: 'admin-1' } } }));
-vi.mock('../../../lib/sentry', () => ({ captureError: vi.fn() }));
+vi.mock('../../../lib/monitoring', () => ({ captureError: vi.fn() }));
 
 import * as fs from 'firebase/firestore';
 import { getAssetChecks, clearAssetCheckSnapshots, CHECK_FULL_REFRESH_MS } from '../../../lib/firestore/assetChecks';

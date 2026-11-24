@@ -8,7 +8,7 @@ import {
     type DocumentData,
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 
 // 알림 생성
 export const createNotification = async (data: Record<string, unknown>) => {

@@ -7,7 +7,6 @@ import { isFirestoreTerminated } from '../lib/firestoreLifecycle';
 import { refreshTokenSilently, refreshToken } from '../lib/tokenRefresh';
 import { handleRedirectResult, wasIntentionalLogout } from '../lib/auth';
 import { clearSessionMarkers } from '../lib/sessionBoot';
-import { setSentryUser } from '../lib/sentry';
 import { getSaTestOrgId } from '../lib/saTestMode';
 import type { User as UserDoc } from '../types/user';
 import {
@@ -79,7 +78,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
      * 저장소를 주기적으로 읽는데, 그 읽기가 빈손으로 돌아오면 "다른 탭이 로그아웃했다"로 해석해
      * null을 흘리고, 다음 읽기가 성공하면 사용자를 되살린다. 그 왕복이 유예(2초)보다 길면
      * 이 훅은 진짜 로그아웃으로 확정해 버린다. 복귀를 잡아 기록하지 않으면 이 경우와
-     * 진짜 세션 소멸이 Sentry에서 같은 이슈로 섞인다.
+     * 진짜 세션 소멸이 오류 기록에서 같은 이슈로 섞인다.
      */
     const recentDropRef = useRef<DroppedSession | null>(null);
 
@@ -160,7 +159,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUserDocState('pending');
             setOrgDeleted(false);
             setLoading(false);
-            setSentryUser(null); // 로그아웃 시 Sentry 컨텍스트 해제
         };
 
         // persistence 설정 완료 후 onAuthStateChanged 구독 시작
@@ -246,9 +244,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                                     lastUserDocRef.current = { exists: true, status: data.status as string | undefined };
                                     setUserData(data);
                                     setUserDocState('present');
-                                    // Sentry 사용자 컨텍스트 설정 (에러 추적 시 역할/기관 파악)
-                                    setSentryUser({ uid: firebaseUser.uid, email: firebaseUser.email || '', role: data.role, organizationId: data.organizationId || '' });
-
                                     // Custom Claims 토큰 갱신: 초기 로드는 불일치 시 백그라운드 갱신, 이후 role/orgId 변경은 강제 갱신
                                     prevClaimsRef.current = syncClaimsWithUserDoc(firebaseUser, data, prevClaimsRef.current);
 

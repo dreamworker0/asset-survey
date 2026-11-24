@@ -18,7 +18,7 @@ import {
 } from '../lib/firestore';
 import type { AuditLogKind } from '../lib/firestore';
 import type { AuditLog } from '../types/auditLog';
-import { captureError } from '../lib/sentry';
+import { captureError } from '../lib/monitoring';
 import { isStaleChunkError, STALE_CHUNK_MESSAGE } from '../lib/staleChunk';
 
 /**

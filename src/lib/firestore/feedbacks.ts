@@ -7,7 +7,7 @@ import {
     orderBy, limit, serverTimestamp,
 } from 'firebase/firestore';
 import { db } from '../firebase';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 import type { Feedback, CreateFeedbackData } from '../../types/feedback';
 
 // 피드백 생성

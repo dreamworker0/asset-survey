@@ -11,7 +11,7 @@ import { db, firebaseFunctions } from '../firebase';
 import type { Organization } from '../../types/organization';
 import type { WithServerTimestamps } from '../../types/common';
 import { createZodConverter, organizationSchema } from '../../schemas';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 
 const orgConverter = createZodConverter(organizationSchema);
 

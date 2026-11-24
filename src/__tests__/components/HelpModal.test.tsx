@@ -19,7 +19,7 @@ vi.mock('@/lib/callableRetry', async (importOriginal) => ({
 }));
 vi.mock('@/lib/firebase', () => ({ auth: { currentUser: null }, firebaseFunctions: {} }));
 vi.mock('@/lib/tokenRefresh', () => ({ refreshTokenSilently: vi.fn() }));
-vi.mock('@/lib/sentry', () => ({ captureError: (...args: unknown[]) => mockCaptureError(...args) }));
+vi.mock('@/lib/monitoring', () => ({ captureError: (...args: unknown[]) => mockCaptureError(...args) }));
 
 import HelpModal from '@/components/common/HelpModal';
 import { EMPLOYEE_QUICK_GUIDE, FAQ_ITEMS } from '@/lib/faqData';

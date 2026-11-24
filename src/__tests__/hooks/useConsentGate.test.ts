@@ -14,7 +14,7 @@ vi.mock('firebase/functions', () => ({
     httpsCallable: vi.fn(() => mockAcceptFn),
 }));
 vi.mock('../../lib/firebase', () => ({ firebaseFunctions: {} }));
-vi.mock('../../lib/sentry', () => ({ captureError: vi.fn() }));
+vi.mock('../../lib/monitoring', () => ({ captureError: vi.fn() }));
 
 const mockGetOrganization = vi.fn();
 vi.mock('../../lib/firestore', () => ({

@@ -6,7 +6,7 @@ import type { Response } from "express";
 import type { Request } from "firebase-functions/v2/https";
 import { getAuth } from "firebase-admin/auth";
 import { HttpsError, CallableRequest } from "firebase-functions/v2/https";
-import { captureError, flushSentry } from "../core/sentry";
+import { captureError } from "../core/monitoring";
 import { checkRateLimitByUid, type RateLimitFailMode } from "../utils/rateLimit";
 import { getRateLimits, type RateLimitKey } from "../utils/constants";
 
@@ -68,7 +68,6 @@ export function wrapHttps(functionName: string, handler: (req: Request, res: Res
                 method: req.method,
                 path: req.path,
             });
-            await flushSentry();
             if (!res.headersSent) {
                 res.status(500).json({ error: `${functionName} 처리 중 오류가 발생했습니다.` });
             }
@@ -110,7 +109,6 @@ export function wrapHandler<T extends unknown[], R>(functionName: string, handle
                 throw err; // 거부 사유를 그대로 호출자에게 전달
             }
             log("ERROR", functionName, error.message, { stack: error.stack });
-            await flushSentry();
             throw err; // 호출자에게 에러 전파
         }
     };
@@ -171,8 +169,7 @@ export function wrapCallableHandler<T, R>(
             if (err instanceof HttpsError) {
                 if (isServerFailure(err)) {
                     log("ERROR", functionName, err.message, { stack: err.stack });
-                    await flushSentry();
-                } else {
+                        } else {
                     log("WARNING", functionName, err.message, { code: err.code });
                 }
                 throw err;
@@ -180,7 +177,6 @@ export function wrapCallableHandler<T, R>(
             
             const error = err as Error;
             log("ERROR", functionName, error.message, { stack: error.stack });
-            await flushSentry();
             throw new HttpsError("internal", `${functionName} 처리 중 오류가 발생했습니다.`);
         }
     };

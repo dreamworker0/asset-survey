@@ -11,7 +11,7 @@
 import { describe, it, expect, vi } from 'vitest';
 
 vi.mock('../../../lib/firebase', () => ({ db: {} }));
-vi.mock('../../../lib/sentry', () => ({ captureError: vi.fn() }));
+vi.mock('../../../lib/monitoring', () => ({ captureError: vi.fn() }));
 
 import { generateInviteCode } from '../../../lib/firestore/organizations';
 

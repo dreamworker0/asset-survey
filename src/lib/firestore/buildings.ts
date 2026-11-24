@@ -12,7 +12,7 @@ import {
 import { db } from '../firebase';
 import { createZodConverter, buildingSchema } from '../../schemas';
 import { sortBuildings, normalizeBuildingText } from '../buildingFloors';
-import { captureError } from '../sentry';
+import { captureError } from '../monitoring';
 import { actorStamp } from './actorStamp';
 import type { Building, BuildingPatch } from '../../types/building';
 

@@ -49,11 +49,11 @@ vi.mock('firebase/functions', () => ({
 }));
 
 vi.mock('../../../lib/firebase', () => ({ db: {}, firebaseFunctions: { __tag: 'functions' } }));
-vi.mock('../../../lib/sentry', () => ({ captureError: vi.fn() }));
+vi.mock('../../../lib/monitoring', () => ({ captureError: vi.fn() }));
 
 import * as fs from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
-import { captureError } from '../../../lib/sentry';
+import { captureError } from '../../../lib/monitoring';
 import {
     findOrganizationByInviteCode,
     regenerateInviteCode,

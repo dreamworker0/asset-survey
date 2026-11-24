@@ -19,7 +19,7 @@ vi.mock('firebase/functions', () => ({
     },
 }));
 vi.mock('../../lib/firebase', () => ({ firebaseFunctions: {}, db: {}, auth: {} }));
-vi.mock('../../lib/sentry', () => ({ captureError: mocks.captureError }));
+vi.mock('../../lib/monitoring', () => ({ captureError: mocks.captureError }));
 
 import { recordExport } from '../../lib/audit/recordExport';
 

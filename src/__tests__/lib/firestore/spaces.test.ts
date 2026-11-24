@@ -32,10 +32,10 @@ vi.mock('firebase/firestore', () => ({
 }));
 
 vi.mock('../../../lib/firebase', () => ({ db: {}, auth: { currentUser: { uid: 'admin-1' } } }));
-vi.mock('../../../lib/sentry', () => ({ captureError: vi.fn() }));
+vi.mock('../../../lib/monitoring', () => ({ captureError: vi.fn() }));
 
 import * as fs from 'firebase/firestore';
-import { captureError } from '../../../lib/sentry';
+import { captureError } from '../../../lib/monitoring';
 import {
     getSpaces, getMySpaces, createSpace, updateSpace, reorderSpaces,
     sortSpaces, normalizeSpaceName, validateSpaceName,

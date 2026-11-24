@@ -416,8 +416,8 @@ jobs:
 
       # ── E2E (비인증) ──
       # 오랫동안 **Chromium 데스크톱 단독**이었다. 이 앱은 PWA·오프라인·IndexedDB가 핵심인데
-      # 그 셋은 WebKit에서 동작이 가장 많이 갈리고, src/lib/sentry.ts의 무시 목록 상당수가
-      # iOS Safari IndexedDB 예외다 — 즉 그 공백은 프로덕션에서만 드러나고 있었다.
+      # 그 셋은 WebKit에서 동작이 가장 많이 갈리고, (예전) Sentry 무시 목록 상당수가
+      # iOS Safari IndexedDB 예외였다 — 즉 그 공백은 프로덕션에서만 드러나고 있었다.
       #
       # PR 게이트에는 세 프로젝트만 올린다(`npm run test:e2e`가 이 조합을 고정한다):
       #   - chromium      : 기존 동작 유지

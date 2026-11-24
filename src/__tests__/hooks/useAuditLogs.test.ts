@@ -43,7 +43,7 @@ vi.mock('../../lib/firestore', () => ({
 }));
 vi.mock('../../lib/excelExport', () => ({ downloadAuditLogsExcel: mocks.downloadAuditLogsExcel }));
 vi.mock('../../hooks/useAuth', () => ({ useAuth: () => mocks.auth }));
-vi.mock('../../lib/sentry', () => ({ captureError: mocks.captureError }));
+vi.mock('../../lib/monitoring', () => ({ captureError: mocks.captureError }));
 
 import useAuditLogs from '../../hooks/useAuditLogs';
 

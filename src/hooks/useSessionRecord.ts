@@ -27,14 +27,14 @@
  * 대신 **놓치지 않으려고 다시 부른다.** 로그인 직후는 네트워크가 가장 불안정한 구간이고
  * (부팅 요청이 몰리고, 모바일은 화면 전환으로 요청이 멈추기도 한다) 이 콜러블은 호출이
  * 드물어 콜드 스타트가 겹치기 쉽다. 같은 sessionId로 같은 문서를 덮어쓰므로 재시도가
- * 기록을 늘리지 않는다. 재시도까지 실패한 네트워크 문제는 Sentry로 올리지 않는다 —
+ * 기록을 늘리지 않는다. 재시도까지 실패한 네트워크 문제는 오류 보고로 올리지 않는다 —
  * 조치로 이어지지 않는 보고는 진짜 결함을 덮는다.
  */
 import { useEffect, useRef } from 'react';
 import { callWithRetry, isTransientCallableError, isAuthExpiredError, isRateLimitedError } from '../lib/callableRetry';
 import { useAuth } from './useAuth';
 import { auth, getAppCheckBlock } from '../lib/firebase';
-import { captureError } from '../lib/sentry';
+import { captureError } from '../lib/monitoring';
 
 const SESSION_KEY = 'auditSessionId';
 /** 이 브라우저 세션의 접속기록이 서버에 남았다는 표식. 값은 기록된 `uid:sessionId`. */

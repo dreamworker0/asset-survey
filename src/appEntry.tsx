@@ -2,7 +2,7 @@
  * appEntry — 인증된 사용자용 전체 앱 엔트리포인트
  *
  * main.tsx에서 Firebase Auth 상태 확인 후 인증 사용자일 때 동적 import됨.
- * AuthProvider, 전체 라우팅, Sentry, HelmetProvider 등 포함.
+ * AuthProvider, 전체 라우팅, 오류 보고, HelmetProvider 등 포함.
  */
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
@@ -22,15 +22,14 @@ import { auth } from './lib/firebaseAuth';
 import { loadWebFont } from './lib/webFont';
 loadWebFont();
 
-// Sentry 지연 초기화
-import('./lib/sentry').then((m) => {
-    m.initSentry();
-    // 지난 부팅에서 "세션이 없는 채로" 열렸다면(껐다 켰더니 로그인 화면) 그 증거를 지금 올린다.
-    // 그 시점은 경량 진입점이라 Sentry가 없었다 — 미뤄 두는 이유는 sessionBoot.ts에 적어 뒀다.
+// 오류 보고 지연 초기화
+import('./lib/monitoring').then((m) => {
+    m.initMonitoring();
+    // 지난 부팅에서 "세션이 없는 채로" 열렸다면(껐다 켰더니 로그인 화면) 그 증거를 지금 남긴다.
+    // 그 시점은 경량 진입점이라 오류 보고 모듈이 없었다 — 미뤄 두는 이유는 sessionBoot.ts에 적어 뒀다.
     const evidence = takePendingSessionLoss();
     if (evidence) {
-        // uid는 sentryScrub이 통과시키는 몇 안 되는 문자열이다 — 누가 겪는지가 없으면
-        // 같은 기기에서 반복되는 건지 여러 기관에 퍼진 건지 가릴 수 없다.
+        // uid가 있어야 같은 기기에서 반복되는 건지 여러 기관에 퍼진 건지 가릴 수 있다(콘솔에만 남는다).
         m.captureWarning('[Auth] 부팅 시 세션 없음 — 다시 로그인해 복귀', {
             uid: auth.currentUser?.uid ?? null,
             ...evidence,
