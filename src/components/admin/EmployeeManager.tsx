@@ -109,6 +109,11 @@ export default function EmployeeManager() {
                 <p className="text-xs text-surface-600 dark:text-surface-400 mt-1 mb-3">
                     이름·이메일·팀을 미리 등록해 두면, 직원이 초대 링크로 가입할 때 이름과 팀이 저절로 들어갑니다.
                 </p>
+                {/* 구글 로그인만 쓰므로 계정 관리가 곧 보안이다 — 공용 계정·퇴사자 방치를 막는 안내(2026-11-24) */}
+                <p className="text-xs text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-900/20 rounded-xl p-3 mb-3">
+                    <b className="font-semibold">한 사람에 구글 계정 하나</b>로 등록하세요. 여러 사람이 한 계정을 같이 쓰면 누가 찍고 승인했는지 남지 않습니다.
+                    그만두거나 다른 곳으로 옮긴 직원은 아래 목록에서 눌러 <b className="font-semibold">바로 비활성화</b>하세요.
+                </p>
                 <div className="flex flex-col sm:flex-row gap-2">
                     <button type="button" onClick={() => setShowAddForm(true)} className="btn-primary min-h-[48px] px-5">
                         + 직원 미리 등록하기

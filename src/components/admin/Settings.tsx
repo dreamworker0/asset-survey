@@ -143,6 +143,16 @@ export default function Settings() {
             <h2 className="text-sm font-semibold text-surface-700 dark:text-surface-300 mt-8 mb-3 px-1">내 계정</h2>
 
             <AccountSection />
+            {/* 관리자 계정은 기관 전체 자료를 다룬다 — 구글 2단계 인증 권고(2026-11-24) */}
+            <div className="glass-card p-4 mt-3 text-sm text-surface-700 dark:text-surface-300">
+                <p>
+                    🔐 관리자 계정은 기관 전체 재물·직원 정보를 다룹니다. 구글 계정에 <b className="font-semibold">2단계 인증</b>을 켜 두세요.
+                </p>
+                <a href="https://myaccount.google.com/signinoptions/twosv" target="_blank" rel="noopener noreferrer"
+                    className="btn-secondary min-h-[48px] px-4 mt-3 inline-flex items-center">
+                    구글 2단계 인증 설정 열기
+                </a>
+            </div>
 
             {/* 기관 ID (읽기 전용) */}
             <h2 className="text-sm font-semibold text-surface-700 dark:text-surface-300 mt-8 mb-3 px-1">기관 정보 · 해지</h2>
