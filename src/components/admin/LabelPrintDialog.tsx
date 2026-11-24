@@ -1,7 +1,7 @@
 /**
  * LabelPrintDialog — QR 라벨 인쇄 (기획서 F09)
  *
- * 목록에서 고른 재물(또는 상세의 1건)을 A4 라벨지에 인쇄한다. 규격 3종 + 직접 치수, 시작 칸(쓰다 남은
+ * 목록에서 고른 재물(또는 상세의 1건)을 A4 라벨지에 인쇄한다. 라벨지 회사 → 모델(폼텍 3종) 또는 다른 회사(직접 치수), 시작 칸(쓰다 남은
  * 라벨지), 재단선. [인쇄]를 누르면 태그가 없는 재물에 태그를 발급하고 인쇄 창을 연다.
  *
  * 인쇄 영역은 body 바로 아래에 따로 그리고(포털), 인쇄하는 동안만 나머지 화면을 숨긴다(index.css의
@@ -10,7 +10,9 @@
 import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import useLabelPrint from '../../hooks/useLabelPrint';
-import { LABEL_PRESETS, perPage, type LabelPreset, type LabelSpec } from '../../lib/labels/layout';
+import {
+    DEFAULT_LABEL_SIZE, LABEL_BRANDS, LABEL_PRESETS, brandOf, perPage, type LabelBrand, type LabelPreset, type LabelSpec,
+} from '../../lib/labels/layout';
 import LabelSheet from './LabelSheet';
 import type { Asset } from '../../types/asset';
 
@@ -81,6 +83,15 @@ export default function LabelPrintDialog({ assets, orgId, onClose, onTags, onRel
     }));
     const sub = 'text-xs text-surface-600 dark:text-surface-400';
 
+    // 회사를 바꿨다가 돌아오면 그 회사에서 고르던 모델로 — 저장값(labelSize)은 하나라 마지막 모델만 기억해 둔다
+    const brand = brandOf(lp.size);
+    const lastPreset = useRef<LabelPreset>(DEFAULT_LABEL_SIZE);
+    useEffect(() => { if (lp.size !== 'custom') lastPreset.current = lp.size; }, [lp.size]);
+    const chooseBrand = (b: LabelBrand) => {
+        if (b === brand) return;
+        lp.setSize(b === 'other' ? 'custom' : lastPreset.current);
+    };
+
     return (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => !lp.busy && onClose()} role="presentation">
             {/* Esc 닫기는 위 effect가 맡는다 (ConfirmModal과 같은 방식) */}
@@ -103,26 +114,44 @@ export default function LabelPrintDialog({ assets, orgId, onClose, onTags, onRel
                 <div className="grid gap-5 md:grid-cols-[1fr_auto]">
                     <div className="space-y-4 min-w-0">
                         <fieldset>
-                            <legend className="text-sm font-semibold text-surface-900 dark:text-surface-100 mb-2">라벨 규격</legend>
-                            <div className="space-y-2">
-                                {(Object.keys(LABEL_PRESETS) as LabelPreset[]).map((k) => {
-                                    const p = LABEL_PRESETS[k];
-                                    return (
-                                        <label key={k} className="flex items-center gap-3 min-h-[44px] text-sm text-surface-800 dark:text-surface-200">
-                                            <input type="radio" name="label-size" checked={lp.size === k} onChange={() => lp.setSize(k)} className="w-5 h-5 accent-primary-600 flex-shrink-0" />
-                                            <span>{p.label} {p.w}×{p.h}mm <span className={sub}>(A4 {p.cols * p.rows}칸)</span></span>
-                                        </label>
-                                    );
-                                })}
-                                <label className="flex items-center gap-3 min-h-[44px] text-sm text-surface-800 dark:text-surface-200">
-                                    <input type="radio" name="label-size" checked={lp.size === 'custom'} onChange={() => lp.setSize('custom')} className="w-5 h-5 accent-primary-600 flex-shrink-0" />
-                                    <span>직접 치수 <span className={sub}>(다른 라벨지 — 포장지에 적힌 치수를 넣으세요)</span></span>
-                                </label>
+                            <legend className="text-sm font-semibold text-surface-900 dark:text-surface-100 mb-2">라벨지 회사</legend>
+                            <div className="grid grid-cols-2 gap-2">
+                                {LABEL_BRANDS.map((b) => (
+                                    <label
+                                        key={b.id}
+                                        className={`flex items-center justify-center gap-2 min-h-[48px] rounded-xl border text-sm font-medium cursor-pointer has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary-500 ${brand === b.id
+                                            ? 'border-primary-600 bg-primary-50 text-primary-800 dark:border-primary-400 dark:bg-primary-900/40 dark:text-primary-100'
+                                            : 'border-surface-300 text-surface-800 dark:border-surface-600 dark:text-surface-200'}`}
+                                    >
+                                        <input type="radio" name="label-brand" className="sr-only" checked={brand === b.id} onChange={() => chooseBrand(b.id)} />
+                                        {b.name}
+                                    </label>
+                                ))}
                             </div>
                         </fieldset>
 
-                        {lp.size === 'custom' && (
+                        {brand === 'formtec' ? (
+                            <fieldset>
+                                <legend className="text-sm font-semibold text-surface-900 dark:text-surface-100 mb-2">
+                                    모델 <span className={`font-normal ${sub}`}>(포장지에 적힌 번호 — 앞의 LS·LQ 등은 매수 차이)</span>
+                                </legend>
+                                <div className="space-y-2">
+                                    {(LABEL_BRANDS.find((b) => b.id === 'formtec')?.presets ?? []).map((k) => {
+                                        const p = LABEL_PRESETS[k];
+                                        return (
+                                            <label key={k} className="flex items-center gap-3 min-h-[44px] text-sm text-surface-800 dark:text-surface-200">
+                                                <input type="radio" name="label-size" checked={lp.size === k} onChange={() => lp.setSize(k)} className="w-5 h-5 accent-primary-600 flex-shrink-0" />
+                                                <span><strong>{p.model}</strong> · {p.label} {p.w}×{p.h}mm <span className={sub}>(A4 {p.cols * p.rows}칸)</span></span>
+                                            </label>
+                                        );
+                                    })}
+                                </div>
+                            </fieldset>
+                        ) : (
                             <div>
+                                <p className="text-sm text-surface-800 dark:text-surface-200 mb-2">
+                                    포장지에 적힌 치수를 넣어 주세요. <span className={sub}>애니라벨(아이라벨)은 실제 라벨지로 위치를 확인한 뒤 목록에 넣을 예정이에요.</span>
+                                </p>
                                 <div className="grid grid-cols-2 gap-2">
                                     {CUSTOM_FIELDS.map((f) => (
                                         <label key={f.key} className="text-xs text-surface-600 dark:text-surface-300">

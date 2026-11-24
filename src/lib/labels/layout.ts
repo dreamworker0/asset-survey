@@ -23,11 +23,31 @@ export interface LabelSpec {
 
 export const A4 = { w: 210, h: 297 } as const;
 
-export const LABEL_PRESETS: Record<LabelPreset, LabelSpec & { label: string }> = {
-    small: { label: '작은', w: 38.1, h: 21.2, cols: 5, rows: 13, top: 10.7, left: 4.75, hpitch: 40.6, vpitch: 21.2 },
-    medium: { label: '중간', w: 63.5, h: 38.1, cols: 3, rows: 7, top: 15.15, left: 7.25, hpitch: 66.0, vpitch: 38.1 },
-    large: { label: '큰', w: 99.1, h: 67.7, cols: 2, rows: 4, top: 13.1, left: 4.65, hpitch: 101.6, vpitch: 67.7 },
+/**
+ * `model` — 칸 크기·칸 수가 같은 폼텍 제품 번호(공식 카탈로그 Formtec_Catalog_Kor.pdf, 2024-02 판에서 확인).
+ * 카탈로그에 여백 수치가 없어 화면은 "일반 종이로 먼저 맞춰 보라"는 안내를 유지한다.
+ */
+export const LABEL_PRESETS: Record<LabelPreset, LabelSpec & { label: string; model: string }> = {
+    small: { label: '작은', model: '3100', w: 38.1, h: 21.2, cols: 5, rows: 13, top: 10.7, left: 4.75, hpitch: 40.6, vpitch: 21.2 },
+    medium: { label: '중간', model: '3105', w: 63.5, h: 38.1, cols: 3, rows: 7, top: 15.15, left: 7.25, hpitch: 66.0, vpitch: 38.1 },
+    large: { label: '큰', model: '3114', w: 99.1, h: 67.7, cols: 2, rows: 4, top: 13.1, left: 4.65, hpitch: 101.6, vpitch: 67.7 },
 };
+
+/**
+ * 라벨지 회사 — 담당자는 "어느 회사 몇 번"으로 라벨지를 사므로 회사를 먼저 고르고 모델을 고른다
+ * (사용자 결정 2026-11-24). 저장값은 그대로 `labelSize` 하나이고 회사는 거기서 정해진다.
+ *
+ * 회사는 실제 라벨지로 시험 인쇄해 위치를 확인한 뒤에만 넣는다. 아이라벨(구 애니라벨) CL551·CL237·CL224는
+ * 판매 페이지 규격표의 여백·칸 높이가 위 값과 달라(예: 65칸 위 여백 12mm, 칸 높이 21.07mm) 시험 인쇄 뒤 추가한다.
+ */
+export type LabelBrand = 'formtec' | 'other';
+
+export const LABEL_BRANDS: Array<{ id: LabelBrand; name: string; presets: LabelPreset[] }> = [
+    { id: 'formtec', name: '폼텍', presets: ['small', 'medium', 'large'] },
+    { id: 'other', name: '다른 회사', presets: [] },
+];
+
+export const brandOf = (size: LabelSize): LabelBrand => (size === 'custom' ? 'other' : 'formtec');
 
 export const DEFAULT_LABEL_SIZE: LabelPreset = 'medium';
 

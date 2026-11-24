@@ -3,11 +3,11 @@
  */
 import { describe, it, expect } from 'vitest';
 import {
-    LABEL_PRESETS, cellPos, labelLayout, paginate, perPage, specOf, validateSpec, textEm, A4,
+    LABEL_BRANDS, LABEL_PRESETS, brandOf, cellPos, labelLayout, paginate, perPage, specOf, validateSpec, textEm, A4,
     type LabelSpec,
 } from '../../../lib/labels/layout';
 
-const { label: _l, ...MEDIUM } = LABEL_PRESETS.medium;
+const { label: _l, model: _m, ...MEDIUM } = LABEL_PRESETS.medium;
 
 describe('기본 3종', () => {
     it('모두 A4 안에 들어가고 직접 치수 검사를 통과한다', () => {
@@ -64,6 +64,18 @@ describe('validateSpec — 직접 치수', () => {
         [{ ...ok, rows: 9 }, /A4 세로/],
     ])('%o → 안내 문장', (spec, re) => {
         expect(validateSpec(spec)).toMatch(re);
+    });
+});
+
+describe('라벨지 회사', () => {
+    it('폼텍 모델은 기본 3종을 빠짐없이 한 번씩 담고, 카탈로그 번호와 같다', () => {
+        const formtec = LABEL_BRANDS.find((b) => b.id === 'formtec');
+        expect(formtec?.presets).toEqual(['small', 'medium', 'large']);
+        expect([LABEL_PRESETS.small.model, LABEL_PRESETS.medium.model, LABEL_PRESETS.large.model]).toEqual(['3100', '3105', '3114']);
+    });
+    it('직접 치수는 다른 회사, 기본 3종은 폼텍', () => {
+        expect(brandOf('custom')).toBe('other');
+        expect(['small', 'medium', 'large'].map((k) => brandOf(k as 'small'))).toEqual(['formtec', 'formtec', 'formtec']);
     });
 });
 
