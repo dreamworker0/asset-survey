@@ -127,7 +127,7 @@ export {
 export type { ManualAssetFields } from './assets';
 
 // 재물 마지막 확인 (상시 확인 기록) — QR로 열거나 조사에서 찍을 때 남긴다
-export { recordAssetCheck, getAssetCheck, getAssetChecks } from './assetChecks';
+export { recordAssetCheck, getAssetCheck, getAssetChecks, clearAssetCheckSnapshots } from './assetChecks';
 export type { RecordAssetCheckInput } from './assetChecks';
 
 // 건물 (Buildings) — 공간을 묶는 위 단계(건물 → 층 → 공간)
