@@ -4,9 +4,9 @@
  * 넓은 화면은 표, 휴대폰은 카드. 검색·공간·상태·라벨·대장에 없음으로 거르고, 고른 재물을 한꺼번에
  * 라벨 인쇄한다(공간별 인쇄는 공간으로 거른 뒤 '모두 고르기'). 건물·층 단위로도 거를 수 있다(2026-11-22).
  */
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import useAssetList, { buildingFilter, floorFilter, checkedAtOf, DEFAULT_FILTERS, type AssetFilters } from '../../hooks/useAssetList';
+import useAssetList, { buildingFilter, floorFilter, checkedAtOf, DEFAULT_FILTERS, filterAssets, type AssetFilters } from '../../hooks/useAssetList';
 import { toLocalDateStr } from '../../lib/dateUtils';
 import { groupSpacesByLocation } from '../../lib/spaceGroups';
 import { StatusBadge, MissingBadge, UsefulLifeOverBadge } from '../common/AssetBadges';
@@ -22,6 +22,11 @@ import type { Building } from '../../types/building';
 
 const sub = 'text-xs text-surface-600 dark:text-surface-400';
 const detailPath = (a: Asset) => `/admin/assets/${encodeURIComponent(a.id)}`;
+const QUICK_VIEWS = [
+    { label: '운영 전체', filters: DEFAULT_FILTERS, empty: '운영 중인 재물이 없습니다.' },
+    { label: '공간 미지정', filters: { ...DEFAULT_FILTERS, space: 'none' }, empty: '공간을 지정할 재물이 없습니다.' },
+    { label: '라벨 미발급', filters: { ...DEFAULT_FILTERS, label: 'untagged' }, empty: '라벨을 발급할 재물이 없습니다.' },
+] satisfies { label: string; filters: AssetFilters; empty: string }[];
 
 export default function AssetList() {
     const al = useAssetList();
@@ -30,6 +35,12 @@ export default function AssetList() {
     const [moving, setMoving] = useState(false);
     const unplacedCount = al.assets.filter((a) => !a.spaceId).length;
     const { filters, setFilter } = al;
+    const quickViews = useMemo(() => QUICK_VIEWS.map((view) => ({
+        ...view, count: filterAssets(al.assets, view.filters).length,
+    })), [al.assets]);
+    const currentView = quickViews.find(({ filters: view }) =>
+        view.status === filters.status && view.space === filters.space && view.label === filters.label,
+    );
     const today = todayText(); // 내용연수 지남 판단 기준일(한 번만 계산)
 
     const where = (a: Asset) => (a.spaceId ? al.spaceName.get(a.spaceId) ?? '(지운 공간)' : null);
@@ -37,6 +48,7 @@ export default function AssetList() {
     const checked = (a: Asset) => { const at = checkedAtOf(al.checks, a.id); return at ? toLocalDateStr(at) : null; };
     const allVisibleSelected = al.visible.length > 0 && al.visible.every((a) => al.selected.has(a.id));
     const filteredSelected = al.filtered.filter((a) => al.selected.has(a.id)).length;
+    const outsideResult = al.selected.size - filteredSelected;
 
     if (al.loading) {
         return <div className="flex justify-center py-20"><div className="w-8 h-8 spinner" /></div>;
@@ -56,7 +68,7 @@ export default function AssetList() {
                 <div>
                     <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">재물 목록</h1>
                     <p className="text-sm text-surface-600 dark:text-surface-400 tabular-nums" aria-live="polite">
-                        전체 {al.assets.length.toLocaleString('ko-KR')}건 · 걸러진 {al.filtered.length.toLocaleString('ko-KR')}건
+                        재물 {al.assets.length.toLocaleString('ko-KR')}건 중 {al.filtered.length.toLocaleString('ko-KR')}건 표시
                     </p>
                 </div>
                 <div className="flex gap-2">
@@ -83,38 +95,53 @@ export default function AssetList() {
                             <button type="button" className="btn-secondary min-h-[48px] px-4" onClick={() => void al.reloadChecks()}>확인 기록 다시 불러오기</button>
                         </div>
                     )}
-                    {unplacedCount > 0 && (
-                        <div className="glass-card p-3 mb-3 flex flex-wrap items-center gap-2 border border-amber-200 dark:border-amber-800/60">
-                            <p className="flex-1 min-w-[12rem] text-sm text-amber-800 dark:text-amber-300">
-                                <span aria-hidden="true">⚠️ </span>공간이 정해지지 않은 재물이 <b className="tabular-nums">{unplacedCount.toLocaleString('ko-KR')}건</b> 있습니다. 공간을 정해야 조사 대상에 들어갑니다.
-                            </p>
-                            <Link to="/admin/assets/unplaced" className="btn-secondary btn-sm min-h-[44px] px-3">위치별로 공간 정하기</Link>
+                    <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <div role="group" aria-label="운영 재물 빠른 보기" className="grid w-full grid-cols-3 gap-2 sm:flex sm:w-auto sm:flex-wrap">
+                            {quickViews.map((view) => (
+                                <button key={view.label} type="button" aria-pressed={currentView === view}
+                                    className={`${currentView === view ? 'btn-primary' : 'btn-secondary'} min-h-[48px] flex-col gap-0 px-1.5 py-1.5 text-sm sm:flex-row sm:gap-2 sm:px-3`}
+                                    onClick={() => {
+                                        al.replaceFilters(view.filters);
+                                        al.clearSelection();
+                                    }}>
+                                    <span>{view.label}</span>{' '}<span className="text-xs tabular-nums sm:text-sm">{view.count.toLocaleString('ko-KR')}건</span>
+                                </button>
+                            ))}
                         </div>
+                        {unplacedCount > 0 && (
+                            <Link to="/admin/assets/unplaced" className="btn-ghost min-h-[48px] px-3 text-sm">위치별로 공간 정하기</Link>
+                        )}
+                    </div>
+                    {filters.space === 'none' && al.filtered.length > 0 && (
+                        <p className="mb-3 text-sm text-surface-600 dark:text-surface-400">공간을 정하면 운영 재물을 조사 대상에 넣을 수 있습니다.</p>
                     )}
                     <Filters filters={filters} setFilter={setFilter} spaces={al.spaces} buildings={al.buildings} onReset={al.resetFilters} />
 
                     <div className="glass-card p-3 mb-3 flex flex-wrap items-center gap-2 sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-10">
                         <span className="text-sm font-medium text-surface-800 dark:text-surface-200 mr-auto" aria-live="polite">
-                            {al.selected.size > 0 ? `${al.selected.size.toLocaleString('ko-KR')}건 고름` : '라벨을 뽑을 재물을 고르세요'}
+                            {al.selected.size.toLocaleString('ko-KR')}건 고름
+                            {outsideResult > 0 && ` · 현재 결과 밖 ${outsideResult.toLocaleString('ko-KR')}건 포함`}
                         </span>
-                        <button type="button" className="btn-secondary btn-sm min-h-[44px] px-3" onClick={al.selectFiltered}
+                        <button type="button" className="btn-secondary btn-sm min-h-[48px] px-3" onClick={al.selectFiltered}
                             disabled={al.filtered.length === 0 || filteredSelected === al.filtered.length}>
                             걸러진 {al.filtered.length.toLocaleString('ko-KR')}건 모두 고르기
                         </button>
                         {al.selected.size > 0 && (
-                            <button type="button" className="btn-secondary btn-sm min-h-[44px] px-3" onClick={al.clearSelection}>고르기 해제</button>
+                            <button type="button" className="btn-secondary btn-sm min-h-[48px] px-3" onClick={al.clearSelection}>고르기 해제</button>
                         )}
                         {al.selected.size > 0 && (
-                            <button type="button" className="btn-secondary btn-sm min-h-[44px] px-3" onClick={() => setMoving(true)}>공간 옮기기</button>
+                            <button type="button" className="btn-secondary btn-sm min-h-[48px] px-3" onClick={() => setMoving(true)}>공간 옮기기</button>
                         )}
-                        <button type="button" className="btn-primary btn-sm min-h-[44px] px-4" onClick={() => setPrinting(true)} disabled={al.selected.size === 0}>
+                        <button type="button" className="btn-primary btn-sm min-h-[48px] px-4" onClick={() => setPrinting(true)} disabled={al.selected.size === 0}>
                             라벨 인쇄
                         </button>
                     </div>
 
                     {al.filtered.length === 0 ? (
                         <div className="glass-card p-6 text-center">
-                            <p className="text-sm text-surface-700 dark:text-surface-300 mb-3">조건에 맞는 재물이 없습니다.</p>
+                            <p className="text-sm text-surface-700 dark:text-surface-300 mb-3">
+                                {currentView?.count === 0 ? currentView.empty : '조건에 맞는 재물이 없습니다.'}
+                            </p>
                             <button type="button" className="btn-secondary min-h-[48px] px-5" onClick={al.resetFilters}>거르기 조건 초기화</button>
                         </div>
                     ) : (
@@ -318,8 +345,8 @@ function Filters({ filters, setFilter, spaces, buildings, onReset }: FiltersProp
                     라벨
                     <select className="input min-h-[48px] mt-1" value={filters.label} onChange={(e) => setFilter('label', e.target.value as AssetFilters['label'])}>
                         <option value="all">전체</option>
-                        <option value="untagged">라벨 없음</option>
-                        <option value="tagged">라벨 있음</option>
+                        <option value="untagged">라벨 미발급</option>
+                        <option value="tagged">라벨 발급됨</option>
                     </select>
                 </label>
                 <label className={label}>

@@ -168,7 +168,11 @@ export default function useAssetList() {
         setFilters((prev) => ({ ...prev, [key]: value }));
         setShown(LIST_PAGE);
     }, []);
-    const resetFilters = useCallback(() => { setFilters(DEFAULT_FILTERS); setShown(LIST_PAGE); }, []);
+    const replaceFilters = useCallback((next: AssetFilters) => {
+        setFilters(next);
+        setShown(LIST_PAGE);
+    }, []);
+    const resetFilters = useCallback(() => replaceFilters(DEFAULT_FILTERS), [replaceFilters]);
 
     const toggle = useCallback((id: string) => {
         setSelected((prev) => {
@@ -206,7 +210,7 @@ export default function useAssetList() {
 
     return {
         orgId, assets, spaces, buildings, spaceName, checks, checksError, reloadChecks, loading, error, reload: load, applySpace,
-        filters, setFilter, resetFilters, filtered,
+        filters, setFilter, replaceFilters, resetFilters, filtered,
         visible: filtered.slice(0, shown), hasMore: filtered.length > shown, showMore: () => setShown((n) => n + LIST_PAGE),
         selected, toggle, setMany, selectFiltered, clearSelection, selectedAssets, applyTags,
     };
