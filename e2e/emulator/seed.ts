@@ -82,3 +82,54 @@ export async function seedEmulator(): Promise<void> {
 
 
 }
+
+/**
+ * 조사 흐름 E2E(authed-survey-flow)용 공간 두 곳을 만든다 — 실행마다 이름이 다르다.
+ *
+ * globalSetup의 공통 시드에 고정 이름으로 두지 않은 이유: 다른 인증 E2E가 같은 기관을 쓰고, CI는 실패한
+ * 테스트를 같은 에뮬레이터에서 한 번 더 돌린다. 이름이 고정이면 재시도 때 지난 시도의 재물이 같은 공간에
+ * 남아 대상 수가 달라진다. 실행마다 새 공간을 만들고 조사 대상도 이 두 곳만 고르면 서로 섞이지 않는다.
+ *
+ * 지난 시도가 도중에 실패해 열린 채 남은 조사가 있으면 새 조사를 시작할 수 없으므로 닫아 둔다
+ * (앱도 기관당 진행 중 조사를 하나만 허락한다).
+ *
+ * @returns 만든 공간 이름 — 가져오기 파일의 위치 칸에 그대로 쓴다(이름이 같으면 위치→공간이 자동으로 이어진다)
+ */
+export async function seedSurveyFlowSpaces(runId: string): Promise<{ managed: string; unmanaged: string }> {
+    if (!getApps().length) initializeApp({ projectId: PROJECT_ID });
+    const db = getFirestore();
+    const now = new Date();
+
+    const leftovers = await db.collection('surveys')
+        .where('organizationId', '==', TEST_ORG_ID)
+        .where('status', 'in', ['open', 'closing'])
+        .get();
+    for (const d of leftovers.docs) await d.ref.update({ status: 'closed', closedAt: now, closedByUid: TEST_ADMIN.uid });
+
+    const managed = `E2E-101호-${runId}`;
+    const unmanaged = `E2E-창고-${runId}`;
+    const base = {
+        organizationId: TEST_ORG_ID, teamIds: [], archived: false, buildingId: null, floor: null,
+        lastEditedByUid: TEST_ADMIN.uid, createdAt: now, updatedAt: now,
+    };
+    // 직원은 '101호'의 공간 담당자 — '나눠서 조사'에서 이 공간을 찍고 제출한다. '창고'는 담당자 없이 둬 관리자가 대신 승인한다.
+    await db.collection('spaces').doc(`e2e-space-101-${runId}`).set({ ...base, name: managed, order: 900, managerUids: [TEST_EMPLOYEE.uid] });
+    await db.collection('spaces').doc(`e2e-space-store-${runId}`).set({ ...base, name: unmanaged, order: 901, managerUids: [] });
+    return { managed, unmanaged };
+}
+
+/** 조사 흐름 E2E가 서버 쪽 결과를 맞춰 보는 데 쓴다 — 회차 문서와 희망이음 반영 목록 */
+export async function readSurveyResult(surveyId: string) {
+    if (!getApps().length) initializeApp({ projectId: PROJECT_ID });
+    const db = getFirestore();
+    const survey = (await db.collection('surveys').doc(surveyId).get()).data();
+    const tasks = await db.collection('syncTasks')
+        .where('organizationId', '==', TEST_ORG_ID)
+        .where('surveyId', '==', surveyId)
+        .get();
+    return {
+        status: survey?.status as string | undefined,
+        summary: survey?.summary as Record<string, number> | undefined,
+        tasks: tasks.docs.map((d) => d.data() as { kind: string; code: string }),
+    };
+}
