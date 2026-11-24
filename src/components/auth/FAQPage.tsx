@@ -222,7 +222,7 @@ export default function FAQPage() {
                                             className="flex-shrink-0 w-12 min-h-[48px] mr-1 my-auto h-12 rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/40 flex items-center justify-center transition-colors group"
                                         >
                                             {copiedIdx === idx ? (
-                                                <svg aria-hidden="true" className="w-4 h-4 text-emerald-700 dark:text-emerald-300" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                                                <svg aria-hidden="true" className="w-4 h-4 text-accent-700 dark:text-accent-300" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                                                     <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                                 </svg>
                                             ) : (
@@ -268,7 +268,7 @@ export default function FAQPage() {
             {copiedIdx !== null && (
                 <div role="status" className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
                     <div className="bg-surface-800 text-white text-sm px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2">
-                        <svg aria-hidden="true" className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
+                        <svg aria-hidden="true" className="w-4 h-4 text-accent-400" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                         </svg>
                         Q{copiedIdx + 1} 링크가 복사되었어요!

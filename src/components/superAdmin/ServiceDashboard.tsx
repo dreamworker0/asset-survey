@@ -33,7 +33,7 @@ function Delta({ now, prev }: { now: number; prev: number }) {
     const diff = Math.round(((now - prev) / prev) * 100);
     const up = diff >= 0;
     return (
-        <span className={`text-xs font-medium ${up ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-700 dark:text-red-300'}`}>
+        <span className={`text-xs font-medium ${up ? 'text-accent-700 dark:text-accent-300' : 'text-red-700 dark:text-red-300'}`}>
             지난달 대비 {up ? '+' : ''}{diff}%
         </span>
     );
@@ -210,7 +210,7 @@ function Growth({ s }: { s: DashboardStats }) {
                                 <td className="py-1.5 pr-3 text-surface-600 dark:text-surface-300 whitespace-nowrap">{g.month.replace('-', '.')}</td>
                                 <td className="py-1.5 pr-3 w-1/2">
                                     <div className="flex items-center gap-2">
-                                        <div className="h-2 rounded-full bg-emerald-500 dark:bg-emerald-400" style={{ width: `${(g.newOrgs / max) * 100}%`, minWidth: g.newOrgs ? 4 : 0 }} />
+                                        <div className="h-2 rounded-full bg-accent-500 dark:bg-accent-400" style={{ width: `${(g.newOrgs / max) * 100}%`, minWidth: g.newOrgs ? 4 : 0 }} />
                                         <span className="text-surface-700 dark:text-surface-200">{g.newOrgs}</span>
                                     </div>
                                 </td>

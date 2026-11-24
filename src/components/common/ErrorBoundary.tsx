@@ -48,10 +48,10 @@ export default class ErrorBoundary extends Component<Props, State> {
         // 옛 앱 파일을 못 받은 경우(대개 새 버전 배포 직후)는 오류가 아니라 새 버전 안내로 보여 준다 (2026-11-22)
         if (this.state.hasError && isChunkLoadError(this.state.error) && !isOffline()) {
             return (
-                <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-surface-950 p-6">
+                <div className="min-h-screen flex items-center justify-center bg-surface-50 dark:bg-surface-950 p-6">
                     <div className="text-center max-w-md">
                         <div className="text-6xl mb-4" aria-hidden="true">🎉</div>
-                        <h2 className="text-xl font-bold text-gray-800 dark:text-surface-100 mb-2">새 버전이 나왔어요</h2>
+                        <h2 className="text-xl font-bold text-surface-800 dark:text-surface-100 mb-2">새 버전이 나왔어요</h2>
                         <p className="text-surface-600 dark:text-surface-400 mb-6 text-sm">더 나아진 재물조사로 바꿀게요. 아래 버튼을 누르면 바로 업데이트됩니다.</p>
                         <button
                             type="button"
@@ -66,10 +66,10 @@ export default class ErrorBoundary extends Component<Props, State> {
         }
         if (this.state.hasError) {
             return (
-                <div role="alert" className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-surface-950 p-6">
+                <div role="alert" className="min-h-screen flex items-center justify-center bg-surface-50 dark:bg-surface-950 p-6">
                     <div className="text-center max-w-md">
                         <div className="text-6xl mb-4" aria-hidden="true">😥</div>
-                        <h2 className="text-xl font-bold text-gray-800 dark:text-surface-100 mb-2">
+                        <h2 className="text-xl font-bold text-surface-800 dark:text-surface-100 mb-2">
                             문제가 발생했습니다
                         </h2>
                         <p className="text-surface-600 dark:text-surface-400 mb-6 text-sm">

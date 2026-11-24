@@ -41,7 +41,7 @@ export default function IOSInstallPrompt() {
 
     return (
         <div className="mx-4 mt-2 mb-1 animate-slide-down">
-            <div className="relative bg-gradient-to-r from-primary-50 to-blue-50 dark:from-primary-950/60 dark:to-blue-950/60 border border-primary-200 dark:border-primary-800 rounded-xl px-4 py-3">
+            <div className="relative bg-gradient-to-r from-primary-50 to-primary-50 dark:from-primary-950/60 dark:to-primary-950/60 border border-primary-200 dark:border-primary-800 rounded-xl px-4 py-3">
                 <button
                     type="button"
                     onClick={handleDismiss}

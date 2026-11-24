@@ -47,7 +47,7 @@ export default function FeedbackItem({
 
     return (
         <div
-            className={`border-b border-surface-50 dark:border-surface-700/50 last:border-b-0 ${isResolved ? 'border-l-4 border-l-green-400' : isUnread ? 'border-l-4 border-l-primary-400' : ''}`}
+            className={`border-b border-surface-50 dark:border-surface-700/50 last:border-b-0 ${isResolved ? 'border-l-4 border-l-accent-400' : isUnread ? 'border-l-4 border-l-primary-400' : ''}`}
         >
             {/* 펼치기 버튼과 처리 버튼을 나란히 둔다 — 예전에는 div role="button" 안에 버튼이 들어 있었다 */}
             <div className="p-3 sm:p-4 flex flex-col sm:flex-row sm:items-start gap-2 sm:gap-3">
@@ -119,7 +119,7 @@ export default function FeedbackItem({
                         aria-label={copiedMessage === fb.id ? '본문을 복사했습니다' : '본문 복사'}
                     >
                         {copiedMessage === fb.id ? (
-                            <svg className="w-4 h-4 text-emerald-700 dark:text-emerald-300" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
+                            <svg className="w-4 h-4 text-accent-700 dark:text-accent-300" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
                                 <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                             </svg>
                         ) : (
@@ -178,7 +178,7 @@ export default function FeedbackItem({
                             /* 답변 완료 — 발송된 답변 표시 */
                             <div>
                                 <div className="flex items-center gap-2 mb-2">
-                                    <span className="text-sm font-semibold text-emerald-700 dark:text-emerald-300"><span aria-hidden="true">✅ </span>발송된 답변</span>
+                                    <span className="text-sm font-semibold text-accent-700 dark:text-accent-300"><span aria-hidden="true">✅ </span>발송된 답변</span>
                                     {fb.repliedBy === 'superAdmin' && (
                                         <span className="badge-primary">
                                             관리자
@@ -190,7 +190,7 @@ export default function FeedbackItem({
                                         </span>
                                     )}
                                 </div>
-                                <div className="text-sm text-surface-700 dark:text-surface-300 whitespace-pre-wrap bg-green-50/50 dark:bg-green-900/10 rounded-xl p-3 border border-green-200/50 dark:border-green-800/30">
+                                <div className="text-sm text-surface-700 dark:text-surface-300 whitespace-pre-wrap bg-accent-50/50 dark:bg-accent-900/10 rounded-xl p-3 border border-accent-200/50 dark:border-accent-800/30">
                                     {fb.reply}
                                 </div>
                             </div>

@@ -288,7 +288,7 @@ function MapSection({ im, locked }: { im: Im; locked: boolean }) {
                         자산금액 합 {won(parsed.amountTotals.all)} (운영 {won(parsed.amountTotals.active)})
                     </p>
                     {totalMatches != null && (
-                        <p className={`text-sm mt-1 ${totalMatches ? 'text-emerald-700 dark:text-emerald-300' : 'text-amber-800 dark:text-amber-300'}`}>
+                        <p className={`text-sm mt-1 ${totalMatches ? 'text-accent-700 dark:text-accent-300' : 'text-amber-800 dark:text-amber-300'}`}>
                             {totalMatches
                                 ? `✓ 대장 합계 줄(${won(im.reportedTotal)})과 같습니다.`
                                 : `⚠ 대장 합계 줄은 ${won(im.reportedTotal)}입니다. 차이 ${won(Math.abs((im.reportedTotal ?? 0) - parsed.amountTotals.all))} — 빠진 줄이나 금액을 읽지 못한 칸이 있는지 확인해 주세요.`}

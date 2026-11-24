@@ -61,7 +61,7 @@ export default function OfflineBanner() {
             <div
                 role="status"
                 aria-live="polite"
-                className="fixed top-0 left-0 right-0 z-[9999] bg-emerald-700 dark:bg-emerald-800 text-white text-center pt-[calc(0.5rem+env(safe-area-inset-top,0px))] pb-2 px-4 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in"
+                className="fixed top-0 left-0 right-0 z-[9999] bg-accent-700 dark:bg-accent-800 text-white text-center pt-[calc(0.5rem+env(safe-area-inset-top,0px))] pb-2 px-4 text-sm font-medium flex items-center justify-center gap-2 animate-fade-in"
             >
                 <svg aria-hidden="true" className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />

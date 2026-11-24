@@ -12,14 +12,27 @@ description: 차량 운행일지 앱 디자인 시스템 규칙. 새 컴포넌�
 ## 1. 색상 팔레트
 
 > `src/index.css`의 `@theme`에 정의된 커스텀 색상 토큰만 사용한다. Tailwind 기본 `blue`, `green`, `slate` 등을 직접 쓰지 않는다.
+> **자동 검사**: [scripts/__tests__/designTokens.test.ts](../../scripts/__tests__/designTokens.test.ts)가 `src/`에서 아래 표에 없는 기본 색상 계열을 찾으면 실패한다(2026-11-24 — 규칙만 있던 동안 266곳까지 쌓여 184곳을 옮겼다).
 
 | 토큰 | 용도 | 실제 색상 |
 |------|------|-----------|
 | `primary-*` | 브랜드 색상, 주요 버튼, 활성 상태, 링크 | Blue 계열 (`#2563eb` 기준) |
 | `accent-*` | 성공, 긍정적 상태, 승인 | Green 계열 (`#16a34a` 기준) |
 | `surface-*` | 배경, 텍스트, 보더, 비활성 상태 | Slate 계열 (`#f8fafc` ~ `#0f172a`) |
-| `red-*` | 위험, 삭제, 에러 | Tailwind red (허용 예외) |
-| `amber-*` | 경고, 운행 중 상태 | Tailwind amber (허용 예외) |
+| `red-*` | 위험, 삭제, 에러, 미등록 판정 | Tailwind red (허용 예외) |
+| `amber-*` | 경고, 다른 공간 판정, 마감 중 | Tailwind amber (허용 예외) |
+
+#### 상태 색상 — 의미별로 고른다
+
+| 의미 | 쓰는 토큰 | 예 |
+|---|---|---|
+| 성공·승인·확인됨 | `accent-*` | 스캔 '확인', 승인됨, 성공 토스트 |
+| 정보·진행 중·이미 처리됨 | `primary-*` | 제출됨, 이미 찍은 재물, 안내 상자 |
+| 경고 | `amber-*` | 다른 공간, 마감 중, 경고 토스트 |
+| 위험·오류 | `red-*` | 미등록, 삭제, 오류 토스트 |
+| 중립·장식 | `surface-*` | 회색 칩, 장식 상자 |
+
+옮길 때 대응(값이 같은 것은 화면이 그대로다): `blue`→`primary`(같은 값), `green`→`accent`(같은 값), `emerald`→`accent`, `sky`·`indigo`→`primary`, `gray`·`slate`→`surface`, `yellow`·`orange`→`amber`, 그 밖의 장식색(`purple` 등)→`surface`.
 
 ### 주요 사용 패턴
 - **배경**: `bg-surface-50` (앱 전체), `bg-white` (카드, 사이드바)
@@ -182,7 +195,8 @@ badge-neutral  — 중립 (회색)
   - 중: `w-10 h-10 rounded-lg` (예약 카드)
   - 소: `w-8 h-8 rounded-lg` (헤더 로고)
 
-### 차량 색상 시스템
+### 차량 색상 시스템 (차량운행일지 사례 — 이 앱에는 차량이 없다)
+> 원칙(같은 대상은 어디서나 같은 색)의 근거로만 남긴다. 이 앱에서 대상별 색이 필요하면 토큰(`primary`·`accent`·`surface`·`amber`·`red`)의 단계로 만든다 — 아래 배열을 그대로 쓰면 디자인 토큰 검사에 걸린다.
 ```js
 const VEHICLE_COLORS = [
     'bg-red-200', 'bg-blue-200', 'bg-yellow-200', 'bg-green-200', 'bg-purple-200',

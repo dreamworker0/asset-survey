@@ -61,8 +61,8 @@ export default function AccountSection() {
                         onClick={handleNotifClick}
                     >
                         <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${permission === 'granted' ? 'bg-blue-100 dark:bg-blue-900/40' : 'bg-surface-100 dark:bg-surface-800'}`}>
-                                <svg className={`w-5 h-5 ${permission === 'granted' ? 'text-blue-500 dark:text-blue-400' : 'text-surface-400 dark:text-surface-500'}`} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${permission === 'granted' ? 'bg-primary-100 dark:bg-primary-900/40' : 'bg-surface-100 dark:bg-surface-800'}`}>
+                                <svg className={`w-5 h-5 ${permission === 'granted' ? 'text-primary-500 dark:text-primary-400' : 'text-surface-400 dark:text-surface-500'}`} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
                                 </svg>
                             </div>
@@ -72,9 +72,9 @@ export default function AccountSection() {
                             </div>
                         </div>
                         {permission === 'default' ? (
-                            <span className="text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-900/30 px-2.5 py-1 rounded-full">활성화</span>
+                            <span className="text-xs font-medium text-primary-700 dark:text-primary-300 bg-primary-50 dark:bg-primary-900/30 px-2.5 py-1 rounded-full">활성화</span>
                         ) : permission === 'granted' ? (
-                            <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-900/30 px-2.5 py-1 rounded-full">켜짐</span>
+                            <span className="text-xs font-medium text-accent-700 dark:text-accent-300 bg-accent-50 dark:bg-accent-900/30 px-2.5 py-1 rounded-full">켜짐</span>
                         ) : (
                             <span className="text-xs font-medium text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-900/30 px-2.5 py-1 rounded-full">꺼짐</span>
                         )}

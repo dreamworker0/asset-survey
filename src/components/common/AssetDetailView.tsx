@@ -136,7 +136,7 @@ export default function AssetDetailView({ admin, renderLabelPrint }: Props) {
                 <h1 className="text-xl font-bold text-surface-900 dark:text-surface-100 break-keep">{a.name ?? '(품명 없음)'}</h1>
                 <p className="font-mono text-surface-700 dark:text-surface-300">{a.code}</p>
                 {justChecked && (
-                    <p className="mt-3 text-sm text-green-800 dark:text-green-300 bg-green-50 dark:bg-green-900/20 rounded-xl p-3" role="status">
+                    <p className="mt-3 text-sm text-accent-800 dark:text-accent-300 bg-accent-50 dark:bg-accent-900/20 rounded-xl p-3" role="status">
                         ✅ 확인 기록을 남겼습니다. 재물 목록에서 마지막 확인 날짜로 오래 못 본 재물을 찾을 수 있어요.
                     </p>
                 )}

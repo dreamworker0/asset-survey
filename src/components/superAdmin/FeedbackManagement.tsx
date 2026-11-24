@@ -264,7 +264,7 @@ export default function FeedbackManagement() {
                                                 aria-label={copiedEmail === group.email ? '이메일을 복사했습니다' : `${group.name} 이메일 복사`}
                                             >
                                                 {copiedEmail === group.email ? (
-                                                    <svg className="w-4 h-4 text-emerald-700 dark:text-emerald-300" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
+                                                    <svg className="w-4 h-4 text-accent-700 dark:text-accent-300" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" aria-hidden="true">
                                                         <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                                                     </svg>
                                                 ) : (

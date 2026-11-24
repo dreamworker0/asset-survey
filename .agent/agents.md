@@ -26,7 +26,7 @@
 
 | # | 금지 항목 | 대안 | 근거 |
 |---|----------|------|------|
-| D7 | Tailwind 기본 색상 직접 사용 (`blue-500`, `green-600` 등) | 커스텀 토큰 (`primary-*`, `surface-*`, `accent-*`) | [design-system §1](rules/design-system.md) |
+| D7 | Tailwind 기본 색상 직접 사용 (`blue-500`, `green-600` 등) | 커스텀 토큰 (`primary-*`, `surface-*`, `accent-*`), 상태 예외 `red-*`(위험)·`amber-*`(경고)만 허용. `designTokens.test.ts`가 강제 | [design-system §1](rules/design-system.md) |
 | D8 | 인라인 색상에 `dark:` 변형 누락 | 반드시 라이트/다크 페어링 | [design-system §1](rules/design-system.md) |
 | D9 | 컴포넌트 내부에서 직접 Firestore 호출 | `lib/firestore/` 도메인 파일에 함수 작성 후 import | [coding-conventions §3.1](rules/coding-conventions.md) |
 | D10 | `organizationId` 없는 Firestore 쿼리 | 모든 쿼리에 조직 격리 조건 포함 (tenant-scoped 파일은 `local/require-organization-filter` ESLint 규칙으로 정적 강제 — §1.1로 자동 감지됨) | [coding-conventions §3.3](rules/coding-conventions.md) |

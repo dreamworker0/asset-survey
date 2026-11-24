@@ -58,7 +58,7 @@ export default memo(function OrgAppCard({
                         {tab === 'pending' && (
                             app.aiVerified ? (
                                 // 대기 목록에 있으므로 아직 승인된 것이 아니다 — "자동 승인"이 아니라 추천으로 적는다
-                                <span className="badge-success font-bold border border-green-200 dark:border-green-700">
+                                <span className="badge-success font-bold border border-accent-200 dark:border-accent-700">
                                     <span aria-hidden="true">✅</span> AI: 승인 추천
                                 </span>
                             ) : app.aiVerifyDetail ? (
@@ -190,17 +190,17 @@ export default memo(function OrgAppCard({
                             </div>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-sm">
                                 <div className="flex items-center gap-1.5">
-                                    <span aria-hidden="true" className={`w-2 h-2 shrink-0 rounded-full ${app.aiVerifyDetail.documentType === '고유번호증' || app.aiVerifyDetail.documentType === '사업자등록증(비영리)' ? 'bg-green-500 dark:bg-green-400' : 'bg-red-500 dark:bg-red-400'}`} />
+                                    <span aria-hidden="true" className={`w-2 h-2 shrink-0 rounded-full ${app.aiVerifyDetail.documentType === '고유번호증' || app.aiVerifyDetail.documentType === '사업자등록증(비영리)' ? 'bg-accent-500 dark:bg-accent-400' : 'bg-red-500 dark:bg-red-400'}`} />
                                     <span className="text-surface-600 dark:text-surface-400">문서 유형:</span>
-                                    <span className={`font-medium ${app.aiVerifyDetail.documentType === '고유번호증' || app.aiVerifyDetail.documentType === '사업자등록증(비영리)' ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-700 dark:text-red-300'}`}>
+                                    <span className={`font-medium ${app.aiVerifyDetail.documentType === '고유번호증' || app.aiVerifyDetail.documentType === '사업자등록증(비영리)' ? 'text-accent-700 dark:text-accent-300' : 'text-red-700 dark:text-red-300'}`}>
                                         {app.aiVerifyDetail.documentType || '확인 불가'}
                                     </span>
                                 </div>
                                 {app.aiVerifyDetail.extractedName && (
                                     <div className="flex items-center gap-1.5">
-                                        <span aria-hidden="true" className={`w-2 h-2 shrink-0 rounded-full ${app.aiVerifyDetail.nameMatch ? 'bg-green-500' : 'bg-red-500'}`} />
+                                        <span aria-hidden="true" className={`w-2 h-2 shrink-0 rounded-full ${app.aiVerifyDetail.nameMatch ? 'bg-accent-500' : 'bg-red-500'}`} />
                                         <span className="text-surface-600 dark:text-surface-400">추출 기관명:</span>
-                                        <span className={`font-medium ${app.aiVerifyDetail.nameMatch ? 'text-emerald-700 dark:text-emerald-300' : 'text-red-700 dark:text-red-300'}`}>
+                                        <span className={`font-medium ${app.aiVerifyDetail.nameMatch ? 'text-accent-700 dark:text-accent-300' : 'text-red-700 dark:text-red-300'}`}>
                                             {app.aiVerifyDetail.extractedName}
                                             {app.aiVerifyDetail.nameMatch ? ' (신청 기관명과 일치)' : ' (신청 기관명과 다름)'}
                                         </span>
@@ -208,14 +208,14 @@ export default memo(function OrgAppCard({
                                 )}
                                 {app.aiVerifyDetail.uniqueNumber && (
                                     <div className="flex items-center gap-1.5">
-                                        <span aria-hidden="true" className="w-2 h-2 shrink-0 rounded-full bg-green-500 dark:bg-green-400" />
+                                        <span aria-hidden="true" className="w-2 h-2 shrink-0 rounded-full bg-accent-500 dark:bg-accent-400" />
                                         <span className="text-surface-600 dark:text-surface-400">{app.aiVerifyDetail.documentType === '고유번호증' ? '고유번호:' : '사업자번호:'}</span>
                                         <span className="font-mono text-surface-700 dark:text-surface-300">{app.aiVerifyDetail.uniqueNumber}</span>
                                     </div>
                                 )}
                                 {app.aiVerifyDetail.address && (
                                     <div className="flex flex-wrap items-center gap-1.5 sm:col-span-2 break-all">
-                                        <span aria-hidden="true" className="w-2 h-2 shrink-0 rounded-full bg-green-500 dark:bg-green-400" />
+                                        <span aria-hidden="true" className="w-2 h-2 shrink-0 rounded-full bg-accent-500 dark:bg-accent-400" />
                                         <span className="text-surface-600 dark:text-surface-400">주소:</span>
                                         <span className="text-surface-700 dark:text-surface-300">{app.aiVerifyDetail.address}</span>
                                         <a

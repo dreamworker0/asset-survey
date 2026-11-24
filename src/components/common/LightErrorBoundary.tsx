@@ -37,18 +37,18 @@ export default class LightErrorBoundary extends Component<Props, State> {
         if (!this.state.hasError) return this.props.children;
 
         return (
-            <div role="alert" className="min-h-screen flex items-center justify-center p-6 bg-gray-50 dark:bg-surface-950">
+            <div role="alert" className="min-h-screen flex items-center justify-center p-6 bg-surface-50 dark:bg-surface-950">
                 <div className="text-center max-w-sm">
-                    <p className="text-base font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                    <p className="text-base font-semibold text-surface-900 dark:text-surface-100 mb-2">
                         화면을 불러오지 못했습니다
                     </p>
-                    <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-400 mb-5">
+                    <p className="text-sm leading-relaxed text-surface-600 dark:text-surface-400 mb-5">
                         네트워크 상태를 확인한 뒤 다시 시도해 주세요.
                     </p>
                     <button
                         type="button"
                         onClick={() => window.location.reload()}
-                        className="min-h-12 px-6 rounded-xl bg-indigo-600 text-white text-sm font-semibold"
+                        className="min-h-12 px-6 rounded-xl bg-primary-600 text-white text-sm font-semibold"
                     >
                         다시 시도
                     </button>

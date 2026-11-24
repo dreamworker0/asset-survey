@@ -20,11 +20,11 @@ import type { Scan, ScanCondition, ScanResult, SurveySubmission } from '../../ty
 const sub = 'text-xs text-surface-600 dark:text-surface-400';
 
 const RESULT_STYLE: Record<ScanResult | 'duplicate', string> = {
-    ok: 'bg-emerald-50 border-emerald-300 text-emerald-800 dark:bg-emerald-900/30 dark:border-emerald-700 dark:text-emerald-200',
+    ok: 'bg-accent-50 border-accent-300 text-accent-800 dark:bg-accent-900/30 dark:border-accent-700 dark:text-accent-200',
     otherSpace: 'bg-amber-50 border-amber-300 text-amber-900 dark:bg-amber-900/30 dark:border-amber-700 dark:text-amber-200',
     unregistered: 'bg-red-50 border-red-300 text-red-800 dark:bg-red-900/30 dark:border-red-700 dark:text-red-200',
     outOfScope: 'bg-surface-100 border-surface-300 text-surface-800 dark:bg-surface-800 dark:border-surface-600 dark:text-surface-200',
-    duplicate: 'bg-sky-50 border-sky-300 text-sky-900 dark:bg-sky-900/30 dark:border-sky-700 dark:text-sky-200',
+    duplicate: 'bg-primary-50 border-primary-300 text-primary-900 dark:bg-primary-900/30 dark:border-primary-700 dark:text-primary-200',
 };
 
 const RESULT_HELP: Record<ScanResult, string> = {
@@ -235,7 +235,7 @@ function SubmissionPanel({ submission, pending, remaining, submitting, onSubmit 
 }) {
     if (submission?.state === 'submitted') {
         return (
-            <section className="rounded-2xl border-2 p-4 bg-sky-50 border-sky-300 text-sky-900 dark:bg-sky-900/30 dark:border-sky-700 dark:text-sky-200" role="status">
+            <section className="rounded-2xl border-2 p-4 bg-primary-50 border-primary-300 text-primary-900 dark:bg-primary-900/30 dark:border-primary-700 dark:text-primary-200" role="status">
                 <p className="font-bold">{pending ? '제출 전송 대기 중' : '제출했습니다'}</p>
                 <p className="text-sm">
                     {pending
@@ -247,7 +247,7 @@ function SubmissionPanel({ submission, pending, remaining, submitting, onSubmit 
     }
     if (submission?.state === 'approved') {
         return (
-            <section className="rounded-2xl border-2 p-4 bg-emerald-50 border-emerald-300 text-emerald-900 dark:bg-emerald-900/30 dark:border-emerald-700 dark:text-emerald-200" role="status">
+            <section className="rounded-2xl border-2 p-4 bg-accent-50 border-accent-300 text-accent-900 dark:bg-accent-900/30 dark:border-accent-700 dark:text-accent-200" role="status">
                 <p className="font-bold">승인됐습니다{submission.proxyApproved ? ' (재물 담당자 대신 승인)' : ''}</p>
                 <p className="text-sm">이 공간의 조사가 끝났습니다. 수고하셨습니다.</p>
             </section>

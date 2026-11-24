@@ -16,7 +16,7 @@ export type Admin = ReturnType<typeof useSurveyAdmin>;
 function SubmissionBadge({ sub: x, names }: { sub: SurveySubmission | null; names: Map<string, string> }) {
     if (!x) return <span className="text-xs text-surface-600 dark:text-surface-400">조사 중 · 제출 전</span>;
     const who = (uid: string | null) => (uid ? names.get(uid) ?? '알 수 없음' : '');
-    if (x.state === 'submitted') return <span className="text-xs font-medium text-sky-700 dark:text-sky-300">제출됨 · {who(x.submittedByUid)}</span>;
+    if (x.state === 'submitted') return <span className="text-xs font-medium text-primary-700 dark:text-primary-300">제출됨 · {who(x.submittedByUid)}</span>;
     // 사유는 마우스 말풍선(title)이 아니라 글자로 — 휴대폰·키보드로는 볼 수 없었다(2026-11-22 점검)
     if (x.state === 'rejected') {
         return (
@@ -26,7 +26,7 @@ function SubmissionBadge({ sub: x, names }: { sub: SurveySubmission | null; name
         );
     }
     return (
-        <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+        <span className="text-xs font-medium text-accent-700 dark:text-accent-300">
             승인{x.proxyApproved ? '(대신)' : x.selfApproved ? '(본인)' : ''} · {who(x.reviewedByUid)}
             {x.reason && <span className="block font-normal text-surface-600 dark:text-surface-400">사유: {x.reason}</span>}
         </span>
