@@ -44,6 +44,7 @@
     "test:e2e:all": "playwright test",
     "lighthouse": "npm run build && npx --yes @lhci/cli@0.15.1 autorun --config=lighthouserc.json",
     "test:e2e:emulator": "firebase emulators:exec --only auth,firestore --project demo-asset-survey \"playwright test -c playwright.emulator.config.ts\"",
+    "perf:assets": "firebase emulators:exec --config firebase.perf.json --only auth,firestore --project demo-asset-survey \"playwright test -c playwright.perf.config.ts\"",
     "prepare": "husky"
   },
   "dependencies": {
