@@ -30,7 +30,7 @@ export interface SyncData {
     type: 'CREATE' | 'UPDATE' | 'DELETE';
     collection: string;
     docId: string;
-    /** 쓴 내용 — 다시 보내지 않는다. 유실 안내에 "무엇을 잃었는지"(날짜·계기판)를 적는 데만 쓴다 */
+    /** 쓴 내용 — 다시 보내지 않는다. 유실 안내에 "무엇을 잃었는지"(재물 스캔의 자산코드·품명)를 적는 데만 쓴다 */
     data: Record<string, unknown> | null;
 }
 

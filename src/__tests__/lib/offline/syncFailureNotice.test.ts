@@ -12,7 +12,7 @@ vi.mock('@/lib/offline/syncQueue', () => ({
 }));
 vi.mock('@/lib/notify', () => ({ notifyUser: vi.fn() }));
 
-import { buildFailureMessage, reportFailedSync, registerSyncFailureNotice, describeRecord, formatQueuedDate } from '@/lib/offline/syncFailureNotice';
+import { buildFailureMessage, reportFailedSync, registerSyncFailureNotice, describeRecord } from '@/lib/offline/syncFailureNotice';
 import { peekFailedRecords, clearFailedRecords, reconcileLedgerQuietly, type FailedRecord } from '@/lib/offline/syncQueue';
 import { notifyUser } from '@/lib/notify';
 
@@ -22,8 +22,8 @@ const mockNotify = vi.mocked(notifyUser);
 
 function record(over: Partial<FailedRecord> = {}): FailedRecord {
     return {
-        type: 'UPDATE',
-        collection: 'driveLogs',
+        type: 'CREATE',
+        collection: 'scans',
         docId: 'a',
         data: {},
         timestamp: 1,
@@ -37,12 +37,12 @@ function record(over: Partial<FailedRecord> = {}): FailedRecord {
 describe('buildFailureMessage', () => {
     it('컬렉션별 건수를 사람이 읽는 이름으로 합산한다', () => {
         const msg = buildFailureMessage([
-            record({ collection: 'driveLogs', docId: 'a' }),
-            record({ collection: 'driveLogs', docId: 'b' }),
-            record({ collection: 'reservations', docId: 'c' }),
+            record({ collection: 'scans', docId: 'a' }),
+            record({ collection: 'scans', docId: 'b' }),
+            record({ collection: 'surveySubmissions', docId: 'c' }),
         ]);
-        expect(msg).toContain('운행일지 2건');
-        expect(msg).toContain('예약 1건');
+        expect(msg).toContain('재물 스캔 2건');
+        expect(msg).toContain('공간 제출 1건');
     });
 
     it('영구 오류가 섞이면 권한/변경 사유로 안내한다', () => {
@@ -58,8 +58,14 @@ describe('buildFailureMessage', () => {
         expect(buildFailureMessage([record({ reason: 'retry-exhausted' })])).toContain('통신 오류가 반복되어');
     });
 
-    it('무엇을 해야 하는지(재입력)를 반드시 말한다', () => {
-        expect(buildFailureMessage([record()])).toContain('다시 입력');
+    it('무엇을 다시 해야 하는지 잃은 것에 맞춰 말한다', () => {
+        // 현장 직원에게 "다시 입력"은 모호하다 — 스캔은 다시 찍고, 제출은 다시 제출한다
+        expect(buildFailureMessage([record()])).toContain('해당 재물을 다시 찍어 주세요');
+        expect(buildFailureMessage([record({ collection: 'surveySubmissions' })])).toContain('공간을 다시 제출해 주세요');
+        expect(buildFailureMessage([record(), record({ collection: 'surveySubmissions' })]))
+            .toContain('해당 재물을 다시 찍고 공간을 다시 제출해 주세요');
+        // 모르는 컬렉션(옛 버전 기록 등)은 일반 문구
+        expect(buildFailureMessage([record({ collection: 'other' })])).toContain('다시 입력해 주세요');
     });
 });
 
@@ -167,13 +173,10 @@ describe('registerSyncFailureNotice', () => {
 });
 
 describe('buildFailureMessage — 잃은 내용을 실제로 실어 보낸다', () => {
-    it('안내 문구에 계기판 숫자가 들어간다 — 배선까지 확인한다', () => {
+    it('안내 문구에 자산코드·품명이 들어간다 — 배선까지 확인한다', () => {
         // describeRecord만 테스트하면 buildFailureMessage가 그것을 **쓰지 않아도** 통과한다.
-        const msg = buildFailureMessage([
-            record({ data: { date: '2026-09-05', destination: '서울역', startKm: 50000, endKm: 50050 } }),
-        ]);
-        expect(msg).toContain('50,000→50,050km');
-        expect(msg).toContain('서울역');
+        const msg = buildFailureMessage([record({ data: { code: '2021-001', name: '냉장고' } })]);
+        expect(msg).toContain('재물 스캔 1건 (2021-001 냉장고)');
     });
 
     it('적을 내용이 없으면 빈 괄호를 만들지 않는다', () => {
@@ -181,38 +184,26 @@ describe('buildFailureMessage — 잃은 내용을 실제로 실어 보낸다', 
     });
 });
 
-describe('describeRecord — 다시 입력할 수 있게 무엇을 잃었는지 적는다', () => {
-    it('날짜·목적지·계기판을 한 줄로 만든다', () => {
-        // 차에서 내린 뒤에는 계기판 숫자를 기억으로 복원할 수 없다. 건수만 알려 주면
-        // "다시 입력해 주세요"를 따를 수가 없다.
-        const line = describeRecord(record({
-            data: { date: '2026-09-05', destination: '서울역', startKm: 50000, endKm: 50050 },
-        }));
-        expect(line).toBe('2026-09-05 · 서울역 · 50,000→50,050km');
+describe('describeRecord — 다시 찍을 수 있게 무엇을 잃었는지 적는다', () => {
+    it('재물 스캔은 자산코드·품명으로 적는다(현장에서 그 라벨을 다시 찾는 단서)', () => {
+        expect(describeRecord(record({ data: { code: '2021-001', name: '냉장고', result: 'ok' } }))).toBe('2021-001 냉장고');
     });
 
-    it('재물 스캔은 자산코드·품명으로 적고, 이름은 재물 스캔으로 센다(6단계)', () => {
-        const r = record({ collection: 'scans', type: 'CREATE', data: { code: '2021-001', name: '냉장고', result: 'ok' } });
-        expect(describeRecord(r)).toBe('2021-001 냉장고');
-        expect(buildFailureMessage([r])).toContain('재물 스캔 1건 (2021-001 냉장고)');
+    it('없는 조각은 빼고 남는 것만 적는다', () => {
+        expect(describeRecord(record({ data: { code: '2021-001' } }))).toBe('2021-001');
+        // 상태 메모 수정(UPDATE)에는 자산코드가 없다
+        expect(describeRecord(record({ type: 'UPDATE', data: { condition: 'damaged', memo: '다리 부러짐' } }))).toBe('');
     });
 
-    it('이틀 걸린 운행은 출발일을 쓴다', () => {
-        expect(describeRecord(record({ data: { startDate: '2026-09-01', date: '2026-09-02' } })))
-            .toBe('2026-09-01');
-    });
-
-    it('없는 조각은 빼고 남는 것만 잇는다', () => {
-        expect(describeRecord(record({ data: { destination: '시청' } }))).toBe('시청');
-    });
-
-    it('계기판은 한쪽만 있으면 적지 않는다 — 반쪽 숫자는 오히려 헷갈린다', () => {
-        expect(describeRecord(record({ data: { startKm: 100 } }))).toBe('');
+    it('공간 제출·모르는 컬렉션은 따로 적지 않는다 — 건수와 할 일 안내로 충분하다', () => {
+        expect(describeRecord(record({ collection: 'surveySubmissions', data: { spaceId: 'sp-1' } }))).toBe('');
+        expect(describeRecord(record({ collection: 'other', data: { code: 'x' } }))).toBe('');
     });
 
     it('쓸 수 있는 값이 없으면 빈 문자열 — 빈 괄호가 뜨지 않게', () => {
         expect(describeRecord(record({ data: {} }))).toBe('');
         expect(describeRecord(record({ data: undefined as never }))).toBe('');
+        expect(buildFailureMessage([record({ data: {} })])).not.toContain('()');
     });
 });
 
@@ -220,7 +211,7 @@ describe('reportFailedSync — 알린 뒤에 비운다', () => {
     beforeEach(() => { vi.clearAllMocks(); });
 
     it('알리기 전에는 비우지 않는다 — 유실을 알리는 장치가 유실되면 안 된다', async () => {
-        mockDrain.mockResolvedValueOnce([record({ data: { destination: '서울역' } })]);
+        mockDrain.mockResolvedValueOnce([record({ data: { code: '2021-001' } })]);
 
         await reportFailedSync();
 
@@ -239,48 +230,22 @@ describe('reportFailedSync — 알린 뒤에 비운다', () => {
 });
 
 describe('describeRecord — 큐가 실제로 담는 모양', () => {
-    it('내부 센티널 마커를 날짜로 찍지 않는다', () => {
-        // 오프라인 **수정**은 당일 운행의 startDate를 deleteField()로 지우는데,
-        // 큐가 그것을 '__syncQueue.deleteField__' 문자열로 바꿔 저장한다.
-        // 거르지 않으면 사용자에게 내부 문자열이 날짜라고 보여진다.
-        const line = describeRecord(record({
-            data: { startDate: '__syncQueue.deleteField__', destination: '서울역' },
-        }));
-        expect(line).toBe('서울역');
-    });
-
-    it('date가 없으면 timestamp로 날짜를 만든다 — 운행일지에는 date 필드가 없다', () => {
-        // buildLogData가 만드는 것은 timestamp(Date)뿐이다. date만 찾으면 날짜는
-        // 사실상 언제나 비어 "날짜를 알려 준다"는 말이 거짓이 된다.
-        const line = describeRecord(record({
-            data: { timestamp: new Date(2026, 8, 5, 18, 0), destination: '시청' },
-        }));
-        expect(line).toBe('2026-09-05 · 시청');
-    });
-});
-
-describe('formatQueuedDate', () => {
-    it('Date를 YYYY-MM-DD로 만든다', () => {
-        expect(formatQueuedDate(new Date(2026, 0, 3))).toBe('2026-01-03');
-    });
-
-    it('Date가 아니거나 망가졌으면 undefined', () => {
-        expect(formatQueuedDate('2026-01-03')).toBeUndefined();
-        expect(formatQueuedDate(new Date('x'))).toBeUndefined();
-        expect(formatQueuedDate(undefined)).toBeUndefined();
+    it('내부 센티널 마커를 자산코드·품명으로 찍지 않는다', () => {
+        // 장부가 deleteField() 등을 '__syncQueue.…' 문자열로 바꿔 저장한다. 거르지 않으면 내부 문자열이 보인다.
+        expect(describeRecord(record({ data: { code: '2021-001', name: '__syncQueue.deleteField__' } }))).toBe('2021-001');
     });
 });
 
 describe('buildFailureMessage — 길이를 묶는다', () => {
     it('상세는 3건까지만 적고 나머지는 건수로 줄인다', () => {
         const many = Array.from({ length: 6 }, (_, i) =>
-            record({ data: { destination: `목적지${i}` } }));
+            record({ data: { code: `2021-00${i}` } }));
 
         const msg = buildFailureMessage(many);
 
-        expect(msg).toContain('목적지0');
+        expect(msg).toContain('2021-000');
         expect(msg).toContain('외 3건');
-        expect(msg).not.toContain('목적지4');
+        expect(msg).not.toContain('2021-004');
     });
 });
 
@@ -289,7 +254,7 @@ describe('reportFailedSync — 겹쳐 불려도 한 번만 알린다', () => {
 
     it('세 트리거가 동시에 발화해도 토스트는 하나다', async () => {
         // online·visibilitychange는 잠금 화면을 풀며 통신이 돌아올 때 같이 뜬다.
-        mockDrain.mockResolvedValue([record({ data: { destination: '서울역' } })]);
+        mockDrain.mockResolvedValue([record({ data: { code: '2021-001' } })]);
 
         await Promise.all([reportFailedSync(), reportFailedSync(), reportFailedSync()]);
 

@@ -14,10 +14,8 @@
 import { peekFailedRecords, clearFailedRecords, reconcileLedgerQuietly, type FailedRecord } from './syncQueue';
 import { notifyUser } from '../notify';
 
-/** 장부에 적히는 컬렉션 → 사용자가 읽는 이름 (trackWrite 호출부와 1:1) */
+/** 장부에 적히는 컬렉션 → 사용자가 읽는 이름 (trackWrite 호출부와 1:1 — firestore/surveys.ts) */
 const COLLECTION_LABEL: Record<string, string> = {
-    driveLogs: '운행일지',
-    reservations: '예약',
     scans: '재물 스캔',
     surveySubmissions: '공간 제출',
 };
@@ -27,13 +25,26 @@ function labelOf(collection: string): string {
 }
 
 /**
+ * 다시 할 일 — 무엇을 잃었느냐에 따라 다르다. 스캔은 그 재물을 다시 찍고, 공간 제출은 다시 제출한다.
+ * "다시 입력해 주세요"만으로는 현장 직원이 무엇을 해야 할지 모른다.
+ */
+function whatToDo(records: FailedRecord[]): string {
+    const lostScan = records.some((r) => r.collection === 'scans');
+    const lostSubmit = records.some((r) => r.collection === 'surveySubmissions');
+    if (lostScan && lostSubmit) return '번거롭지만 해당 재물을 다시 찍고 공간을 다시 제출해 주세요.';
+    if (lostSubmit) return '번거롭지만 공간을 다시 제출해 주세요.';
+    if (lostScan) return '번거롭지만 해당 재물을 다시 찍어 주세요.';
+    return '번거롭지만 다시 입력해 주세요.';
+}
+
+/**
  * 유실 사유별 안내 문구.
- * - permanent: 서버가 쓰기를 거부했다(권한 등) → 재작성 외에 방법이 없다
- * - not-applied: 앱이 닫힌 뒤 다음 실행에서 확인해 보니 서버에 없다 → 역시 재작성이 필요하다
+ * - permanent: 서버가 쓰기를 거부했다(권한·조사 마감 등) → 다시 하는 것 외에 방법이 없다
+ * - not-applied: 앱이 닫힌 뒤 다음 실행에서 확인해 보니 서버에 없다 → 역시 다시 해야 한다
  * - retry-exhausted: 옛 버전의 재시도 소진 기록(기기에 남아 있을 수 있다)
  *
- * 어느 경우든 "다시 입력해야 한다"는 행동을 분명히 말한다. 유실 사실만 알리고
- * 무엇을 해야 하는지 말하지 않으면 운전자는 그대로 지나간다.
+ * 어느 경우든 "무엇을 다시 해야 하는지"를 분명히 말한다. 유실 사실만 알리고
+ * 무엇을 해야 하는지 말하지 않으면 현장에서는 그대로 지나간다.
  */
 export function buildFailureMessage(records: FailedRecord[]): string {
     const counts = new Map<string, number>();
@@ -52,9 +63,8 @@ export function buildFailureMessage(records: FailedRecord[]): string {
             ? '전송이 끝나기 전에 앱이 닫혀'
             : '통신 오류가 반복되어';
 
-    // 무엇을 잃었는지 함께 적는다. "다시 입력해 주세요"만으로는 다시 입력할 수가 없다 —
-    // 차에서 내린 뒤에는 계기판 숫자를 기억으로 복원할 방법이 없기 때문이다.
-    // 장부는 쓴 내용을 그대로 들고 있다(다시 보내지는 않는다) — 건수만 세고 버리지 않는다.
+    // 무엇을 잃었는지 함께 적는다 — 건수만으로는 어느 재물을 다시 찍어야 할지 알 수 없다.
+    // 장부는 쓴 내용을 그대로 들고 있다(다시 보내지는 않는다).
     // 길이를 묶는다. 오래 오프라인이던 사용자는 폐기가 여러 건 쌓이는데, 전부 이으면
     // 15초짜리 토스트에 수백 자가 들어가 정작 읽히지 않는다.
     const MAX_DETAILS = 3;
@@ -65,59 +75,27 @@ export function buildFailureMessage(records: FailedRecord[]): string {
         ? ` (${shown.join(' / ')}${rest > 0 ? ` 외 ${rest}건` : ''})`
         : '';
 
-    return `저장하지 못한 내용이 있습니다 — ${summary}${detailText}. ${cause} 서버에 반영되지 않았습니다. 번거롭지만 다시 입력해 주세요.`;
+    return `저장하지 못한 내용이 있습니다 — ${summary}${detailText}. ${cause} 서버에 반영되지 않았습니다. ${whatToDo(records)}`;
 }
 
 /**
  * 폐기된 기록 한 건을 사용자가 알아볼 수 있는 한 줄로 만든다.
  *
- * 다시 입력하려면 **계기판 숫자**가 있어야 한다 — 날짜·목적지는 기억나도 그건 안 난다.
- * 값이 없는 조각은 빼고, 남는 것이 없으면 빈 문자열을 돌려준다(빈 괄호가 뜨지 않게).
+ * 재물 스캔은 자산코드·품명 — 현장에서 그 라벨을 다시 찾는 단서다. 공간 제출은 장부에 공간 ID만 있어
+ * 따로 적지 않는다(건수와 "공간을 다시 제출" 안내로 충분하다).
+ * 값이 없으면 빈 문자열을 돌려준다(빈 괄호가 뜨지 않게).
  */
 export function describeRecord(record: FailedRecord): string {
+    if (record.collection !== 'scans') return '';
     const data = (record.data ?? {}) as Record<string, unknown>;
-    // 장부가 센티널을 문자열 마커로 바꿔 저장한다(syncQueue의 toStorable). 오프라인 **수정**은
-    // 당일 운행의 startDate를 deleteField()로 지우므로 그 자리에 `__syncQueue.deleteField__`가
-    // 들어 있다 — 거르지 않으면 사용자에게 내부 문자열이 날짜라고 보여진다.
+    // 장부가 deleteField() 등 센티널을 문자열 마커(`__syncQueue.…`)로 바꿔 저장한다(syncQueue의 toStorable).
+    // 거르지 않으면 내부 문자열이 자산코드·품명처럼 보인다.
     const str = (v: unknown) => {
         if (typeof v !== 'string') return undefined;
         const t = v.trim();
         return t && !t.startsWith('__syncQueue.') ? t : undefined;
     };
-    const num = (v: unknown) => (typeof v === 'number' && Number.isFinite(v) ? v : undefined);
-
-    // 재물 스캔 — 다시 찍으려면 자산코드·품명이 있어야 한다(현장 라벨을 다시 찾는 단서)
-    if (record.collection === 'scans') {
-        return [str(data.code), str(data.name)].filter(Boolean).join(' ');
-    }
-
-    const parts: string[] = [];
-    const when = str(data.startDate) ?? str(data.date) ?? formatQueuedDate(data.timestamp);
-    if (when) parts.push(when);
-    const where = str(data.destination);
-    if (where) parts.push(where);
-
-    const startKm = num(data.startKm);
-    const endKm = num(data.endKm);
-    if (startKm !== undefined && endKm !== undefined) {
-        parts.push(`${startKm.toLocaleString('ko-KR')}→${endKm.toLocaleString('ko-KR')}km`);
-    }
-    return parts.join(' · ');
-}
-
-/**
- * 큐에 실린 `timestamp`를 'YYYY-MM-DD'로 만든다.
- *
- * **운행일지에는 `date` 필드가 없다.** `buildLogData`가 만드는 것은 `timestamp`(Date)뿐이고
- * `date`는 옛 문서에만 남아 있는 레거시다. 그것만 찾으면 날짜는 사실상 언제나 비어,
- * "날짜를 알려 준다"는 말이 거짓이 된다. Date는 structuredClone을 그대로 통과하므로
- * 큐에서도 Date로 남아 있다.
- */
-export function formatQueuedDate(value: unknown): string | undefined {
-    const d = value instanceof Date ? value : undefined;
-    if (!d || Number.isNaN(d.getTime())) return undefined;
-    const pad = (n: number) => String(n).padStart(2, '0');
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+    return [str(data.code), str(data.name)].filter(Boolean).join(' ');
 }
 
 /**
