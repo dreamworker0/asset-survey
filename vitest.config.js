@@ -149,8 +149,9 @@ export default defineConfig({
                 'src/lib/pdf/**': {
                     lines: 87, statements: 85, functions: 92, branches: 76,
                 },
-                // 재물 문서 — 가져오기 확정(commitImport)·증분 읽기·공간 이동 (실측 81.4/81.7/70.0/80.8)
-                'src/lib/firestore/assets.ts': {
+                // 재물 문서 — 가져오기 확정(commitImport)·증분 읽기·공간 이동 (실측 81.4/81.7/70.0/80.8).
+                // 2026-11-24 assets.ts를 읽기·가져오기(assetImport)·직접 수정(assetEdit)·공용(assetShared)으로 나눴다 — 넷을 함께 본다
+                'src/lib/firestore/{assets,assetImport,assetEdit,assetShared}.ts': {
                     lines: 78, statements: 78, functions: 66, branches: 77,
                 },
                 // 마지막 확인 기록 (실측 87.0/87.7/80.0/81.0)
