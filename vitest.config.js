@@ -104,29 +104,75 @@ export default defineConfig({
             //
             // glob 하한은 실측보다 3~6pp 낮게 잡는다. 리팩토링으로 분기 몇 개가 오가는 정도로는
             // 깨지지 않되, 모듈 하나가 통째로 무방비가 되면 걸리는 선이다.
+            // 2026-11-24 재물조사 기능(1~5단계)과 테스트가 쌓인 뒤 처음 다시 쟀다 — 차량운행일지 시절 하한이
+            //            그대로라 실측(lines 58.0/stmts 56.4/funcs 47.5/branches 46.7)보다 10pp가량 낮았다.
+            //            전역은 실측 -3pp로 올리고, 재물조사 핵심 영역에 glob 하한을 새로 건다.
             thresholds: {
-                lines: 48,
-                statements: 47,
-                functions: 39,
-                branches: 37,
+                lines: 55,
+                statements: 53,
+                functions: 44,
+                branches: 43,
 
-                // 오프라인 큐 — 지하주차장에서 쓴 기록이 사라지지 않게 하는 유일한 장치 (실측 92/81/82/73)
+                // 오프라인 큐 — 통신이 끊긴 창고·지하에서 찍은 스캔이 사라지지 않게 하는 유일한 장치 (실측 97.7/95.5/97.3/84.2)
                 'src/lib/offline/**': {
-                    lines: 87, statements: 77, functions: 77, branches: 68,
+                    lines: 94, statements: 92, functions: 94, branches: 80,
                 },
-                // Firestore 도메인 — organizationId 격리가 사는 자리 (실측 54/53/50/60)
+                // Firestore 도메인 — organizationId 격리가 사는 자리 (실측 65.4/64.7/51.7/67.4)
                 'src/lib/firestore/**': {
-                    lines: 50, statements: 49, functions: 45, branches: 55,
+                    lines: 62, statements: 61, functions: 48, branches: 64,
                 },
-                // 문서 스키마 — 필드 누락이 조용한 데이터 유실로 이어지는 경계 (실측 100/100/100/67)
+                // 문서 스키마 — 필드 누락이 조용한 데이터 유실로 이어지는 경계 (실측 100/100/100/66.7)
                 'src/schemas/**': {
-                    lines: 95, statements: 95, functions: 95, branches: 60,
+                    lines: 95, statements: 95, functions: 95, branches: 63,
                 },
                 // 기관 문서 — 초대 코드·승인 상태·소속 사용자 일괄 삭제가 지나가는 자리. 글롭 평균(57%)이
                 // 통과하는 동안 이 파일은 26%였다 — 위 "전역 임계치만으로는 부족하다"가 한 단계 아래에서
-                // 재현된 것이라 파일 단위로 따로 건다 (2026-09-02 실측 96/96/100/100)
+                // 재현된 것이라 파일 단위로 따로 건다 (2026-09-02 실측 96/96/100/100, 2026-11-24 95.7/95.9/100/100)
                 'src/lib/firestore/organizations.ts': {
                     lines: 90, statements: 90, functions: 95, branches: 90,
+                },
+
+                // ── 재물조사 핵심 (2026-11-24 신설) ──
+                // 대장 가져오기 — 열 인식·건수/금액 대사·다시 가져오기 비교. 틀리면 희망이음 원장과 어긋난다 (실측 98.9/96.4/96.9/91.6)
+                'src/lib/import/**': {
+                    lines: 95, statements: 93, functions: 93, branches: 88,
+                },
+                // 조사 판정·집계 — 판정 6종, 중복 스캔, 결과 보고 숫자 (실측 100/98.6/98.4/85.2)
+                'src/lib/survey/**': {
+                    lines: 96, statements: 95, functions: 95, branches: 82,
+                },
+                // QR 라벨 — 태그·인쇄 배치 계산 (실측 100/100/100/100)
+                'src/lib/labels/**': {
+                    lines: 96, statements: 96, functions: 96, branches: 96,
+                },
+                // 결과 보고서 인쇄 (실측 90.7/88.1/95.5/79.4)
+                'src/lib/pdf/**': {
+                    lines: 87, statements: 85, functions: 92, branches: 76,
+                },
+                // 재물 문서 — 가져오기 확정(commitImport)·증분 읽기·공간 이동 (실측 81.4/81.7/70.0/80.8)
+                'src/lib/firestore/assets.ts': {
+                    lines: 78, statements: 78, functions: 66, branches: 77,
+                },
+                // 마지막 확인 기록 (실측 87.0/87.7/80.0/81.0)
+                'src/lib/firestore/assetChecks.ts': {
+                    lines: 84, statements: 84, functions: 76, branches: 78,
+                },
+                // 회차·스캔·제출·마감 — 함수 커버리지가 낮다(32%: 구독·마감 이력 함수 다수가 화면 테스트에서만 지나간다).
+                // 지금 선을 지키고, 테스트를 보태면서 올린다 (실측 57.3/56.5/32.1/57.0)
+                'src/lib/firestore/surveys.ts': {
+                    lines: 54, statements: 53, functions: 29, branches: 54,
+                },
+                // 현장 스캔 훅 — 판정·중복·마감 중 잠금 (실측 88.2/83.4/69.2/73.8)
+                'src/hooks/useScanner.ts': {
+                    lines: 85, statements: 80, functions: 66, branches: 70,
+                },
+                // 회차 관리 훅 — 시작·승인·마감 (실측 92.9/88.2/83.3/75.9)
+                'src/hooks/useSurveyAdmin.ts': {
+                    lines: 90, statements: 85, functions: 80, branches: 72,
+                },
+                // 가져오기 훅 — 이어 저장·재시도 (실측 87.2/81.2/80.0/75.7)
+                'src/hooks/useAssetImport.ts': {
+                    lines: 84, statements: 78, functions: 76, branches: 72,
                 },
             },
             include: ['src/**/*.{ts,tsx}'],
