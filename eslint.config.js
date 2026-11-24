@@ -186,16 +186,14 @@ export default defineConfig([
     // 전역 도메인만 ignores로 명시해 뺀다. 새 도메인 파일은 별도 등록 없이 자동으로 검사된다.
     files: ['src/lib/firestore/**/*.ts'],
     ignores: [
-      // 전역 도메인 — 컬렉션이 기관 단위가 아니거나(기관·사용자·공휴일·통계·캐시),
+      // 전역 도메인 — 컬렉션이 기관 단위가 아니거나(기관·사용자·통계·캐시),
       // 사용자 본인(uid) 또는 superAdmin 범위로 격리된다(broadcasts: superAdmin 전용 전체 공지 이력).
       'src/lib/firestore/organizations.ts',
       'src/lib/firestore/users.ts',
-      'src/lib/firestore/favorites.ts',
       'src/lib/firestore/feedbacks.ts',
       'src/lib/firestore/notifications.ts',
       'src/lib/firestore/superAdmin.ts',
       'src/lib/firestore/statistics.ts',
-      'src/lib/firestore/holidays.ts',
       'src/lib/firestore/preRegistered.ts',
       'src/lib/firestore/cache.ts',
       'src/lib/firestore/broadcasts.ts',

@@ -1,6 +1,6 @@
 {
     "name": "functions",
-    "description": "Cloud Functions for 차량운행일지",
+    "description": "Cloud Functions for 재물조사(asset-survey)",
     "scripts": {
         "build": "tsc",
         "gcp-build": "",
