@@ -4,12 +4,12 @@
  * 흐름: 파일 고르기 → 시트·머리글·열 연결 → 검사 → (다음) 위치→공간 대응·비교 → 확정
  * 계산은 lib/import의 순수 함수가 하고, 여기서는 상태를 이어 붙이고 저장만 부른다.
  */
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useRef } from 'react';
 import { useAuth } from './useAuth';
 import { useToast } from './useToast';
 import { useConfirm } from './useConfirm';
 import {
-    getOrganization, getSpaces, createSpace, getAssets, getAccountingMap, commitImport,
+    getOrganization, getSpaces, createSpace, getAssets, getAccountingMap, commitImport, newImportId, importRecordExists,
     validateSpaceName, normalizeSpaceName, getBuildings,
 } from '../lib/firestore';
 import { matchSpaceByLocation, parseLocation } from '../lib/import/locationMatch';
@@ -21,6 +21,7 @@ import type { Space } from '../types/space';
 import type { Building } from '../types/building';
 import type { Asset, AssetAccounting } from '../types/asset';
 import type { Organization } from '../types/organization';
+import type { ImportDiffCounts } from '../lib/firestore/assets';
 
 export type ImportStep = 'pick' | 'map' | 'compare' | 'saving' | 'done';
 
@@ -79,6 +80,11 @@ export default function useAssetImport() {
     const [locationMap, setLocationMap] = useState<LocationSpaceMap>({});
     const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
     const [importId, setImportId] = useState<string | null>(null);
+    /**
+     * 멈춘 가져오기 — 같은 파일·시트·열 연결로 다시 확정하면 처음 기록 ID와 처음 건수를 이어 쓴다(2026-11-24).
+     * 파일을 다시 골라도 내용이 같으면 이어지도록 화면 상태(reset)와 따로 둔다.
+     */
+    const pending = useRef<{ key: string; id: string; counts: ImportDiffCounts } | null>(null);
     /** 확정한 결과 요약 — 비교(diff)는 비교 단계에서만 계산하므로 완료 화면용으로 따로 남긴다 */
     const [result, setResult] = useState<{ added: number; changed: number; missing: number; unchanged: number } | null>(null);
 
@@ -254,23 +260,38 @@ export default function useAssetImport() {
             diff.missing.length > 0 ? `이번 파일에 없는 재물 ${diff.missing.length}건은 지우지 않고 '대장에 없음'으로 표시합니다.` : '',
             unmapped > 0 ? `공간을 정하지 않은 재물 ${unmapped}건은 공간 없이 저장됩니다(나중에 다시 가져와 정할 수 있습니다).` : '',
         ].filter(Boolean);
-        const ok = await confirm({ title: '가져오기 확정', message: `${lines.join('\n')}\n\n이대로 저장할까요?`, confirmText: '저장' });
+        // 같은 가져오기를 다시 확정하는가 — 같은 파일·시트·열 연결·건수·금액 합계
+        const key = JSON.stringify([fileName, table.sheetName, columnMap, parsed.counts, parsed.amountTotals.all]);
+        const resume = pending.current?.key === key ? pending.current : null;
+        if (resume) lines.unshift("지난번에 멈춘 가져오기를 이어서 저장합니다(이미 저장된 것은 '그대로'로 셉니다).");
+        const ok = await confirm({ title: resume ? '가져오기 이어서 저장' : '가져오기 확정', message: `${lines.join('\n')}\n\n이대로 저장할까요?`, confirmText: '저장' });
         if (!ok) return;
+
+        const counts: ImportDiffCounts = { added: diff.added.length, changed: diff.changed.length, missing: diff.missing.length, unchanged: diff.unchanged };
+        const run = resume ?? { key, id: newImportId(), counts };
+        pending.current = run;
 
         setStep('saving');
         setProgress({ done: 0, total: 0 });
         try {
-            const id = await commitImport({
-                orgId, fileName, sheetName: table.sheetName, columnMap, locationMap, parsed, diff, reportedTotal,
-                onProgress: (done, total) => setProgress({ done, total }),
-            });
+            // 남은 것이 없으면 지난번 마지막 배치가 저장됐는데 응답만 못 받았을 수 있다 — 기록이 있으면 끝난 것
+            const nothingLeft = counts.added + counts.changed + counts.missing === 0;
+            const id = resume && nothingLeft && await importRecordExists(run.id)
+                ? run.id
+                : await commitImport({
+                    orgId, fileName, sheetName: table.sheetName, columnMap, locationMap, parsed, diff, reportedTotal,
+                    importId: run.id, recordDiff: run.counts,
+                    onProgress: (done, total) => setProgress({ done, total }),
+                });
+            pending.current = null;
             setImportId(id);
-            setResult({ added: diff.added.length, changed: diff.changed.length, missing: diff.missing.length, unchanged: diff.unchanged });
+            // 완료 요약은 처음 확정한 건수 — 다시 확정했으면 남은 건수만 비교되기 때문
+            setResult(run.counts);
             setStep('done');
-            showToast('가져오기를 마쳤습니다.', 'success');
+            showToast(resume ? '멈췄던 가져오기를 이어서 마쳤습니다.' : '가져오기를 마쳤습니다.', 'success');
         } catch {
             setStep('compare');
-            setError('저장하다 멈췄습니다. 일부만 저장됐을 수 있습니다 — 같은 파일로 다시 확정하면 남은 것만 이어서 저장합니다.');
+            setError('저장하다 멈췄습니다. 일부만 저장됐을 수 있습니다 — 같은 파일로 다시 확정하면 남은 것만 이어서 저장하고, 가져오기 기록은 하나로 남습니다.');
             // 다시 비교할 수 있게 앱 쪽 재물을 새로 읽는다
             try {
                 const [assetList, accMap] = await Promise.all([getAssets(orgId), getAccountingMap(orgId)]);
