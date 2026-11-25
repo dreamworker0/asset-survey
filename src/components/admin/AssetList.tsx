@@ -14,6 +14,7 @@ import { isUsefulLifeOver, todayText, usefulLifeEnd } from '../../lib/usefulLife
 import LabelPrintDialog from './LabelPrintDialog';
 import PanelModal from './space/PanelModal';
 import SpacePickOptions from './space/SpacePickOptions';
+import { SkeletonBox, SkeletonList, SkeletonTable } from '../common/Skeleton';
 import { useToast } from '../../hooks/useToast';
 import { moveAssetsToSpace } from '../../lib/firestore';
 import type { Asset } from '../../types/asset';
@@ -51,11 +52,30 @@ export default function AssetList() {
     const outsideResult = al.selected.size - filteredSelected;
 
     if (al.loading) {
-        return <div className="flex justify-center py-20"><div className="w-8 h-8 spinner" /></div>;
+        return (
+            <div className="max-w-5xl mx-auto animate-fade-in space-y-4" role="status" aria-label="재물 목록을 불러오는 중">
+                <div className="flex items-end justify-between gap-3">
+                    <div>
+                        <SkeletonBox className="h-7 w-28 mb-2" />
+                        <SkeletonBox className="h-4 w-44" />
+                    </div>
+                    <div className="flex gap-2">
+                        <SkeletonBox className="h-12 w-24 rounded-xl" />
+                        <SkeletonBox className="h-12 w-28 rounded-xl" />
+                    </div>
+                </div>
+                <div className="hidden md:block">
+                    <SkeletonTable rows={6} cols={5} />
+                </div>
+                <div className="md:hidden">
+                    <SkeletonList count={5} />
+                </div>
+            </div>
+        );
     }
     if (al.error) {
         return (
-            <div className="max-w-3xl mx-auto glass-card p-6 text-center">
+            <div className="max-w-5xl mx-auto glass-card p-6 text-center">
                 <p className="text-red-700 dark:text-red-300 mb-3" role="alert">재물 목록을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 다시 불러오세요.</p>
                 <button type="button" className="btn-secondary min-h-[48px] px-4" onClick={() => void al.reload()}>다시 불러오기</button>
             </div>
@@ -63,7 +83,7 @@ export default function AssetList() {
     }
 
     return (
-        <div className="max-w-6xl mx-auto animate-fade-in">
+        <div className="max-w-5xl mx-auto animate-fade-in">
             <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
                 <div>
                     <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">재물 목록</h1>
@@ -117,7 +137,7 @@ export default function AssetList() {
                     )}
                     <Filters filters={filters} setFilter={setFilter} spaces={al.spaces} buildings={al.buildings} onReset={al.resetFilters} />
 
-                    <div className="glass-card p-3 mb-3 flex flex-wrap items-center gap-2 sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-10">
+                    <div className={`glass-card p-3 mb-3 flex flex-wrap items-center gap-2 sticky top-[calc(3.5rem+env(safe-area-inset-top,0px))] z-10 transition-colors ${al.selected.size > 0 ? 'border-primary-300 dark:border-primary-700 bg-primary-50/70 dark:bg-primary-950/30 shadow-glass-lg' : ''}`}>
                         <span className="text-sm font-medium text-surface-800 dark:text-surface-200 mr-auto" aria-live="polite">
                             {al.selected.size.toLocaleString('ko-KR')}건 고름
                             {outsideResult > 0 && ` · 현재 결과 밖 ${outsideResult.toLocaleString('ko-KR')}건 포함`}

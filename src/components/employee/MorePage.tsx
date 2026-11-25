@@ -42,7 +42,7 @@ export default function MorePage() {
 
     return (
         <div className="max-w-lg mx-auto animate-fade-in space-y-3">
-            <h1 className="text-lg font-bold text-surface-900 dark:text-surface-100 mb-2">더보기</h1>
+            <h1 className="text-xl font-bold text-surface-900 dark:text-surface-100 mb-2">더보기</h1>
 
             {/* 로그인 계정 정보 */}
             <div className="glass-card p-4 flex items-center gap-3">

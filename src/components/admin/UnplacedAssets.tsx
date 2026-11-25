@@ -174,7 +174,7 @@ export default function UnplacedAssets() {
                     </ul>
 
                     <div className="fixed bottom-3 left-3 right-3 lg:left-[calc(16rem+1.5rem)] lg:right-6 z-40 flex justify-center pointer-events-none">
-                        <div className="pointer-events-auto w-full max-w-3xl glass-card p-3 shadow-xl border border-primary-200 dark:border-primary-800 flex flex-wrap items-center gap-2 bg-white/95 dark:bg-surface-900/95">
+                        <div className="pointer-events-auto w-full max-w-3xl glass-card p-3 shadow-glass-lg border border-primary-200 dark:border-primary-800 flex flex-wrap items-center gap-2 bg-white/95 dark:bg-surface-900/95 backdrop-blur-md">
                             <p className="flex-1 min-w-[10rem] text-sm text-surface-800 dark:text-surface-200 tabular-nums" role="status">
                                 {progress
                                     ? `옮기는 중… ${progress.done.toLocaleString('ko-KR')} / ${progress.total.toLocaleString('ko-KR')}건`

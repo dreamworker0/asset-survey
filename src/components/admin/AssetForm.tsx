@@ -56,7 +56,7 @@ export default function AssetForm() {
     );
 
     return (
-        <div className="max-w-2xl mx-auto animate-fade-in">
+        <div className="max-w-3xl mx-auto animate-fade-in">
             <Link to={f.isNew ? '/admin/assets' : detailPath(assetId!)} className="inline-flex items-center gap-1 text-sm font-medium text-primary-700 dark:text-primary-300 min-h-[48px] pr-2">
                 <span aria-hidden="true">←</span> {f.isNew ? '재물 목록' : '재물 정보'}
             </Link>

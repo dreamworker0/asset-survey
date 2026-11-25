@@ -47,7 +47,7 @@ export default function LoginPage() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary-600 via-primary-700 to-primary-900 px-4">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-primary-800 via-primary-900 to-surface-950 px-4">
             <SEOHead
                 title="로그인"
                 description="Google 계정으로 재물조사에 로그인하세요."
@@ -55,7 +55,7 @@ export default function LoginPage() {
             />
             {/* 배경 장식 */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-400/20 rounded-full blur-3xl" />
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary-400/15 rounded-full blur-3xl" />
                 <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-primary-300/10 rounded-full blur-3xl" />
                 <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-accent-400/10 rounded-full blur-3xl" />
             </div>
@@ -98,7 +98,7 @@ export default function LoginPage() {
                                 type="button"
                                 onClick={handleGoogleLogin}
                                 disabled={loading}
-                                className="w-full flex items-center justify-center gap-3 px-4 py-3 min-h-[48px] bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-600 rounded-xl font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800/50 dark:bg-surface-800 hover:shadow-md transition-all duration-200 disabled:opacity-50 active:scale-[0.98]"
+                                className="w-full flex items-center justify-center gap-3 px-4 py-3 min-h-[48px] bg-white dark:bg-surface-800 border border-surface-300 dark:border-surface-600 rounded-xl font-medium text-surface-800 dark:text-surface-200 hover:bg-surface-50 dark:hover:bg-surface-700 shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 active:scale-[0.98]"
                             >
                                 {loading ? (
                                     <div className="w-5 h-5 spinner" />

@@ -116,7 +116,7 @@ export default function SpaceManager() {
     };
 
     return (
-        <div className="max-w-3xl mx-auto animate-fade-in">
+        <div className="max-w-5xl mx-auto animate-fade-in">
             <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-2">공간 관리</h1>
             <p className="text-sm text-surface-600 dark:text-surface-400 mb-4">
                 재물이 놓인 곳(사무실·시설)을 등록하고 담당 직원이나 팀을 정합니다. 건물이 여러 곳이면 [건물·층]에서 먼저 등록하세요.
@@ -257,7 +257,7 @@ export default function SpaceManager() {
                             {selectedIds.length > 0 && (
                                 // 화면 아래에 고정 — sticky는 레이아웃의 overflow 때문에 목록 끝에 머물러, 위쪽 층을 고르면 보이지 않았다
                                 <div className="fixed bottom-3 left-3 right-3 lg:left-[calc(16rem+1.5rem)] lg:right-6 z-40 flex justify-center pointer-events-none">
-                                <div className="pointer-events-auto w-full max-w-3xl glass-card p-3 shadow-xl border border-primary-200 dark:border-primary-800 flex flex-wrap items-center gap-2 bg-white/95 dark:bg-surface-900/95"
+                                <div className="pointer-events-auto w-full max-w-5xl glass-card p-3 shadow-glass-lg border border-primary-200 dark:border-primary-800 flex flex-wrap items-center gap-2 bg-white/95 dark:bg-surface-900/95 backdrop-blur-md"
                                     role="region" aria-label="고른 공간에 할 일">
                                     <span className="text-sm font-semibold text-surface-900 dark:text-surface-100 tabular-nums mr-auto">{selectedIds.length}곳 고름</span>
                                     <label htmlFor="bulk-assign" className="sr-only">고른 공간에 담당 지정</label>

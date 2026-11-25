@@ -1,10 +1,10 @@
 ---
-description: 차량 운행일지 앱 디자인 시스템 규칙. 새 컴포넌트를 만들거나, 기존 UI를 수정할 때 반드시 참고한다.
+description: 재물조사 앱 디자인 시스템 규칙. 새 컴포넌트를 만들거나, 기존 UI를 수정할 때 반드시 참고한다.
 ---
 
 # 🎨 디자인 시스템
 
-이 문서는 차량 운행일지 앱의 **디자인 일관성**을 유지하기 위한 규칙이다.
+이 문서는 재물조사 앱의 **디자인 일관성**을 유지하기 위한 규칙이다.
 새 컴포넌트를 만들거나 기존 UI를 수정할 때 반드시 따른다.
 
 ---
@@ -16,7 +16,7 @@ description: 차량 운행일지 앱 디자인 시스템 규칙. 새 컴포넌�
 
 | 토큰 | 용도 | 실제 색상 |
 |------|------|-----------|
-| `primary-*` | 브랜드 색상, 주요 버튼, 활성 상태, 링크 | Blue 계열 (`#2563eb` 기준) |
+| `primary-*` | 브랜드 색상, 주요 버튼, 활성 상태, 링크 | Deep Blue 계열 (`#1e52a8` 기준) |
 | `accent-*` | 성공, 긍정적 상태, 승인 | Green 계열 (`#16a34a` 기준) |
 | `surface-*` | 배경, 텍스트, 보더, 비활성 상태 | Slate 계열 (`#f8fafc` ~ `#0f172a`) |
 | `red-*` | 위험, 삭제, 에러, 미등록 판정 | Tailwind red (허용 예외) |
@@ -104,11 +104,11 @@ description: 차량 운행일지 앱 디자인 시스템 규칙. 새 컴포넌�
 
 ### 3.1 카드
 ```
-glass-card     — 기본 카드: 흰 배경 + 블러 + 그림자 + rounded-2xl
+glass-card     — 기본 솔리드 카드: 흰 배경 + 선명한 1px 보더 + 미세 그림자 + rounded-2xl (다크: surface-900 + surface-800 보더)
 glass-card p-5 — 일반 콘텐츠 카드 (padding 5)
-glass-card p-4 — 콤팩트 카드 (예약 폼 등)
+glass-card p-4 — 콤팩트 카드 (예약·스캔 현황 등)
 ```
-- **빈 상태 (Empty State)**: `glass-card p-8 text-center` + 아이콘(text-3xl~4xl) + 설명 텍스트
+- **빈 상태 (Empty State)**: `glass-card p-8 text-center` + 아이콘 컨테이너(`w-12 h-12 rounded-2xl`) + 설명 텍스트
 - **리스트 아이템**: `glass-card p-4 hover:shadow-glass-lg transition-all`
 
 ### 3.2 버튼
@@ -144,12 +144,13 @@ badge-neutral  — 중립 (회색)
 ```
 
 ### 3.5 모달
+- 공용 모달 컴포넌트 [Modal.tsx](../../src/components/common/Modal.tsx)를 우선 사용한다(`document.body` Portal, 포커스 트랩, ESC 닫기, 열기 버튼으로 초점 복원 포함).
 ```jsx
-// 오버레이
-<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40">
+// 오버레이 톤
+<div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-[2px]">
   // 모달 본체
-  <div className="glass-card p-6 w-full max-w-md animate-scale-in">
-    <h3 className="text-lg font-semibold text-surface-900 mb-4">제목</h3>
+  <div className="glass-card p-5 w-full max-w-md animate-scale-in">
+    <h2 className="text-lg font-bold text-surface-900 dark:text-surface-100">제목</h2>
     ...
     <div className="flex gap-3 pt-2">
       <button className="btn-secondary flex-1">취소</button>
@@ -165,10 +166,12 @@ badge-neutral  — 중립 (회색)
 
 ### 4.1 관리자 (PC 중심)
 - 좌측 사이드바 (`w-64`, `bg-white`, `border-r`) + 우측 메인 콘텐츠
-- 상단 헤더: `sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b h-14`
+- 상단 헤더: `sticky top-0 z-[45] bg-white/90 backdrop-blur-md border-b h-14`
 - 콘텐츠 영역: `p-4 lg:p-6`
-- 콘텐츠 최대 폭: `max-w-4xl mx-auto`
-- 사이드바 반응형: 모바일에서 오버레이로 전환 (`lg:static`, `-translate-x-full lg:translate-x-0`)
+- 콘텐츠 최대 폭 (2단계 규칙):
+  - **목록·대시보드·현황판·보고서형**: `max-w-5xl mx-auto` (`AdminDashboard`, `AssetList`, `SpaceManager`, `EmployeeManager`, `SurveyManager`, `SurveyReport`)
+  - **집중 폼·설정·로그형**: `max-w-3xl mx-auto` (`Settings`, `AssetForm`, `AssetImport`, `AuditLogViewer`, `UnplacedAssets`)
+- 사이드바 반응형: 모바일에서 오버레이로 전환 (`lg:static`, `-translate-x-full lg:translate-x-0`), 모바일 서랍 닫기(`✕`) 버튼 포함
 
 ### 4.2 직원 (모바일 중심)
 - 상단 헤더: `sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b h-14`
@@ -186,25 +189,16 @@ badge-neutral  — 중립 (회색)
 
 ## 5. 아이콘 규칙
 
-- **라이브러리**: Heroicons (outline, strokeWidth 1.5)
+- **라이브러리**: Heroicons (outline, strokeWidth 1.5~1.8) — **시스템 이모지 대신 Heroicons SVG를 우선 사용**한다(OS별 렌더링 편차 방지).
 - **사이드바/탭 아이콘**: `w-5 h-5` (사이드바), `w-6 h-6` (모바일 탭)
 - **버튼 내 아이콘**: `w-4 h-4` (btn-sm), `w-5 h-5` (기본)
-- **이모지**: 차량 타입 아이콘에만 사용 (🚗🚙🚐🚌), 빈 상태 장식 (📋📅 등)
 - **아이콘 컨테이너**: 정사각형 배경 + rounded
-  - 대: `w-12 h-12 rounded-xl` (대시보드 통계)
-  - 중: `w-10 h-10 rounded-lg` (예약 카드)
+  - 대: `w-12 h-12 rounded-2xl` (빈 상태, 스캔 버튼)
+  - 중: `w-10 h-10 rounded-xl` (대시보드 통계, 빠른 작업)
   - 소: `w-8 h-8 rounded-lg` (헤더 로고)
 
-### 차량 색상 시스템 (차량운행일지 사례 — 이 앱에는 차량이 없다)
-> 원칙(같은 대상은 어디서나 같은 색)의 근거로만 남긴다. 이 앱에서 대상별 색이 필요하면 토큰(`primary`·`accent`·`surface`·`amber`·`red`)의 단계로 만든다 — 아래 배열을 그대로 쓰면 디자인 토큰 검사에 걸린다.
-```js
-const VEHICLE_COLORS = [
-    'bg-red-200', 'bg-blue-200', 'bg-yellow-200', 'bg-green-200', 'bg-purple-200',
-    'bg-orange-300', 'bg-cyan-200', 'bg-pink-300', 'bg-indigo-300', 'bg-lime-300',
-];
-// 차량 ID를 해시하여 고유 색상을 배정한다
-```
-- 이 색상 배열과 해시 함수(`getVehicleColor`)는 차량을 표시하는 모든 곳에서 동일하게 사용한다.
+### 대상별 색상 원칙 (토큰 단계 활용)
+> 대상별 색이 필요하면 허용 토큰(`primary`·`accent`·`surface`·`amber`·`red`)의 단계로 만든다 — Tailwind 기본 색상(`blue`, `green`, `purple` 등)을 쓰면 `designTokens.test.ts` 검사에 걸린다.
 
 ---
 
@@ -219,16 +213,7 @@ const VEHICLE_COLORS = [
 | `animate-scale-in` | 모달, 팝업 |
 | `animate-pulse-soft` | 부드러운 강조 |
 
-### 6.2 CSS 커스텀 애니메이션 (index.css)
-- **운행 중 상태** 전용:
-  - `driving-card` — 운행 중 카드 배경 (amber 그라데이션)
-  - `driving-progress-bar` — 상단 주행 애니메이션 바
-  - `driving-badge` — 운행 중 뱃지
-  - `driving-dot` — 점멸 도트
-  - `@keyframes carDrive` — 차 아이콘 흔들림
-  - `@keyframes drivePulse` — 뱃지 펄스
-
-### 6.3 인터랙션
+### 6.2 인터랙션
 - **버튼 클릭**: `active:scale-[0.98]` (btn 베이스에 포함)
 - **카드 호버**: `hover:shadow-glass-lg transition-all`
 - **목록 아이템 호버**: `hover:bg-surface-50` 또는 `hover:bg-surface-100`

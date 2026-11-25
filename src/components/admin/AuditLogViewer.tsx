@@ -106,7 +106,7 @@ export default function AuditLogViewer() {
     } = useAuditLogs();
 
     return (
-        <div className="max-w-2xl mx-auto animate-fade-in">
+        <div className="max-w-3xl mx-auto animate-fade-in">
             <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-2">접속기록</h1>
             <p className="text-sm text-surface-600 dark:text-surface-400 mb-6 leading-relaxed">
                 개인정보에 대한 접속·변경·반출 기록입니다. 개인정보 보호법에 따라 1년간 보관된 뒤 자동으로

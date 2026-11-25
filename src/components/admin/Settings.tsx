@@ -38,7 +38,7 @@ export default function Settings() {
     }
 
     return (
-        <div className="max-w-2xl mx-auto animate-fade-in">
+        <div className="max-w-3xl mx-auto animate-fade-in">
             <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-6">설정</h1>
 
             {/* 기관 관리 섹션 */}

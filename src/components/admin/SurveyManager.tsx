@@ -12,16 +12,28 @@ import type { SurveySubmission } from '../../types/survey';
 import { sub, card, MODE_LABEL } from './survey/surveyStyles';
 import { Dashboard } from './survey/SurveyDashboard';
 import { StartFormView } from './survey/SurveyStartForm';
+import { SkeletonBox, SkeletonCard, SkeletonList } from '../common/Skeleton';
 
 export default function SurveyManager() {
     const s = useSurveyAdmin();
     const { confirm } = useConfirm();
     const navigate = useNavigate();
 
-    if (s.loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 spinner" /></div>;
+    if (s.loading) {
+        return (
+            <div className="max-w-5xl mx-auto animate-fade-in space-y-4" role="status" aria-label="조사 정보를 불러오는 중">
+                <div>
+                    <SkeletonBox className="h-7 w-28 mb-2" />
+                    <SkeletonBox className="h-4 w-72" />
+                </div>
+                <SkeletonCard />
+                <SkeletonList count={3} />
+            </div>
+        );
+    }
     if (s.error) {
         return (
-            <div className="max-w-3xl mx-auto glass-card p-6 text-center">
+            <div className="max-w-5xl mx-auto glass-card p-6 text-center">
                 <p className="text-red-700 dark:text-red-300 mb-3" role="alert">조사 정보를 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 다시 불러오세요.</p>
                 <button type="button" className="btn-secondary min-h-[48px] px-4" onClick={() => void s.reload()}>다시 불러오기</button>
             </div>
@@ -55,7 +67,7 @@ export default function SurveyManager() {
     const activeSpaceCount = s.spaces.filter((x) => !x.archived).length;
 
     return (
-        <div className="max-w-4xl mx-auto animate-fade-in">
+        <div className="max-w-5xl mx-auto animate-fade-in">
             <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-1">재물조사</h1>
             <p className="text-sm text-surface-600 dark:text-surface-400 mb-6">
                 조사를 시작하면 그때의 운영 재물이 공간별 대상 목록으로 고정되고, 공간 담당자 화면의 스캔 탭이 열립니다.

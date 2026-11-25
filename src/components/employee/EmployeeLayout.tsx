@@ -86,7 +86,7 @@ export default function EmployeeLayout() {
             예약 배너(z-40)와 약관 재동의 배너(z-40)가 알림 패널을 덮었다.
             고정 배너(40)보다 위, 모달(50)보다 아래여야 하므로 그 사이 값을 쓴다.
             */}
-            <header className="sticky top-0 z-[45] bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border-b border-surface-100 dark:border-surface-700 px-4 h-[calc(3.5rem+env(safe-area-inset-top,0px))] flex items-center justify-between safe-top">
+            <header className="sticky top-0 z-[45] bg-white/90 dark:bg-surface-900/90 backdrop-blur-md border-b border-surface-200/80 dark:border-surface-800 px-4 h-[calc(3.5rem+env(safe-area-inset-top,0px))] flex items-center justify-between safe-top">
                 <div className="flex items-center gap-3 min-w-0">
                     <div className="w-8 h-8 flex-shrink-0 bg-primary-100 dark:bg-primary-900/40 rounded-lg flex items-center justify-center">
                         <AppIcon className="w-4 h-4 text-primary-600 dark:text-primary-400" />
@@ -98,11 +98,13 @@ export default function EmployeeLayout() {
                     {isSuperAdmin && (
                         <button
                             onClick={exitSaTestMode}
-                            className="flex items-center justify-center gap-1 text-xs bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50 px-3 py-2 rounded-lg transition-colors font-medium"
+                            className="btn-icon min-h-[48px] min-w-[48px] bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-amber-900/50"
                             title="슈퍼관리자 화면으로 복귀"
                             aria-label="슈퍼관리자 화면으로 복귀"
                         >
-                            <span aria-hidden="true">⚡</span>
+                            <svg aria-hidden="true" className="w-5 h-5" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="m3.75 13.5 10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75Z" />
+                            </svg>
                         </button>
                     )}
                     {(userData?.role === 'admin' || isSuperAdmin) && (
@@ -152,8 +154,8 @@ export default function EmployeeLayout() {
             </main>
 
             {/* 하단 탭 바 (모바일 최적화) */}
-            <nav className="fixed bottom-0 left-0 right-0 bg-white/85 dark:bg-surface-900/85 backdrop-blur-xl border-t border-surface-200/50 dark:border-surface-700/50 z-30 safe-bottom" aria-label="직원 메뉴">
-                <div className="flex items-center justify-between h-[68px] max-w-lg mx-auto px-4 relative">
+            <nav className="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-surface-900/95 backdrop-blur-md border-t border-surface-200/80 dark:border-surface-800 z-30 safe-bottom" aria-label="직원 메뉴">
+                <div className="grid grid-cols-3 items-center h-[68px] max-w-lg mx-auto px-2 relative">
                     {navItems.map((item, idx) => {
                         // NavLink 클릭 시 startTransition을 통해 부드러운 페이지 전환 유도
                         const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -165,24 +167,31 @@ export default function EmployeeLayout() {
                             }
                         };
 
-                        // 중앙의 Elevated FAB (스캔)
+                        // 중앙의 Elevated 스캔 버튼 — 비활성일 때도 브랜드 주색과 라벨로 용도가 바로 보이게
                         if (idx === 1) {
                             return (
                                 <NavLink
                                     key={item.to}
                                     to={item.to}
                                     onClick={handleNavClick}
-                                    // 아이콘만 있는 링크라 접근 가능한 이름이 없다 — 스크린리더에는
-                                    // "링크"로만 읽힌다 (axe link-name serious 위반, authed-accessibility가 게이트)
-                                    aria-label={item.label}
                                     className={({ isActive }) =>
-                                        `absolute left-1/2 -translate-x-1/2 -top-5 flex flex-col items-center justify-center w-14 h-14 rounded-full shadow-lg transition-all duration-300 transform hover:scale-105 active:scale-95 ${isActive
-                                            ? 'bg-primary-600 dark:bg-primary-500 text-white ring-4 ring-white/50 dark:ring-surface-900/50'
-                                            : 'bg-surface-800 text-surface-50 dark:bg-surface-200 dark:text-surface-900 ring-4 ring-surface-50 dark:ring-surface-900 shadow-surface-300/50 dark:shadow-black/50 hover:bg-surface-700 dark:hover:bg-surface-300'
+                                        `flex flex-col items-center justify-center gap-0.5 py-1 min-h-[48px] rounded-xl transition-all duration-200 ${isActive
+                                            ? 'text-primary-700 dark:text-primary-300 font-bold'
+                                            : 'text-surface-700 dark:text-surface-200 hover:text-primary-600 dark:hover:text-primary-400 font-semibold'
                                         }`
                                     }
                                 >
-                                    <div className="scale-110">{item.icon}</div>
+                                    {({ isActive }) => (
+                                        <>
+                                            <span className={`-mt-5 flex items-center justify-center w-12 h-12 rounded-full shadow-glass-lg transition-all duration-200 active:scale-95 ${isActive
+                                                ? 'bg-primary-600 dark:bg-primary-500 text-white ring-4 ring-primary-200 dark:ring-primary-900/70'
+                                                : 'bg-primary-600 dark:bg-primary-500 text-white ring-4 ring-white dark:ring-surface-900 hover:bg-primary-700 dark:hover:bg-primary-400'
+                                            }`}>
+                                                {item.icon}
+                                            </span>
+                                            <span className={`text-xs ${isActive ? 'tracking-tight' : ''}`}>{item.label}</span>
+                                        </>
+                                    )}
                                 </NavLink>
                             );
                         }
@@ -194,11 +203,9 @@ export default function EmployeeLayout() {
                                 to={item.to}
                                 onClick={handleNavClick}
                                 className={({ isActive }) =>
-                                    `flex flex-col items-center justify-center gap-1 w-14 py-1.5 min-h-[48px] rounded-xl transition-all duration-200 ${
-                                        idx === 0 ? 'mr-14' : idx === 2 ? 'ml-14' : ''
-                                    } ${isActive
+                                    `flex flex-col items-center justify-center gap-1 py-1.5 min-h-[48px] rounded-xl transition-all duration-200 ${isActive
                                         ? 'text-primary-600 dark:text-primary-400 font-bold'
-                                        : 'text-surface-500 dark:text-surface-400 hover:text-surface-600 hover:bg-surface-100/50 dark:hover:bg-surface-800/50 font-medium'
+                                        : 'text-surface-500 dark:text-surface-400 hover:text-surface-700 hover:bg-surface-100/60 dark:hover:text-surface-200 dark:hover:bg-surface-800/60 font-medium'
                                     }`
                                 }
                             >

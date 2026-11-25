@@ -10,6 +10,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { getMySpaces, getAssetsBySpaces } from '../../lib/firestore';
 import { sortAssets, filterAssets, DEFAULT_FILTERS } from '../../hooks/useAssetList';
 import { StatusBadge, MissingBadge, UsefulLifeOverBadge } from '../common/AssetBadges';
+import { SkeletonBox, SkeletonList } from '../common/Skeleton';
 import { isUsefulLifeOver, usefulLifeEnd } from '../../lib/usefulLife';
 import type { Asset } from '../../types/asset';
 import type { Space } from '../../types/space';
@@ -54,7 +55,15 @@ export default function MyAssets() {
     }), [assets, search, current, withInactive]);
     const countIn = (id: string) => assets.filter((a) => a.spaceId === id && (withInactive || a.status === 'active')).length;
 
-    if (loading) return <div className="flex justify-center py-20"><div className="w-8 h-8 spinner" /></div>;
+    if (loading) {
+        return (
+            <div className="max-w-lg mx-auto animate-fade-in space-y-3" role="status" aria-label="내 공간 재물을 불러오는 중">
+                <SkeletonBox className="h-7 w-32" />
+                <SkeletonBox className="h-12 w-full rounded-xl" />
+                <SkeletonList count={4} />
+            </div>
+        );
+    }
     if (error) {
         return (
             <div role="alert" className="max-w-lg mx-auto glass-card p-6 text-center">

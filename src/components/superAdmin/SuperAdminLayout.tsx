@@ -182,20 +182,20 @@ export default function SuperAdminLayout() {
             {sidebarOpen && (
                 <div
                     role="presentation"
-                    className="fixed inset-0 bg-black/30 z-40 lg:hidden"
+                    className="fixed inset-0 bg-black/40 z-40 lg:hidden"
                     onClick={closeSidebar}
                 />
             )}
 
             {/* 사이드바 */}
             <aside ref={asideRef} id="superadmin-sidebar" inert={!sidebarOpen && !isDesktop} className={`
-        fixed lg:sticky inset-y-0 left-0 lg:top-0 lg:h-screen z-50
-        w-64 bg-white dark:bg-surface-900 border-r border-surface-100 dark:border-surface-700
+        fixed lg:sticky inset-y-0 left-0 lg:top-0 h-dvh z-50
+        w-64 bg-white dark:bg-surface-900 border-r border-surface-200/80 dark:border-surface-800
         transform transition-transform duration-300 ease-out
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         flex flex-col
       `}>
-                <div className="p-4 pt-[calc(1rem+env(safe-area-inset-top,0px))] border-b border-surface-100 dark:border-surface-700">
+                <div className="p-4 pt-[calc(1rem+env(safe-area-inset-top,0px))] border-b border-surface-200/80 dark:border-surface-800">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/40 rounded-xl flex items-center justify-center">
                             <svg className="w-5 h-5 text-primary-600 dark:text-primary-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
@@ -299,7 +299,7 @@ export default function SuperAdminLayout() {
 
                 </nav>
 
-                <div className="p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] border-t border-surface-100 dark:border-surface-700 space-y-1">
+                <div className="p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom,0px))] border-t border-surface-200/80 dark:border-surface-800 space-y-1">
 
 
                     <div className="flex items-center justify-between px-3 py-2 rounded-lg">
@@ -336,7 +336,7 @@ export default function SuperAdminLayout() {
                 예약 배너(z-40)와 약관 재동의 배너(z-40)가 알림 패널을 덮었다.
                 고정 배너(40)보다 위, 모달(50)보다 아래여야 하므로 그 사이 값을 쓴다.
                 */}
-                <header className="sticky top-0 z-[45] bg-white/80 dark:bg-surface-900/80 backdrop-blur-md border-b border-surface-100 dark:border-surface-700 px-4 lg:px-6 h-[calc(3.5rem+env(safe-area-inset-top,0px))] flex items-center justify-between safe-top">
+                <header className="sticky top-0 z-[45] bg-white/90 dark:bg-surface-900/90 backdrop-blur-md border-b border-surface-200/80 dark:border-surface-800 px-4 lg:px-6 h-[calc(3.5rem+env(safe-area-inset-top,0px))] flex items-center justify-between safe-top">
                     <button
                         ref={menuButtonRef}
                         type="button"
@@ -358,14 +358,20 @@ export default function SuperAdminLayout() {
                             onClick={() => { void startTestMode('admin'); }}
                             className="btn-secondary btn-sm min-h-[48px]"
                         >
-                            <span aria-hidden="true">🏢</span> 관리자<span className="hidden sm:inline"> 화면 보기</span>
+                            <svg className="w-4 h-4 text-surface-500 dark:text-surface-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z" />
+                            </svg>
+                            <span>관리자<span className="hidden sm:inline"> 화면 보기</span></span>
                         </button>
                         <button
                             type="button"
                             onClick={() => { void startTestMode('employee'); }}
                             className="btn-secondary btn-sm min-h-[48px]"
                         >
-                            <span aria-hidden="true">🙋</span> 직원<span className="hidden sm:inline"> 화면 보기</span>
+                            <svg className="w-4 h-4 text-surface-500 dark:text-surface-400" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+                            </svg>
+                            <span>직원<span className="hidden sm:inline"> 화면 보기</span></span>
                         </button>
                     </div>
 

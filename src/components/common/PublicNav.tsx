@@ -4,6 +4,7 @@
  */
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import AppIcon from './AppIcon';
 
 interface NavItem {
     href: string;
@@ -53,13 +54,14 @@ export default function PublicNav({ variant = 'solid' }: PublicNavProps) {
             <div className="max-w-5xl mx-auto px-4 h-12 flex items-center justify-between">
                 <Link
                     to="/"
-                    className={`text-sm font-semibold tracking-tight transition-colors min-h-[48px] flex items-center px-2 -ml-2 ${
+                    className={`text-sm font-semibold tracking-tight transition-colors min-h-[48px] flex items-center gap-2 px-2 -ml-2 ${
                         isOverlay
-                            ? isScrolled ? 'text-surface-800 dark:text-surface-200 hover:text-primary-600 dark:hover:text-primary-400' : 'text-white/90 hover:text-white'
+                            ? isScrolled ? 'text-surface-800 dark:text-surface-200 hover:text-primary-600 dark:hover:text-primary-400' : 'text-white/95 hover:text-white'
                             : 'text-surface-800 dark:text-surface-200 hover:text-primary-600 dark:hover:text-primary-400'
                     }`}
                 >
-                    재물조사
+                    <AppIcon className="w-5 h-5" />
+                    <span>재물조사</span>
                 </Link>
                 <div className="flex items-center gap-1">
                     {NAV_ITEMS.map((item) => {

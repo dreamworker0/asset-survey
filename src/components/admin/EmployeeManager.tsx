@@ -78,7 +78,7 @@ export default function EmployeeManager() {
 
     if (loading) {
         return (
-            <div className="max-w-4xl mx-auto animate-fade-in">
+            <div className="max-w-5xl mx-auto animate-fade-in">
                 <SkeletonBox className="h-7 w-28 mb-1" />
                 <SkeletonBox className="h-4 w-40 mb-6" />
                 <SkeletonList count={4} />
@@ -89,7 +89,7 @@ export default function EmployeeManager() {
     const inviteLink = `${APP_URL}?code=${organization?.inviteCode || '------'}`;
 
     return (
-        <div className="max-w-4xl mx-auto animate-fade-in">
+        <div className="max-w-5xl mx-auto animate-fade-in">
             <div className="mb-6">
                 <h1 className="text-2xl font-bold text-surface-900 dark:text-surface-100">팀·직원 관리</h1>
                 <p className="text-sm text-surface-600 dark:text-surface-400 mt-1" aria-live="polite">
@@ -289,7 +289,7 @@ export default function EmployeeManager() {
             {pickedMembers.length > 0 && <div className="h-36 sm:h-24" aria-hidden="true" />}
             {pickedMembers.length > 0 && (
                 <div className="fixed bottom-3 left-3 right-3 lg:left-[calc(16rem+1.5rem)] lg:right-6 z-40 flex justify-center pointer-events-none">
-                    <div className="pointer-events-auto w-full max-w-4xl glass-card p-3 shadow-xl border border-primary-200 dark:border-primary-800 flex flex-wrap items-center gap-2 bg-white/95 dark:bg-surface-900/95"
+                    <div className="pointer-events-auto w-full max-w-5xl glass-card p-3 shadow-glass-lg border border-primary-200 dark:border-primary-800 flex flex-wrap items-center gap-2 bg-white/95 dark:bg-surface-900/95 backdrop-blur-md"
                         role="region" aria-label="고른 직원에게 할 일">
                         <span className="text-sm font-semibold text-surface-900 dark:text-surface-100 tabular-nums mr-auto">{pickedMembers.length}명 고름</span>
                         <label htmlFor="bulk-team" className="sr-only">고른 직원의 팀 지정</label>
@@ -306,7 +306,10 @@ export default function EmployeeManager() {
                         {pickedPending.length > 0 && (
                             <button type="button" className="btn-primary btn-sm min-h-[48px] px-3"
                                 onClick={() => void bulkSendInvites(pickedPending).then((ok) => { if (ok) setSelected(new Set()); })}>
-                                ✉️ 초대 메일 보내기 ({pickedPending.length}명)
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" aria-hidden="true">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" />
+                                </svg>
+                                <span>초대 메일 보내기 ({pickedPending.length}명)</span>
                             </button>
                         )}
                         {pickedPending.length > 0 && (
