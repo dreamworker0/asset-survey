@@ -343,7 +343,11 @@ service cloud.firestore {
     }
 
     match /assets/{assetId} {
-      allow read: if isSuperAdmin() || isOrgMember(resource.data.organizationId);
+      // 아직 없는 재물(resource == null)은 문서 ID 앞부분(기관ID__)이 내 기관일 때만 확인할 수 있다.
+      // 직접 등록 전 '같은 코드가 있나' 확인(createAssetManually)이 null 오류로 막히지 않게 한다.
+      allow read: if isSuperAdmin()
+                  || (resource != null && isOrgMember(resource.data.organizationId))
+                  || (resource == null && isSignedIn() && assetId.matches(request.auth.token.orgId + '__.+'));
       allow create: if (isSuperAdmin() || isOrgAdmin(request.resource.data.organizationId))
                     && assetId.matches(request.resource.data.organizationId + '__.+')
                     && assetDataValid(request.resource.data)
