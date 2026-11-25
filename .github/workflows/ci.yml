@@ -263,9 +263,23 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         # 비밀값은 환경 변수로 넘겨 그대로 쓴다 — `echo "${{ secrets.X }}"`로 쓰면 값 안의 백틱·$가
         # 셸에서 해석돼 파일이 깨진다(2026-11-21 첫 CI: .env 주석의 백틱 때문에 빌드 실패).
+        # 포크 PR에는 GitHub가 비밀값을 넘기지 않는다 — 그때만 에뮬레이터용 가짜 Firebase 값으로 빌드해
+        # 빌드·번들 예산·E2E(비로그인 화면 + 에뮬레이터 로그인)를 그대로 돌린다. 운영 Firebase에는 닿지 않는다.
+        # 저장소 안 실행에서 비밀값이 비면 예전처럼 빌드가 멈춘다(설정 사고를 조용히 넘기지 않게).
+        # 2026-11-25 외부 기여 #49가 빌드에서 멈춰 E2E를 못 돌고 저장소 브랜치로 옮겨야 했던 뒤 넣었다.
         env:
           ENV_FILE: ${{ secrets.ENV_FILE }}
-        run: printf '%s\n' "$ENV_FILE" > .env
+          FORK_PR: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
+        run: |
+          if [ -n "$ENV_FILE" ]; then
+            printf '%s\n' "$ENV_FILE" > .env
+          elif [ "$FORK_PR" = "true" ]; then
+            echo "::notice title=가짜 Firebase 설정으로 빌드::포크 PR이라 비밀값이 없어 .env.emulator.local.example의 가짜 값으로 빌드합니다. 운영 Firebase에는 닿지 않습니다."
+            grep -v '^VITE_USE_EMULATOR' .env.emulator.local.example > .env
+          else
+            echo "::error::ENV_FILE 비밀값이 비어 있습니다(포크 PR이 아닌데). 저장소 Settings → Secrets에서 확인하세요."
+            exit 1
+          fi
 
       - name: Build
         id: build
@@ -371,9 +385,23 @@ jobs:
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         # 비밀값은 환경 변수로 넘겨 그대로 쓴다 — `echo "${{ secrets.X }}"`로 쓰면 값 안의 백틱·$가
         # 셸에서 해석돼 파일이 깨진다(2026-11-21 첫 CI: .env 주석의 백틱 때문에 빌드 실패).
+        # 포크 PR에는 GitHub가 비밀값을 넘기지 않는다 — 그때만 에뮬레이터용 가짜 Firebase 값으로 빌드해
+        # 빌드·번들 예산·E2E(비로그인 화면 + 에뮬레이터 로그인)를 그대로 돌린다. 운영 Firebase에는 닿지 않는다.
+        # 저장소 안 실행에서 비밀값이 비면 예전처럼 빌드가 멈춘다(설정 사고를 조용히 넘기지 않게).
+        # 2026-11-25 외부 기여 #49가 빌드에서 멈춰 E2E를 못 돌고 저장소 브랜치로 옮겨야 했던 뒤 넣었다.
         env:
           ENV_FILE: ${{ secrets.ENV_FILE }}
-        run: printf '%s\n' "$ENV_FILE" > .env
+          FORK_PR: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
+        run: |
+          if [ -n "$ENV_FILE" ]; then
+            printf '%s\n' "$ENV_FILE" > .env
+          elif [ "$FORK_PR" = "true" ]; then
+            echo "::notice title=가짜 Firebase 설정으로 빌드::포크 PR이라 비밀값이 없어 .env.emulator.local.example의 가짜 값으로 빌드합니다. 운영 Firebase에는 닿지 않습니다."
+            grep -v '^VITE_USE_EMULATOR' .env.emulator.local.example > .env
+          else
+            echo "::error::ENV_FILE 비밀값이 비어 있습니다(포크 PR이 아닌데). 저장소 Settings → Secrets에서 확인하세요."
+            exit 1
+          fi
 
       - name: Build
         id: build
@@ -492,9 +520,23 @@ jobs:
         run: npm ci
 
       - name: Create .env file
+        # 포크 PR에는 GitHub가 비밀값을 넘기지 않는다 — 그때만 에뮬레이터용 가짜 Firebase 값으로 빌드해
+        # 빌드·번들 예산·E2E(비로그인 화면 + 에뮬레이터 로그인)를 그대로 돌린다. 운영 Firebase에는 닿지 않는다.
+        # 저장소 안 실행에서 비밀값이 비면 예전처럼 빌드가 멈춘다(설정 사고를 조용히 넘기지 않게).
+        # 2026-11-25 외부 기여 #49가 빌드에서 멈춰 E2E를 못 돌고 저장소 브랜치로 옮겨야 했던 뒤 넣었다.
         env:
           ENV_FILE: ${{ secrets.ENV_FILE }}
-        run: printf '%s\n' "$ENV_FILE" > .env
+          FORK_PR: ${{ github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name != github.repository }}
+        run: |
+          if [ -n "$ENV_FILE" ]; then
+            printf '%s\n' "$ENV_FILE" > .env
+          elif [ "$FORK_PR" = "true" ]; then
+            echo "::notice title=가짜 Firebase 설정으로 빌드::포크 PR이라 비밀값이 없어 .env.emulator.local.example의 가짜 값으로 빌드합니다. 운영 Firebase에는 닿지 않습니다."
+            grep -v '^VITE_USE_EMULATOR' .env.emulator.local.example > .env
+          else
+            echo "::error::ENV_FILE 비밀값이 비어 있습니다(포크 PR이 아닌데). 저장소 Settings → Secrets에서 확인하세요."
+            exit 1
+          fi
 
       - name: Build
         run: npm run build
